@@ -101,6 +101,8 @@ public class NetworkServicePendingMessagesSupervisorAgent extends FermatAgent {
             //todo: esta clase va en el layer, este no deberia saber si hay o no conexión.
             NetworkClientConnection networkClientConnection = networkServiceRoot.getConnection();
 
+
+            //todo: si pasa los 3 intentos de envio no mando todo el mensaje si no que mando el paquete de isOnline(Profile) -> este paquete no existe ni existe el processor en el server, hay que hacerlo.
             /*
              * For all destination in the message request a new connection
              */

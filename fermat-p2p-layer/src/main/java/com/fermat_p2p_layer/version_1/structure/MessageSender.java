@@ -24,6 +24,7 @@ public class MessageSender {
     private final P2PLayerPluginRoot p2PLayerPluginRoot;
 
     /**
+     * this map is for the outgoing messages quienes no retornó el ack aún,
      * PackageId + NetworkServiceType
      */
     private ConcurrentHashMap<UUID,NetworkServiceType> messagesSentWaitingForAck;
@@ -45,7 +46,6 @@ public class MessageSender {
     public UUID sendMessage(NetworkServiceMessage networkServiceMessage, NetworkServiceType networkServiceType, String nodeDestinationPublicKey) throws CantSendMessageException {
         //todo: ver porqué el ultimo parametro del metodo sendMessage es el destination del actor,ns o lo que sea. ver si agrego el nodo ahí o que hago
         UUID packageId = p2PLayerPluginRoot.getNetworkClient().sendMessage(networkServiceMessage, PackageType.MESSAGE_TRANSMIT,networkServiceType,networkServiceMessage.getReceiverPublicKey());
-
         if (packageId != null)
             messagesSentWaitingForAck.put(packageId,networkServiceType);
         return packageId;
