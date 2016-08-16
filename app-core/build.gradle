@@ -1,0 +1,27 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    testCompile 'junit:junit:4.12'
+    compile project(':IoPClient')
+    compile project(':fermat-osa-addon-android-file-system-bitdubai')
+    compile files('libs/fermat-pip-addon-platform-service-event-manager-bitdubai-2.0.jar')
+    compile files('libs/fermat-pip-addon-platform-service-error-manager-bitdubai-1.0.jar')
+}
