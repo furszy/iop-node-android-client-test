@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface MessageReceiver {
 
-    void onMessageReceived(String chatMetadataRecord);
+    void onMessageReceived(String sender,String chatMetadataRecord);
 
     void onActorListReceived(List<ActorProfile> list);
 

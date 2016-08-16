@@ -124,7 +124,8 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
             System.out.println("----------------------------\n" + "CONVIERTIENDO MENSAJE ENTRANTE A GSON: " + newFermatMessageReceive.toJson() + "\n-------------------------------------------------");
 
             if (messageReceiver!=null){
-                messageReceiver.onMessageReceived(newFermatMessageReceive.getContent());
+
+                messageReceiver.onMessageReceived(newFermatMessageReceive.getSenderPublicKey(),newFermatMessageReceive.getContent());
             }
 
 //            JsonObject messageData = EncodeMsjContent.decodeMsjContent(newFermatMessageReceive);

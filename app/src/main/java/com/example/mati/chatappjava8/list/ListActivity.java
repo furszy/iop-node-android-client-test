@@ -1,6 +1,10 @@
 package com.example.mati.chatappjava8.list;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -104,8 +108,24 @@ public class ListActivity extends AppCompatActivity implements MessageReceiver, 
     }
 
     @Override
-    public void onMessageReceived(String chatMetadataRecord) {
+    public void onMessageReceived(String senderPk,String chatMetadataRecord) {
+        pushNotification();
+    }
 
+    void pushNotification(){
+        Intent intent = new Intent(getApplicationContext(), ChatActivity2.class);
+        PendingIntent pi = PendingIntent
+                .getActivity(this, 0, intent, 0);
+        Notification.Builder builder = new Notification.Builder(this).setTicker("ticker")
+                .setPriority(Notification.PRIORITY_LOW).setAutoCancel(true)
+                .setAutoCancel(true)
+                .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000})
+                .setLights(Color.YELLOW, 3000, 3000)
+                .setContentIntent(pi)
+                .setWhen(System.currentTimeMillis());
+        NotificationManager notificationManager = (NotificationManager)
+                getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.notify(3,builder.build());
     }
 
     @Override
