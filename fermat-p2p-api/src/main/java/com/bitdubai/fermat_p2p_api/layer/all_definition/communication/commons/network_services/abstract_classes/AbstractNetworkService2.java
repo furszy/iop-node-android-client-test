@@ -533,22 +533,22 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
 
             NetworkServiceMessage networkServiceMessageOld;
 
-            try {
-                networkServiceMessageOld = networkServiceConnectionManager.getIncomingMessagesDao().findById(networkServiceMessage.getId().toString());
-                if(networkServiceMessageOld!=null && networkServiceMessageOld.equals(networkServiceMessage)) {
-                    System.out.println("***************** MESSAGE DUPLICATED. IGNORING MESSAGE *****************");
-                    return;
-                }
+//            try {
+//                networkServiceMessageOld = networkServiceConnectionManager.getIncomingMessagesDao().findById(networkServiceMessage.getId().toString());
+//                if(networkServiceMessageOld!=null && networkServiceMessageOld.equals(networkServiceMessage)) {
+//                    System.out.println("***************** MESSAGE DUPLICATED. IGNORING MESSAGE *****************");
+//                    return;
+//                }
 
-                if(networkServiceMessageOld!=null){
-                    System.out.println("***************** ID DUPLICATED. GENERATING A NEW ONE *****************");
-                    networkServiceMessage.setId(UUID.randomUUID());
-                }
-            }catch(CantReadRecordDataBaseException | RecordNotFoundException e){
-                e.printStackTrace();
-            }
+//                if(networkServiceMessageOld!=null){
+//                    System.out.println("***************** ID DUPLICATED. GENERATING A NEW ONE *****************");
+//                    networkServiceMessage.setId(UUID.randomUUID());
+//                }
+//            }catch(CantReadRecordDataBaseException | RecordNotFoundException e){
+//                e.printStackTrace();
+//            }
 
-            networkServiceConnectionManager.getIncomingMessagesDao().create(networkServiceMessage);
+//            networkServiceConnectionManager.getIncomingMessagesDao().create(networkServiceMessage);
             onNewMessageReceived(networkServiceMessage);
 
         } catch (Exception e) {

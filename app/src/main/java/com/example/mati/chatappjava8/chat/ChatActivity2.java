@@ -1,5 +1,6 @@
 package com.example.mati.chatappjava8.chat;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,12 +17,15 @@ import com.example.mati.app_core.Core;
 import com.example.mati.chatappjava8.IntentConstants;
 import com.example.mati.chatappjava8.R;
 
+import org.iop.ns.chat.structure.test.MessageReceiver;
+
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
-public class ChatActivity2 extends AppCompatActivity  {
+public class ChatActivity2 extends AppCompatActivity implements MessageReceiver {
 
     private EditText messageET;
     private RecyclerView messagesContainer;
@@ -42,9 +46,16 @@ public class ChatActivity2 extends AppCompatActivity  {
             remote = Core.getInstance().getLastRemoteProfile();
         }
 
-        setContentView(R.layout.activity_chat_2);
-        initControls();
+        if(remote==null){
+            new AlertDialog.Builder(this).setTitle("Remote profile null, please go back to the actors list and pick one before chat").show();
+        }else {
 
+            setContentView(R.layout.activity_chat_2);
+            initControls();
+
+        }
+
+        Core.getInstance().setReceiver(this);
 
     }
 
@@ -97,10 +108,16 @@ public class ChatActivity2 extends AppCompatActivity  {
         });
     }
 
-    public void displayMessage(ChatMessage message) {
-        adapter.addItem(message);
-        adapter.notifyDataSetChanged();
-        scroll();
+    public void displayMessage(final ChatMessage message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                adapter.addItem(message);
+                adapter.notifyDataSetChanged();
+                scroll();
+            }
+        });
+
     }
 
     private void scroll() {
@@ -134,4 +151,19 @@ public class ChatActivity2 extends AppCompatActivity  {
     }
 
 
+    @Override
+    public void onMessageReceived(String content) {
+        Random random = new Random();
+        ChatMessage chatMessage = new ChatMessage();
+        chatMessage.setId(random.nextInt());//dummy
+        chatMessage.setMessage(content);
+        chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
+        chatMessage.setMe(false);
+        displayMessage(chatMessage);
+    }
+
+    @Override
+    public void onActorListReceived(List<ActorProfile> list) {
+
+    }
 }

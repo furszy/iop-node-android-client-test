@@ -520,7 +520,7 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                         destinationIdentityPublicKey
                 );
 
-                networkClientCommunicationChannel.getClientConnection().getAsyncRemote().sendObject(pack).get();
+                networkClientCommunicationChannel.getClientConnection().getBasicRemote().sendObject(pack);
 
                 return pack.getPackageId();
             } catch (Exception exception) {
@@ -601,7 +601,7 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                         serverIdentity
                 );
 
-                networkClientCommunicationChannel.getClientConnection().getAsyncRemote().sendObject(
+                networkClientCommunicationChannel.getClientConnection().getBasicRemote().sendObject(
                         packagea
                 );
 

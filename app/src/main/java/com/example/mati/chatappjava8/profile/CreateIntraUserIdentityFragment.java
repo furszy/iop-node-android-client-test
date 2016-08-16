@@ -2,13 +2,17 @@ package com.example.mati.chatappjava8.profile;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
@@ -38,6 +42,9 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.pr
 import com.example.mati.app_core.Core;
 import com.example.mati.chatappjava8.R;
 import com.example.mati.chatappjava8.list.ListActivity;
+import com.example.mati.chatappjava8.util.BitmapWorkerTask;
+import com.example.mati.chatappjava8.util.CircleTransform;
+import com.squareup.picasso.Picasso;
 
 import org.iop.ns.chat.ChatNetworkServicePluginRoot;
 
@@ -92,6 +99,7 @@ public class CreateIntraUserIdentityFragment extends Fragment {
     ExecutorService executorService;
 
     private ChatNetworkServicePluginRoot manager;
+    private ActorProfile identity;
 
     public static CreateIntraUserIdentityFragment newInstance(ChatNetworkServicePluginRoot chatNetworkServicePluginRoot) {
         CreateIntraUserIdentityFragment createIntraUserIdentityFragment = new CreateIntraUserIdentityFragment();
@@ -102,18 +110,8 @@ public class CreateIntraUserIdentityFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         executorService = Executors.newFixedThreadPool(3);
-        try {
-
-
-//            if(moduleManager.getAllIntraWalletUsersFromCurrentDeviceUser().isEmpty()){
-//                moduleManager.createNewIntraWalletUser("John Doe", null);
-//            }
-
-        } catch (Exception ex) {
-
-        }
+        identity = Core.getInstance().getProfile();
     }
 
     @Override
@@ -168,10 +166,13 @@ public class CreateIntraUserIdentityFragment extends Fragment {
             public void onClick(View view) {
 //                CommonLogger.debug(TAG, "Entrando en createButton.setOnClickListener");
 
-
-                if (CREATE_IDENTITY_SUCCESS==createNewIdentity()){
-                    Intent intent = new Intent(getActivity(),ListActivity.class);
-                    startActivity(intent);
+                if (identity==null) {
+                    if (CREATE_IDENTITY_SUCCESS == createNewIdentity()) {
+                        Intent intent = new Intent(getActivity(), ListActivity.class);
+                        startActivity(intent);
+                    }
+                }else{
+                    new AlertDialog.Builder(getActivity()).setTitle("Identity exist, shutdown the app to change your identity").show();
                 }
 
 
@@ -215,71 +216,41 @@ public class CreateIntraUserIdentityFragment extends Fragment {
     }
 
     private void setUpIdentity() {
-        try {
+        try {//
 
-//            identitySelected = (IntraUserModuleIdentity) appSession.getData(SessionConstants.IDENTITY_SELECTED);
-//
-//
-//            if (identitySelected != null) {
-//                loadIdentity();
-//            } else {
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        ActiveActorIdentityInformation activeActorIdentityInformation = null;
-//                        try {
-//                            activeActorIdentityInformation = appSession.getModuleManager().getSelectedActorIdentity();
-//                        } catch (CantGetSelectedActorIdentityException e) {
-//                            e.printStackTrace();
-//                        } catch (ActorIdentityNotSelectedException e) {
-//                            e.printStackTrace();
-//                        }
-//                        if(activeActorIdentityInformation!=null){
-//                            identitySelected = (IntraUserModuleIdentity) activeActorIdentityInformation;
-//                        }
-//                        getActivity().runOnUiThread(new Runnable() {
-//                                                        @Override
-//                                                        public void run() {
-//                                                            if (identitySelected != null) {
-//                                                                loadIdentity();
-//                                                                isUpdate = true;
-//                                                                createButton.setText("Save changes");
-//                                                                createButton.setBackgroundColor(Color.parseColor("#7DD5CA"));
-//                                                            }
-//                                                        }
-//                                                    }
-//                        );
-//
-//                    }
-//                }).start();
-//
-//            }
+            if (identity != null) {
+                loadIdentity();
+                isUpdate = true;
+                createButton.setText("Save changes");
+                createButton.setBackgroundColor(Color.parseColor("#7DD5CA"));
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private void loadIdentity(){
-//        if (identitySelected.getImage() != null) {
-//            Bitmap bitmap = null;
-//            if (identitySelected.getImage().length > 0) {
-//                bitmap = BitmapFactory.decodeByteArray(identitySelected.getImage(), 0, identitySelected.getImage().length);
-//                BitmapWorkerTask bitmapWorkerTask = new BitmapWorkerTask(mphoto_header,getResources(),false);
-//                bitmapWorkerTask.execute(identitySelected.getImage());
-//                mphoto_header.setAlpha(150);
-////                bitmap = Bitmap.createScaledBitmap(bitmap, mBrokerImage.getWidth(), mBrokerImage.getHeight(), true);
-//            } else {
+        if (identity.getPhoto() != null) {
+            Bitmap bitmap = null;
+            if (identity.getPhoto().length > 0) {
+                bitmap = BitmapFactory.decodeByteArray(identity.getPhoto(), 0, identity.getPhoto().length);
+                BitmapWorkerTask bitmapWorkerTask = new BitmapWorkerTask(mphoto_header,getResources(),0,true);
+                bitmapWorkerTask.execute(identity.getPhoto());
+                mphoto_header.setAlpha(150);
+//                bitmap = Bitmap.createScaledBitmap(bitmap, mBrokerImage.getWidth(), mBrokerImage.getHeight(), true);
+            } else {
 //                bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_profile_male);
 //
 //                Picasso.with(getActivity()).load(R.drawable.ic_profile_male).into(mphoto_header);
-//            }
-//            bitmap = Bitmap.createScaledBitmap(bitmap, 100, 100, true);
-//            brokerImageByteArray = toByteArray(bitmap);
-//            mBrokerImage.setImageDrawable(ImagesUtils.getRoundedBitmap(getResources(), bitmap));
-//
-//        }
-//        mBrokerName.setText(identitySelected.getAlias());
-//        mBrokerPhrase.setText(identitySelected.getPhrase());
+            }
+            bitmap = Bitmap.createScaledBitmap(bitmap, 100, 100, true);
+            brokerImageByteArray = toByteArray(bitmap);
+            mBrokerImage.setImageDrawable(ImagesUtils.getRoundedBitmap(getResources(), bitmap));
+
+        }
+        mBrokerName.setText(identity.getName());
+        mBrokerPhrase.setText(identity.getExtraData());
     }
 
     @Override
@@ -366,29 +337,29 @@ public class CreateIntraUserIdentityFragment extends Fragment {
 
                     break;
                 case REQUEST_LOAD_IMAGE:
-                 //   Uri selectedImage = data.getData();
-                 //   try {
-                 //       if (isAttached) {
-                 //           ContentResolver contentResolver = getActivity().getContentResolver();
-                 //           imageBitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImage);
-                 //           imageBitmap = Bitmap.createScaledBitmap(imageBitmap, mBrokerImage.getWidth(), mBrokerImage.getHeight(), true);
-                 //           brokerImageByteArray = toByteArray(imageBitmap);
-                 //           updateProfileImage = true;
-                 //           Picasso.with(getActivity()).load(selectedImage).transform(new CircleTransform()).into(mBrokerImage);
-                 //       }
-                 //   } catch (Exception e) {
-                 //       e.printStackTrace();
-                 //       Toast.makeText(getActivity().getApplicationContext(), "Error cargando la imagen", Toast.LENGTH_SHORT).show();
-                 //   }
-
                     Uri selectedImage = data.getData();
                     try {
-//                        if (isAttached) {
-//                            ContentResolver contentResolver = getActivity().getContentResolver();
+                        if (isAdded()) {
+                            ContentResolver contentResolver = getActivity().getContentResolver();
+                            imageBitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImage);
+                            imageBitmap = Bitmap.createScaledBitmap(imageBitmap, mBrokerImage.getWidth(), mBrokerImage.getHeight(), true);
+                            brokerImageByteArray = toByteArray(imageBitmap);
+                            updateProfileImage = true;
+//                            Picasso.with(getActivity()).load(selectedImage).transform(new CircleTransform()).into(mBrokerImage);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(getActivity().getApplicationContext(), "Error cargando la imagen", Toast.LENGTH_SHORT).show();
+                    }
+
+//                    Uri selectedImage = data.getData();
+                    try {
+                        if (isAdded()) {
+                            ContentResolver contentResolver = getActivity().getContentResolver();
 //                            imageBitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImage);
-//                            //cryptoBrokerBitmap = Bitmap.createScaledBitmap(cryptoBrokerBitmap, mBrokerImage.getWidth(), mBrokerImage.getHeight(), true);
-//                            if (imageBitmap.getWidth() >= 192 && imageBitmap.getHeight() >= 192) {
-//                                // cryptoBrokerBitmap = ImagesUtils.cropImage(cryptoBrokerBitmap);
+                            //cryptoBrokerBitmap = Bitmap.createScaledBitmap(cryptoBrokerBitmap, mBrokerImage.getWidth(), mBrokerImage.getHeight(), true);
+                            if (imageBitmap.getWidth() >= 192 && imageBitmap.getHeight() >= 192) {
+                                // cryptoBrokerBitmap = ImagesUtils.cropImage(cryptoBrokerBitmap);
 //                                final DialogCropImage dialogCropImagee = new DialogCropImage(getActivity(), appSession, null, imageBitmap);
 //                                dialogCropImagee.show();
 //                                dialogCropImagee.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -408,13 +379,13 @@ public class CreateIntraUserIdentityFragment extends Fragment {
 //                                        }
 //                                    }
 //                                });
-//                            } else {
-//                                Toast.makeText(getActivity(), "The image selected is too small. Please select a photo with height and width of at least 192x192", Toast.LENGTH_LONG).show();
-//                                // cryptoBrokerBitmap = null;
-//                                // Toast.makeText(getActivity(), "The image selected is too small", Toast.LENGTH_SHORT).show();
-//                            }
-//
-//                        }
+                            } else {
+                                Toast.makeText(getActivity(), "The image selected is too small. Please select a photo with height and width of at least 192x192", Toast.LENGTH_LONG).show();
+                                // cryptoBrokerBitmap = null;
+                                // Toast.makeText(getActivity(), "The image selected is too small", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
                     } catch (Exception e) {
                        // errorManager.reportUnexpectedUIException(UISource.ACTIVITY, UnexpectedUIExceptionSeverity.UNSTABLE, FermatException.wrapException(e));
                         Toast.makeText(getActivity().getApplicationContext(), "Error loading the image", Toast.LENGTH_SHORT).show();
@@ -423,16 +394,16 @@ public class CreateIntraUserIdentityFragment extends Fragment {
                     break;
             }
 
-//            final Bitmap finalImageBitmap = imageBitmap;
-//            handler.post(new Runnable() {
-//                @Override
-//                public void run() {
-//                    if (mBrokerImage != null && finalImageBitmap != null) {
-////                        mBrokerImage.setImageDrawable(new BitmapDrawable(getResources(), finalImageBitmap));
-//                        mBrokerImage.setImageDrawable(ImagesUtils.getRoundedBitmap(getResources(), finalImageBitmap));
-//                    }
-//                }
-//            });
+            final Bitmap finalImageBitmap = imageBitmap;
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (mBrokerImage != null && finalImageBitmap != null) {
+//                        mBrokerImage.setImageDrawable(new BitmapDrawable(getResources(), finalImageBitmap));
+                        mBrokerImage.setImageDrawable(ImagesUtils.getRoundedBitmap(getResources(), finalImageBitmap));
+                    }
+                }
+            });
 
         }
         super.onActivityResult(requestCode, resultCode, data);

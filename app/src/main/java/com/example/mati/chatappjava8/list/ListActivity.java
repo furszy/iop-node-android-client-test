@@ -68,9 +68,6 @@ public class ListActivity extends AppCompatActivity implements MessageReceiver, 
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         this.recyclerView.setLayoutManager(linearLayoutManager);
         List<ActorProfile>  list = new ArrayList<>();
-        ActorProfile actorProfile = new ActorProfile();
-        actorProfile.setName("mati");
-        list.add(actorProfile);
         listAdapter = new ListAdapter(getApplicationContext(),list);
         listAdapter.setFermatListEventListener(this);
         this.recyclerView.setAdapter(listAdapter);

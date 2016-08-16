@@ -1,6 +1,7 @@
 package com.example.mati.chatappjava8.list;
 
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bitdubai.fermat_api.layer.all_definition.navigation_structure.interfaces.FermatHeader;
@@ -13,6 +14,7 @@ import com.example.mati.chatappjava8.chat.FermatViewHolder;
 public class ActorHolder extends FermatViewHolder {
 
     TextView textView_name;
+    ImageView img_photo;
 
     /**
      * Constructor
@@ -22,5 +24,6 @@ public class ActorHolder extends FermatViewHolder {
     protected ActorHolder(View itemView) {
         super(itemView);
         this.textView_name = (TextView) itemView.findViewById(R.id.txt_name);
+        this.img_photo = (ImageView) itemView.findViewById(R.id.img_photo);
     }
 }
