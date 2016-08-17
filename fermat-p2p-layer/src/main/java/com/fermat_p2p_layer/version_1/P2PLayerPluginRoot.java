@@ -360,6 +360,7 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
     public UUID sendMessage(NetworkServiceMessage packageContent, NetworkServiceType networkServiceType,String nodeDestinationPublicKey) throws CantSendMessageException {
         System.out.println("***P2PLayer Method sendMessage..");
         //todo: me faltan cosas
+        if (packageContent.getSenderPublicKey().equals(packageContent.getReceiverPublicKey())) throw new CantSendMessageException("Sender and Receiver are the same");
         return messageSender.sendMessage(packageContent,networkServiceType,nodeDestinationPublicKey);
     }
 
@@ -369,6 +370,7 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
         //todo: me faltan cosas
         return messageSender.sendDiscoveryMessage(packageContent,networkServiceType,nodeDestinationPublicKey);
     }
+
 
     /**
      * Handle the event CompleteComponentConnectionRequestNotificationEvent
