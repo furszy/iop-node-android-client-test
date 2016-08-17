@@ -21,6 +21,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.pr
 import com.example.mati.app_core.Core;
 import com.example.mati.chatappjava8.IntentConstants;
 import com.example.mati.chatappjava8.R;
+import com.example.mati.chatappjava8.commons.Notifications;
 
 import org.iop.ns.chat.structure.test.MessageReceiver;
 
@@ -167,7 +168,7 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
             chatMessage.setMe(false);
             displayMessage(chatMessage);
         }else {
-            pushNotification(senderPk);
+            Notifications.pushNotification(this,content);
         }
     }
 
@@ -176,20 +177,4 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
 
     }
 
-    void pushNotification(String senderPk){
-        Intent intent = new Intent(getApplicationContext(), ChatActivity2.class);
-        PendingIntent pi = PendingIntent
-                .getActivity(this, 0, intent, 0);
-        Notification.Builder builder = new Notification.Builder(this).setTicker("ticker")
-                .setContentTitle("New Message received!").setSubText("Message from: "+senderPk)
-                .setPriority(Notification.PRIORITY_LOW).setAutoCancel(true)
-                .setAutoCancel(true)
-                .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000})
-                .setLights(Color.YELLOW, 3000, 3000)
-                .setContentIntent(pi)
-                .setWhen(System.currentTimeMillis());
-        NotificationManager notificationManager = (NotificationManager)
-                getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.notify(3,builder.build());
-    }
 }
