@@ -30,8 +30,10 @@ public class Core {
 
     private static Core instance = new Core();
 
-    private ActorProfile profile;
+
     ChatNetworkServicePluginRoot chatNetworkServicePluginRoot;
+    IoPClientPluginRoot ioPClientPluginRoot;
+    private ActorProfile profile;
     private ActorProfile lastRemoteProfile;
 
     private Core() {
@@ -81,18 +83,18 @@ public class Core {
             p2PLayerPluginRoot.start();
 
             //node
-            IoPClientPluginRoot ioPNodePluginRoot = new IoPClientPluginRoot();
-            ioPNodePluginRoot.setPluginFileSystem((PluginFileSystem) pluginFileSystemLinuxAddonRoot.getManager());
-            ioPNodePluginRoot.setEventManager((EventManager) eventManagerPlatformServiceAddonRoot.getManager());
-            ioPNodePluginRoot.setP2PLayerManager(p2PLayerPluginRoot);
-            ioPNodePluginRoot.start();
+            ioPClientPluginRoot = new IoPClientPluginRoot();
+            ioPClientPluginRoot.setPluginFileSystem((PluginFileSystem) pluginFileSystemLinuxAddonRoot.getManager());
+            ioPClientPluginRoot.setEventManager((EventManager) eventManagerPlatformServiceAddonRoot.getManager());
+            ioPClientPluginRoot.setP2PLayerManager(p2PLayerPluginRoot);
+            ioPClientPluginRoot.start();
 
 
 
             //console ns
             chatNetworkServicePluginRoot = new ChatNetworkServicePluginRoot();
             chatNetworkServicePluginRoot.setP2PLayerManager(p2PLayerPluginRoot);
-            chatNetworkServicePluginRoot.setNetworkClientManager(ioPNodePluginRoot);
+            chatNetworkServicePluginRoot.setNetworkClientManager(ioPClientPluginRoot);
             chatNetworkServicePluginRoot.setEventManager((EventManager) eventManagerPlatformServiceAddonRoot.getManager());
             chatNetworkServicePluginRoot.setPluginFileSystem((PluginFileSystem) pluginFileSystemLinuxAddonRoot.getManager());
             chatNetworkServicePluginRoot.setErrorManager((ErrorManager) errorManagerPlatformServiceAddonRoot.getManager());
@@ -151,7 +153,10 @@ public class Core {
     }
 
     public void setProfile(ActorProfile profile) {
-        this.profile = profile;
+        if (profile!=null) {
+            this.profile = profile;
+            chatNetworkServicePluginRoot.registerProfile(profile);
+        }
     }
 
     public ChatNetworkServicePluginRoot getChatNetworkServicePluginRoot() {
@@ -172,5 +177,9 @@ public class Core {
 
     public ActorProfile getLastRemoteProfile() {
         return this.lastRemoteProfile;
+    }
+
+    public boolean isConnected(){
+        return ioPClientPluginRoot.isConnected();
     }
 }

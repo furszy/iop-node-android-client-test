@@ -21,6 +21,8 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.ne
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceQuery;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.exceptions.RecordNotFoundException;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.exceptions.ActorAlreadyRegisteredException;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.exceptions.CantRegisterActorException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -390,6 +392,16 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
 
         System.out.println("method onNetworkServiceRegistered: chatNS");
 
+        for (ActorProfile myActorProfile : myActorProfiles) {
+            try {
+                registerActor(myActorProfile,0,0);
+            } catch (ActorAlreadyRegisteredException e) {
+                e.printStackTrace();
+            } catch (CantRegisterActorException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     public void setMessageReceiver(MessageReceiver messageReceiver) {
@@ -443,8 +455,8 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
         }
     }
 
-    public List<ActorProfile> getResult() {
-        return result;
+    public void registerProfile(ActorProfile actorProfile){
+        myActorProfiles.add(actorProfile);
     }
 
 }
