@@ -196,7 +196,7 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
             /*
              * Initialize the data base
              */
-//            initializeDataBase();
+            initializeDataBase();
 
 //            queriesDao = new QueriesDao(getDataBase());
 
@@ -965,6 +965,10 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
 
     public void setP2PLayerManager(P2PLayerManager p2PLayerManager) {
         this.p2PLayerManager = p2PLayerManager;
+    }
+
+    public void setPluginDatabaseSystem(PluginDatabaseSystem pluginDatabaseSystem){
+        this.pluginDatabaseSystem = pluginDatabaseSystem;
     }
 
 }

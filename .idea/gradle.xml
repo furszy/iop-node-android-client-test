@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/app-core" />
             <option value="$PROJECT_DIR$/console-network-service" />
             <option value="$PROJECT_DIR$/fermat-api" />
+            <option value="$PROJECT_DIR$/fermat-osa-addon-android-database-system-bitdubai" />
             <option value="$PROJECT_DIR$/fermat-osa-addon-android-file-system-bitdubai" />
             <option value="$PROJECT_DIR$/fermat-p2p-api" />
             <option value="$PROJECT_DIR$/fermat-p2p-layer" />

@@ -1,1 +1,1 @@
-include ':app', ':fermat-api', ':IoPClient', ':fermat-osa-addon-android-file-system-bitdubai', ':fermat-p2p-api', ':fermat-pip-api', ':fermat-p2p-layer', ':console-network-service', ':app-core'
+include ':app', ':fermat-api', ':IoPClient', ':fermat-osa-addon-android-file-system-bitdubai', ':fermat-p2p-api', ':fermat-pip-api', ':fermat-p2p-layer', ':console-network-service', ':app-core', 'fermat-osa-addon-android-database-system-bitdubai'
