@@ -106,6 +106,7 @@ public class NetworkClientCommunicationChannel {
         registerMessageProcessor(new CheckInClientRespondProcessor(this));
         registerMessageProcessor(new CheckInActorRespondProcessor(this));
         registerMessageProcessor(new CheckInNetworkServiceRespondProcessor(this));
+        registerMessageProcessor(new IsActorOnlineRespondProcessor(this));
 
 
     }

@@ -6,9 +6,14 @@ import com.bitdubai.fermat_api.FermatAgent;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.error_manager.enums.UnexpectedPluginExceptionSeverity;
 import com.bitdubai.fermat_api.layer.all_definition.enums.AgentStatus;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.NetworkClientConnection;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.P2PLayerManager;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.IsActorOnlineMsgRequest;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.ProfileStatus;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.abstract_classes.AbstractNetworkService;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.abstract_classes.AbstractNetworkService2;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.constants.NetworkServiceDatabaseConstants;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.factories.NetworkServiceMessageFactory;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.NetworkServiceProfile;
 import com.bitdubai.fermat_p2p_api.layer.p2p_communication.MessagesStatus;
@@ -17,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -35,20 +41,22 @@ import java.util.concurrent.TimeUnit;
  */
 public class NetworkServicePendingMessagesSupervisorAgent extends FermatAgent {
 
-    private AbstractNetworkService networkServiceRoot;
+    private AbstractNetworkService2 networkServiceRoot;
     private ScheduledExecutorService scheduledThreadPool;
     private List<ScheduledFuture> scheduledFutures;
+    private Map<String, ProfileStatus> actorProfileStatus;
 
     /**
      * Constructor with parameter
      *
      * @param networkServiceRoot
      */
-    public NetworkServicePendingMessagesSupervisorAgent(final AbstractNetworkService networkServiceRoot){
+    public NetworkServicePendingMessagesSupervisorAgent(final AbstractNetworkService2 networkServiceRoot){
 
         super();
         this.networkServiceRoot = networkServiceRoot;
         this.status             = AgentStatus.CREATED;
+        this.actorProfileStatus = new HashMap<>();
     }
 
     /**
@@ -99,8 +107,10 @@ public class NetworkServicePendingMessagesSupervisorAgent extends FermatAgent {
              */
             Map<String, Boolean> receivers = networkServiceRoot.getNetworkServiceConnectionManager().getOutgoingMessagesDao().findByFailCount(countFail, countFailMax);
             //todo: esta clase va en el layer, este no deberia saber si hay o no conexión.
-            NetworkClientConnection networkClientConnection = networkServiceRoot.getConnection();
-
+            P2PLayerManager p2PLayerManager = networkServiceRoot.getConnection();
+            boolean sendingFlag;
+            IsActorOnlineMsgRequest isActorOnlineMsgRequest;
+            //ProfileStatus actorProfileStatus;
 
             //todo: si pasa los 3 intentos de envio no mando todo el mensaje si no que mando el paquete de isOnline(Profile) -> este paquete no existe ni existe el processor en el server, hay que hacerlo.
             /*
@@ -108,28 +118,72 @@ public class NetworkServicePendingMessagesSupervisorAgent extends FermatAgent {
              */
             for (Map.Entry<String, Boolean> receiver : receivers.entrySet()) {
 
-                if (networkClientConnection.isConnected()) {
+                //if (networkClientConnection.isConnected()) {
 
-                    if (receiver.getValue()) {
-                        ActorProfile remoteParticipant = new ActorProfile();
-                        remoteParticipant.setIdentityPublicKey(receiver.getKey());
-                        //
+                if (receiver.getValue()) {
+                    ActorProfile remoteParticipant = new ActorProfile();
+                    remoteParticipant.setIdentityPublicKey(receiver.getKey());
+                    //
 //                        networkServiceRoot.getNetworkServiceConnectionManager().connectTo(remoteParticipant);
+                    //If the count fail is upper to 3 I'll ask if the actor is online before to send the message
+                    if(countFail>3){
+                        if(actorProfileStatus.get(receiver.getKey())==ProfileStatus.ONLINE){
+                            //The actor is online, I'll try to send the message
+                            sendingFlag = true;
+                        } else {
+                            //The actor is not online, I'll ask if is online
+                            sendingFlag = false;
+                            isActorOnlineMsgRequest = new IsActorOnlineMsgRequest(
+                                    UUID.randomUUID(),
+                                    remoteParticipant);
+                            p2PLayerManager.sendIsOnlineActorMessage(
+                                    isActorOnlineMsgRequest,
+                                    networkServiceRoot.getNetworkServiceType(),
+                                    null);
+                        }
                     } else {
-
-                        NetworkServiceProfile remoteParticipant = new NetworkServiceProfile();
-                        remoteParticipant.setIdentityPublicKey(receiver.getKey());
-
-                        networkServiceRoot.getNetworkServiceConnectionManager().connectTo(remoteParticipant);
+                        //The count fail is 3 or minor, I'll try to send the message
+                        sendingFlag = true;
                     }
+                    if(sendingFlag){
+                        List<NetworkServiceMessage> pendingToSendMessagesByReceiverPublicKey =
+                                networkServiceRoot
+                                        .getNetworkServiceConnectionManager()
+                                        .getOutgoingMessagesDao()
+                                        .findPendingToSendMessagesByReceiverPublicKey(receiver.getKey());
+                        for(NetworkServiceMessage networkServiceMessage : pendingToSendMessagesByReceiverPublicKey){
+                            p2PLayerManager.sendMessage(
+                                    networkServiceMessage,
+                                    networkServiceMessage.getNetworkServiceType(),
+                                    null);
+                        }
+                        actorProfileStatus.put(receiver.getKey(),ProfileStatus.UNKNOWN);
+                    }
+                } else {
+
+                    NetworkServiceProfile remoteParticipant = new NetworkServiceProfile();
+                    remoteParticipant.setIdentityPublicKey(receiver.getKey());
+
+                    networkServiceRoot.getNetworkServiceConnectionManager().connectTo(remoteParticipant);
                 }
+
             }
+            //}
 
         } catch (Exception e) {
             System.out.println("NetworkServicePendingMessagesSupervisorAgent ("+networkServiceRoot.getProfile().getNetworkServiceType()+") - processPendingOutgoingMessage detect a error: "+e.getMessage());
             networkServiceRoot.reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
         }
 
+    }
+
+    /**
+     * This method puts the profile status from an actor in agent internal map
+     * @param actorPublicKey
+     * @param profileStatus
+     */
+    public void putActorOnlineStatus(String actorPublicKey, ProfileStatus profileStatus){
+        actorProfileStatus.put(actorPublicKey, profileStatus);
     }
 
     @Override

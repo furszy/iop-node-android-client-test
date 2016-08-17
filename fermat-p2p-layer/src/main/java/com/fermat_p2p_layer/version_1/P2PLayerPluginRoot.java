@@ -14,18 +14,29 @@ import com.bitdubai.fermat_api.layer.all_definition.events.interfaces.FermatEven
 import com.bitdubai.fermat_api.layer.all_definition.events.interfaces.FermatEventListener;
 import com.bitdubai.fermat_api.layer.all_definition.network_service.enums.NetworkServiceType;
 import com.bitdubai.fermat_api.layer.all_definition.util.Version;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.*;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientACKEvent;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientActorListReceivedEvent;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientConnectionLostEvent;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientIsActorOnlineEvent;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientNewMessageFailedEvent;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientNewMessageTransmitEvent;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientProfileRegisteredEvent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantSendMessageException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.NetworkChannel;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.P2PLayerManager;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.ActorListMsgRequest;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.IsActorOnlineMsgRequest;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.respond.MsgRespond;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.UpdateTypes;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.abstract_classes.AbstractNetworkService2;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.P2pEventType;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.events.*;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.events.ClientConnectionCloseNotificationEvent;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.events.CompleteComponentConnectionRequestNotificationEvent;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.events.FailureComponentConnectionRequestNotificationEvent;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.events.VPNConnectionCloseNotificationEvent;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.events.VPNConnectionLooseNotificationEvent;
 import com.fermat_p2p_layer.version_1.structure.MessageSender;
 
 import java.util.Collection;
@@ -282,6 +293,7 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
                     } else {
                         //mensaje no llegó, acá entra en juego el agente de re envio manuel
                         System.out.println("##### ACK MENSAJE NO LLEGÓ AL OTRO LADO ##### ID:" + fermatEvent.getContent().getPackageId());
+                        abstractNetworkService2.startNetworkServicePendingMessagesSupervisorAgent();
                         abstractNetworkService2.handleOnMessageSent(fermatEvent.getContent().getPackageId());
                     }
                 }else System.out.println("##### ACK MENSAJE p2p layer, ns is not started. ID:" + fermatEvent.getContent().getPackageId());
@@ -290,6 +302,29 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
         });
         eventManager.addListener(ackEventListener);
         listenersAdded.add(ackEventListener);
+
+        /**
+         * Is Online listener
+         */
+        FermatEventListener isOnlineListener = eventManager.getNewListener(P2pEventType.NETWORK_CLIENT_IS_ACTOR_ONLINE);
+        isOnlineListener.setEventHandler(new FermatEventHandler<NetworkClientIsActorOnlineEvent>() {
+            @Override
+            public void handleEvent(NetworkClientIsActorOnlineEvent fermatEvent) throws FermatException {
+                System.out.println("Is Online message is in P2PLayer with ID: "+fermatEvent.getPackageId());
+                //Todo: notify to anyone.
+                NetworkServiceType networkServiceType = messageSender.packageAck(fermatEvent.getPackageId());
+                AbstractNetworkService2 abstractNetworkService2 = networkServices.get(networkServiceType);
+                if(abstractNetworkService2.isStarted()){
+                    System.out.println("The actor "+fermatEvent.getActorProfile().getAlias()+" is "+fermatEvent.getProfileStatus());
+                    abstractNetworkService2.putActorOnlineStatus(
+                            fermatEvent.getActorProfile().getIdentityPublicKey(),
+                            fermatEvent.getProfileStatus());
+                }
+            }
+        });
+        eventManager.addListener(isOnlineListener);
+        listenersAdded.add(isOnlineListener);
+
     }
 
 
@@ -383,6 +418,18 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
         return messageSender.sendDiscoveryMessage(packageContent,networkServiceType,nodeDestinationPublicKey);
     }
 
+    @Override
+    public UUID sendIsOnlineActorMessage(
+            IsActorOnlineMsgRequest isActorOnlineMsgRequest,
+            NetworkServiceType networkServiceType,
+            String nodeDestinationPublicKey) throws CantSendMessageException {
+        System.out.println("***P2PLayer Method sendIsOnlineActorMessage...");
+        return messageSender.sendIsOnlineActorMessage(
+                isActorOnlineMsgRequest,
+                networkServiceType,
+                nodeDestinationPublicKey
+                );
+    }
 
     /**
      * Handle the event CompleteComponentConnectionRequestNotificationEvent

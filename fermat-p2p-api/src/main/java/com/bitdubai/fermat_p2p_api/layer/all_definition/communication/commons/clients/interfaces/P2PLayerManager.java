@@ -5,6 +5,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.cl
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.Package;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.PackageContent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.ActorListMsgRequest;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.IsActorOnlineMsgRequest;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.UpdateTypes;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.abstract_classes.AbstractNetworkService;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.abstract_classes.AbstractNetworkService2;
@@ -39,4 +40,17 @@ public interface P2PLayerManager {
      * @param nodeDestinationKey if this is nul the default value is the homeNode
      */
     UUID sendDiscoveryMessage(ActorListMsgRequest actorListMsgRequest, NetworkServiceType networkServiceType,@Nullable String nodeDestinationKey) throws CantSendMessageException;
+
+    /**
+     * This method sends an IsActorOnlineMsgRequest
+     * @param isActorOnlineMsgRequest
+     * @param networkServiceType
+     * @param nodeDestinationPublicKey if this is nul the default value is the homeNode
+     * @return
+     * @throws CantSendMessageException
+     */
+    UUID sendIsOnlineActorMessage(
+            IsActorOnlineMsgRequest isActorOnlineMsgRequest,
+            NetworkServiceType networkServiceType,
+            @Nullable  String nodeDestinationPublicKey) throws CantSendMessageException;
 }

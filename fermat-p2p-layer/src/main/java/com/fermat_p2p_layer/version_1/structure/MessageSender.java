@@ -5,6 +5,7 @@ import com.bitdubai.fermat_api.layer.all_definition.network_service.enums.Networ
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantRegisterProfileException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantSendMessageException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.ActorListMsgRequest;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.IsActorOnlineMsgRequest;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.NetworkServiceProfile;
@@ -46,6 +47,13 @@ public class MessageSender {
     public UUID sendMessage(NetworkServiceMessage networkServiceMessage, NetworkServiceType networkServiceType, String nodeDestinationPublicKey) throws CantSendMessageException {
         //todo: ver porqué el ultimo parametro del metodo sendMessage es el destination del actor,ns o lo que sea. ver si agrego el nodo ahí o que hago
         UUID packageId = p2PLayerPluginRoot.getNetworkClient().sendMessage(networkServiceMessage, PackageType.MESSAGE_TRANSMIT,networkServiceType,networkServiceMessage.getReceiverPublicKey());
+        if (packageId != null)
+            messagesSentWaitingForAck.put(packageId,networkServiceType);
+        return packageId;
+    }
+
+    public UUID sendIsOnlineActorMessage(IsActorOnlineMsgRequest isActorOnlineMsgRequest, NetworkServiceType networkServiceType, String nodeDestinationPublicKey) throws CantSendMessageException {
+        UUID packageId = p2PLayerPluginRoot.getNetworkClient().sendMessage(isActorOnlineMsgRequest, PackageType.MESSAGE_TRANSMIT,networkServiceType,nodeDestinationPublicKey);
         if (packageId != null)
             messagesSentWaitingForAck.put(packageId,networkServiceType);
         return packageId;
