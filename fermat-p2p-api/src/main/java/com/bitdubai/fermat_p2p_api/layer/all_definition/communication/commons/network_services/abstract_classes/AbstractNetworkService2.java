@@ -967,4 +967,8 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
         this.p2PLayerManager = p2PLayerManager;
     }
 
+    public void setPluginDatabaseSystem(PluginDatabaseSystem pluginDatabaseSystem){
+        this.pluginDatabaseSystem = pluginDatabaseSystem;
+    }
+
 }

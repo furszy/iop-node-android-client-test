@@ -5,7 +5,9 @@ import android.content.Context;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.ErrorManager;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.EventManager;
 import com.bitdubai.fermat_api.layer.all_definition.enums.Actors;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.Database;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.PluginDatabaseSystem;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.DatabaseNotFoundException;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginFileSystem;
 import com.bitdubai.fermat_osa_addon.layer.android.database_system.developer.bitdubai.version_1.PluginDatabaseSystemAndroidAddonRoot;
 import com.bitdubai.fermat_osa_addon.layer.android.file_system.developer.bitdubai.version_1.PluginFileSystemAndroidAddonRoot;
@@ -94,7 +96,7 @@ public class Core {
             chatNetworkServicePluginRoot.setEventManager((EventManager) eventManagerPlatformServiceAddonRoot.getManager());
             chatNetworkServicePluginRoot.setPluginFileSystem((PluginFileSystem) pluginFileSystemLinuxAddonRoot.getManager());
             chatNetworkServicePluginRoot.setErrorManager((ErrorManager) errorManagerPlatformServiceAddonRoot.getManager());
-            //chatNetworkServicePluginRoot.setDatabaseSystem((PluginDatabaseSystem) pluginDatabaseSystemAndroidAddonRoot.getManager());
+            chatNetworkServicePluginRoot.setPluginDatabaseSystem((PluginDatabaseSystem) pluginDatabaseSystemAndroidAddonRoot.getManager());
             chatNetworkServicePluginRoot.start();
 
             System.out.println("FERMAT - Network Client - started satisfactory...");
@@ -127,7 +129,20 @@ public class Core {
 
 
 //            chatNetworkServicePluginRoot.requestActorProfilesList();
-//Database test
+            //Database test
+            /*PluginDatabaseSystem pluginDatabaseSystem = (PluginDatabaseSystem) pluginDatabaseSystemAndroidAddonRoot.getManager();
+            Database database;
+            try{
+                database = pluginDatabaseSystem.openDatabase(
+                        UUID.fromString("b76064da-49f6-4121-b8f6-f614351bffb2"),
+                        "TestDatabase");
+            } catch(DatabaseNotFoundException e){
+                database = pluginDatabaseSystem.createDatabase(
+                        UUID.fromString("b76064da-49f6-4121-b8f6-f614351bffb2"),
+                        "TestDatabase");
+            }
+            System.out.println(database);*/
+
 
 
         }catch (Exception e){
