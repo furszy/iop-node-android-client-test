@@ -34,7 +34,7 @@ public enum PackageType {
 
     ACK, // Este lo usas para transmitir una respuesta con un resultado "Exitoso" o "Fail" + algún objeto de contexto que el processor pueda utilizar en forma de bytes todo: ver bien esto
 
-
+    IS_ACTOR_ONLINE, //This represents a request to check if an actor in online in this or any node
 
     //todo: esto no creo que vaya
     SERVER_HANDSHAKE_RESPONSE, // the servers returns a message to the client when the client check in and the connection was successful
