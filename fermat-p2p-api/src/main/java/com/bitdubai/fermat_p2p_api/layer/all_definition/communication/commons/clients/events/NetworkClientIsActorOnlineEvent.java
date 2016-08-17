@@ -26,17 +26,12 @@ public class NetworkClientIsActorOnlineEvent extends AbstractEvent<P2pEventType>
     /**
      * Represents the actor profile
      */
-    private ActorProfile actorProfile      ;
+    private String actorProfilePublicKey      ;
 
     /**
      * Represents the profile status
      */
     private ProfileStatus profileStatus;
-
-    /**
-     * Represent the query id
-     */
-    private UUID queryID;
 
     /**
      * Represent the status
@@ -65,12 +60,12 @@ public class NetworkClientIsActorOnlineEvent extends AbstractEvent<P2pEventType>
         this.networkServiceType = networkServiceType;
     }
 
-    public ActorProfile getActorProfile() {
-        return actorProfile;
+    public String getActorProfilePublicKey() {
+        return actorProfilePublicKey;
     }
 
-    public void setActorProfile(ActorProfile actorProfile) {
-        this.actorProfile = actorProfile;
+    public void setActorProfilePublicKey(String actorProfilePublicKey) {
+        this.actorProfilePublicKey = actorProfilePublicKey;
     }
 
     public ProfileStatus getProfileStatus() {
@@ -79,14 +74,6 @@ public class NetworkClientIsActorOnlineEvent extends AbstractEvent<P2pEventType>
 
     public void setProfileStatus(ProfileStatus profileStatus) {
         this.profileStatus = profileStatus;
-    }
-
-    public UUID getQueryID() {
-        return queryID;
-    }
-
-    public void setQueryID(UUID queryID) {
-        this.queryID = queryID;
     }
 
     public STATUS getStatus() {
@@ -109,9 +96,8 @@ public class NetworkClientIsActorOnlineEvent extends AbstractEvent<P2pEventType>
     public String toString() {
         return "NetworkClientActorUnreachableEvent{" +
                 "networkServiceType=" + networkServiceType +
-                ", actorProfile=" + actorProfile +
+                ", actorProfilePublicKey=" + actorProfilePublicKey +
                 ", profileStatus=" + profileStatus +
-                ", queryID=" + queryID +
                 ", status=" + status +
                 ", packageId=" + packageId +
                 '}';

@@ -12,14 +12,9 @@ import java.util.UUID;
 public class IsActorOnlineMsgRespond extends MsgRespond {
 
     /**
-     * Represents the query Id
-     */
-    private UUID queryId;
-
-    /**
      * Represents the actor profile
      */
-    private ActorProfile requestedProfile;
+    private String requestedProfilePublicKey;
 
     /**
      * Represents the profile status from the requested profile
@@ -42,35 +37,25 @@ public class IsActorOnlineMsgRespond extends MsgRespond {
             UUID packageId,
             STATUS status,
             String details,
-            ActorProfile requestedProfile,
+            String requestedProfilePublicKey,
             ProfileStatus profileStatus,
-            UUID queryId,
             String networkServiceType
     ) {
         super(
                 packageId,
                 status,
                 details);
-        this.requestedProfile = requestedProfile;
+        this.requestedProfilePublicKey = requestedProfilePublicKey;
         this.profileStatus = profileStatus;
-        this.queryId = queryId;
         this.networkServiceType = networkServiceType;
-    }
-
-    /**
-     * This method returns the query Id
-     * @return
-     */
-    public UUID getQueryId() {
-        return queryId;
     }
 
     /**
      * This method returns the requested profile
      * @return
      */
-    public ActorProfile getRequestedProfile() {
-        return requestedProfile;
+    public String getRequestedProfile() {
+        return requestedProfilePublicKey;
     }
 
     /**
@@ -107,8 +92,7 @@ public class IsActorOnlineMsgRespond extends MsgRespond {
     @Override
     public String toString() {
         return "IsActorOnlineMsgRespond{" +
-                "queryId=" + queryId +
-                ", requestedProfile=" + requestedProfile +
+                ", requestedProfilePublicKey=" + requestedProfilePublicKey +
                 ", profileStatus=" + profileStatus +
                 ", networkServiceType='" + networkServiceType + '\'' +
                 '}';

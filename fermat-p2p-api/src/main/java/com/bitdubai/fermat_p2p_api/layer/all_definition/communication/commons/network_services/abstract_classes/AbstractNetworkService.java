@@ -683,9 +683,9 @@ public abstract class AbstractNetworkService extends AbstractPlugin implements N
 
         try {
             if (networkServicePendingMessagesSupervisorAgent == null)
-                this.networkServicePendingMessagesSupervisorAgent = new NetworkServicePendingMessagesSupervisorAgent(this);
+                this.networkServicePendingMessagesSupervisorAgent = new NetworkServicePendingMessagesSupervisorAgent(null);
 
-            this.networkServicePendingMessagesSupervisorAgent.start();
+            //this.networkServicePendingMessagesSupervisorAgent.start();
 
         } catch (Exception ex) {
             this.reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, ex);

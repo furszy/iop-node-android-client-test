@@ -315,9 +315,9 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
                 NetworkServiceType networkServiceType = messageSender.packageAck(fermatEvent.getPackageId());
                 AbstractNetworkService2 abstractNetworkService2 = networkServices.get(networkServiceType);
                 if(abstractNetworkService2.isStarted()){
-                    System.out.println("The actor "+fermatEvent.getActorProfile().getAlias()+" is "+fermatEvent.getProfileStatus());
+                    System.out.println("The actor "+fermatEvent.getActorProfilePublicKey()+" is "+fermatEvent.getProfileStatus());
                     abstractNetworkService2.putActorOnlineStatus(
-                            fermatEvent.getActorProfile().getIdentityPublicKey(),
+                            fermatEvent.getActorProfilePublicKey(),
                             fermatEvent.getProfileStatus());
                 }
             }
