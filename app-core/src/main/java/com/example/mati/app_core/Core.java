@@ -5,7 +5,9 @@ import android.content.Context;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.ErrorManager;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.EventManager;
 import com.bitdubai.fermat_api.layer.all_definition.enums.Actors;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.PluginDatabaseSystem;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginFileSystem;
+import com.bitdubai.fermat_osa_addon.layer.android.database_system.developer.bitdubai.version_1.PluginDatabaseSystemAndroidAddonRoot;
 import com.bitdubai.fermat_osa_addon.layer.android.file_system.developer.bitdubai.version_1.PluginFileSystemAndroidAddonRoot;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.bitdubai.fermat_pip_addon.layer.platform_service.error_manager.developer.bitdubai.version_1.ErrorManagerPlatformServiceAddonRoot;
@@ -66,6 +68,11 @@ public class Core {
             eventManagerPlatformServiceAddonRoot.setErrorManager((ErrorManager) errorManagerPlatformServiceAddonRoot.getManager());
             eventManagerPlatformServiceAddonRoot.start();
 
+            //Database addon
+            PluginDatabaseSystemAndroidAddonRoot pluginDatabaseSystemAndroidAddonRoot = new PluginDatabaseSystemAndroidAddonRoot();
+            pluginDatabaseSystemAndroidAddonRoot.setContext(context);
+            pluginDatabaseSystemAndroidAddonRoot.start();
+
             //layer
             P2PLayerPluginRoot p2PLayerPluginRoot = new P2PLayerPluginRoot();
             p2PLayerPluginRoot.setEventManager((EventManager) eventManagerPlatformServiceAddonRoot.getManager());
@@ -87,6 +94,7 @@ public class Core {
             chatNetworkServicePluginRoot.setEventManager((EventManager) eventManagerPlatformServiceAddonRoot.getManager());
             chatNetworkServicePluginRoot.setPluginFileSystem((PluginFileSystem) pluginFileSystemLinuxAddonRoot.getManager());
             chatNetworkServicePluginRoot.setErrorManager((ErrorManager) errorManagerPlatformServiceAddonRoot.getManager());
+            //chatNetworkServicePluginRoot.setDatabaseSystem((PluginDatabaseSystem) pluginDatabaseSystemAndroidAddonRoot.getManager());
             chatNetworkServicePluginRoot.start();
 
             System.out.println("FERMAT - Network Client - started satisfactory...");
@@ -119,6 +127,7 @@ public class Core {
 
 
 //            chatNetworkServicePluginRoot.requestActorProfilesList();
+//Database test
 
 
         }catch (Exception e){

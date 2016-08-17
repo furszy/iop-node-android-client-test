@@ -196,7 +196,7 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
             /*
              * Initialize the data base
              */
-//            initializeDataBase();
+            initializeDataBase();
 
 //            queriesDao = new QueriesDao(getDataBase());
 
