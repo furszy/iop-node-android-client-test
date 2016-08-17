@@ -272,20 +272,19 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
         ackEventListener.setEventHandler(new FermatEventHandler<NetworkClientACKEvent>() {
             @Override
             public void handleEvent(NetworkClientACKEvent fermatEvent) throws FermatException {
-                if (fermatEvent.getContent().getStatus()== MsgRespond.STATUS.SUCCESS){
-                    System.out.println("##### ACK MENSAJE LLEGÓ BIEN A LA LAYER!!!##### ID:"+fermatEvent.getContent().getPackageId());
-                    //Mensaje llega exitoso, falta
-                    NetworkServiceType networkServiceType = messageSender.packageAck(fermatEvent.getContent().getPackageId());
-                    networkServices.get(networkServiceType).handleOnMessageSent(fermatEvent.getContent().getPackageId());
-                }else{
-                    System.out.println("##### ACK MENSAJE NO LLEGÓ AL OTRO LADO ##### ID:"+fermatEvent.getContent().getPackageId());
-                    //mensaje no llegó, acá entra en juego el agente de re envio manuel
-                    NetworkServiceType networkServiceType = messageSender.packageAck(fermatEvent.getContent().getPackageId());
-                    networkServices.get(networkServiceType).handleOnMessageSent(fermatEvent.getContent().getPackageId());
-                }
-
-
-
+                NetworkServiceType networkServiceType = messageSender.packageAck(fermatEvent.getContent().getPackageId());
+                AbstractNetworkService2 abstractNetworkService2 = networkServices.get(networkServiceType);
+                if (abstractNetworkService2.isStarted()) {
+                    if (fermatEvent.getContent().getStatus() == MsgRespond.STATUS.SUCCESS) {
+                        System.out.println("##### ACK MENSAJE LLEGÓ BIEN A LA LAYER!!!##### ID:" + fermatEvent.getContent().getPackageId());
+                        //Mensaje llega exitoso, falta
+                        abstractNetworkService2.handleOnMessageSent(fermatEvent.getContent().getPackageId());
+                    } else {
+                        //mensaje no llegó, acá entra en juego el agente de re envio manuel
+                        System.out.println("##### ACK MENSAJE NO LLEGÓ AL OTRO LADO ##### ID:" + fermatEvent.getContent().getPackageId());
+                        abstractNetworkService2.handleOnMessageSent(fermatEvent.getContent().getPackageId());
+                    }
+                }else System.out.println("##### ACK MENSAJE p2p layer, ns is not started. ID:" + fermatEvent.getContent().getPackageId());
 
             }
         });
