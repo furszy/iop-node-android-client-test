@@ -290,8 +290,6 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
         });
         eventManager.addListener(ackEventListener);
         listenersAdded.add(ackEventListener);
-
-
     }
 
 

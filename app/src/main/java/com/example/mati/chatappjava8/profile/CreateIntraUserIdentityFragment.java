@@ -41,9 +41,11 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.ne
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.example.mati.app_core.Core;
 import com.example.mati.chatappjava8.R;
+import com.example.mati.chatappjava8.commons.Utils;
 import com.example.mati.chatappjava8.list.ListActivity;
 import com.example.mati.chatappjava8.util.BitmapWorkerTask;
 import com.example.mati.chatappjava8.util.CircleTransform;
+import com.squareup.okhttp.internal.Util;
 import com.squareup.picasso.Picasso;
 
 import org.iop.ns.chat.ChatNetworkServicePluginRoot;
@@ -168,11 +170,12 @@ public class CreateIntraUserIdentityFragment extends Fragment {
 
                 if (identity==null) {
                     if (CREATE_IDENTITY_SUCCESS == createNewIdentity()) {
-                        Intent intent = new Intent(getActivity(), ListActivity.class);
-                        startActivity(intent);
+//                        Intent intent = new Intent(getActivity(), ListActivity.class);
+//                        startActivity(intent);
+                        Toast.makeText(getActivity(),"Profile creado!",Toast.LENGTH_SHORT).show();
                     }
                 }else{
-                    new AlertDialog.Builder(getActivity()).setTitle("Identity exist, shutdown the app to change your identity").show();
+                    new AlertDialog.Builder(getActivity()).setTitle("Identity exist, No podes cambiar de nombre por ahora").show();
                 }
 
 
@@ -472,14 +475,9 @@ public class CreateIntraUserIdentityFragment extends Fragment {
             executorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        Core.getInstance().setProfile(profile);
-                        manager.registerActor(profile, 0, 0);
-                    } catch (ActorAlreadyRegisteredException e) {
-                        e.printStackTrace();
-                    } catch (CantRegisterActorException e) {
-                        e.printStackTrace();
-                    }
+                    Utils.saveActorProfileSettings(getActivity(), profile);
+                    Core.getInstance().setProfile(profile);
+//                        manager.registerActor(profile, 0, 0);
                 }
             });
 
