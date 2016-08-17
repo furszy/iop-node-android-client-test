@@ -15,12 +15,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.example.mati.app_core.Core;
 import com.example.mati.chatappjava8.R;
 import com.example.mati.chatappjava8.chat.ChatActivity2;
 import com.example.mati.chatappjava8.commons.NavigationListener;
+import com.example.mati.chatappjava8.commons.Notifications;
 
-public class ProfileActivity extends AppCompatActivity {
+import org.iop.ns.chat.structure.test.MessageReceiver;
+
+import java.util.List;
+
+public class ProfileActivity extends AppCompatActivity implements MessageReceiver {
 
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
@@ -43,6 +49,8 @@ public class ProfileActivity extends AppCompatActivity {
 //            }
 //        });
 
+
+        Core.getInstance().setReceiver(this);
 
         navigationView = (NavigationView) findViewById(R.id.navigation);
         navigationView.inflateMenu(R.menu.navigation_menu);
@@ -89,5 +97,15 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onMessageReceived(String sender, String chatMetadataRecord) {
+        Notifications.pushNotification(this,chatMetadataRecord);
+    }
+
+    @Override
+    public void onActorListReceived(List<ActorProfile> list) {
+
     }
 }

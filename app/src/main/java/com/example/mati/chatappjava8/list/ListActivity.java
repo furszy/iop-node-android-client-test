@@ -25,6 +25,7 @@ import com.example.mati.chatappjava8.R;
 import com.example.mati.chatappjava8.chat.ChatActivity2;
 import com.example.mati.chatappjava8.chat.FermatListItemListeners;
 import com.example.mati.chatappjava8.commons.NavigationListener;
+import com.example.mati.chatappjava8.commons.Notifications;
 
 import org.iop.ns.chat.structure.test.MessageReceiver;
 
@@ -47,7 +48,7 @@ public class ListActivity extends AppCompatActivity implements MessageReceiver, 
 
 
         navigationView = (NavigationView) findViewById(R.id.navigation);
-        navigationView.inflateMenu(R.menu.navigation_menu);
+//        navigationView.inflateMenu(R.menu.navigation_menu);
         navigationView.setNavigationItemSelectedListener(new NavigationListener(this));
         final ActionBar actionBar = getSupportActionBar();
 
@@ -109,24 +110,9 @@ public class ListActivity extends AppCompatActivity implements MessageReceiver, 
 
     @Override
     public void onMessageReceived(String senderPk,String chatMetadataRecord) {
-        pushNotification();
+        Notifications.pushNotification(this,chatMetadataRecord);
     }
 
-    void pushNotification(){
-        Intent intent = new Intent(getApplicationContext(), ChatActivity2.class);
-        PendingIntent pi = PendingIntent
-                .getActivity(this, 0, intent, 0);
-        Notification.Builder builder = new Notification.Builder(this).setTicker("ticker")
-                .setPriority(Notification.PRIORITY_LOW).setAutoCancel(true)
-                .setAutoCancel(true)
-                .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000})
-                .setLights(Color.YELLOW, 3000, 3000)
-                .setContentIntent(pi)
-                .setWhen(System.currentTimeMillis());
-        NotificationManager notificationManager = (NotificationManager)
-                getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.notify(3,builder.build());
-    }
 
     @Override
     public void onActorListReceived(final List<ActorProfile> list) {
