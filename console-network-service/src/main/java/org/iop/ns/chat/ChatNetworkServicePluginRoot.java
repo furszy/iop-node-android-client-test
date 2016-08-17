@@ -201,17 +201,17 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
     }
 
     @Override
-    public void onSentMessage(NetworkServiceMessage messageSent) {
+    public void onSentMessage(UUID messageId) {
 
         try {
-            JsonObject messageData = EncodeMsjContent.decodeMsjContent(messageSent);
-            Gson gson = new Gson();
-            UUID chatId = gson.fromJson(messageData.get(ChatTransmissionJsonAttNames.ID_CHAT), UUID.class);
-            ChatMessageTransactionType chatMessageTransactionType = gson.fromJson(messageData.get(ChatTransmissionJsonAttNames.MSJ_CONTENT_TYPE), ChatMessageTransactionType.class);
-            if (chatMessageTransactionType == ChatMessageTransactionType.CHAT_METADATA_TRASMIT) {
+//            JsonObject messageData = EncodeMsjContent.decodeMsjContent(messageSent);
+//            Gson gson = new Gson();
+//            UUID chatId = gson.fromJson(messageData.get(ChatTransmissionJsonAttNames.ID_CHAT), UUID.class);
+//            ChatMessageTransactionType chatMessageTransactionType = gson.fromJson(messageData.get(ChatTransmissionJsonAttNames.MSJ_CONTENT_TYPE), ChatMessageTransactionType.class);
+//            if (chatMessageTransactionType == ChatMessageTransactionType.CHAT_METADATA_TRASMIT) {
 //                launchOutgoingChatNotification(chatId);
                 System.out.println("ChatNetworkServicePluginRoot - SALIENDO DEL HANDLE NEW SENT MESSAGE NOTIFICATION");
-            }
+//            }
 
         } catch (Exception e) {
             //quiere decir que no estoy reciviendo metadata si no una respuesta

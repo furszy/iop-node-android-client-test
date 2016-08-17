@@ -19,6 +19,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.cl
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.NetworkChannel;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.P2PLayerManager;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.ActorListMsgRequest;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.respond.MsgRespond;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.UpdateTypes;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.abstract_classes.AbstractNetworkService2;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
@@ -271,7 +272,21 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
         ackEventListener.setEventHandler(new FermatEventHandler<NetworkClientACKEvent>() {
             @Override
             public void handleEvent(NetworkClientACKEvent fermatEvent) throws FermatException {
-                System.out.println("##### ACK MENSAJE LLEGÓ BIEN A LA LAYER!!!##### ID:"+fermatEvent.getContent().getPackageId());
+                if (fermatEvent.getContent().getStatus()== MsgRespond.STATUS.SUCCESS){
+                    System.out.println("##### ACK MENSAJE LLEGÓ BIEN A LA LAYER!!!##### ID:"+fermatEvent.getContent().getPackageId());
+                    //Mensaje llega exitoso, falta
+                    NetworkServiceType networkServiceType = messageSender.packageAck(fermatEvent.getContent().getPackageId());
+                    networkServices.get(networkServiceType).handleOnMessageSent(fermatEvent.getContent().getPackageId());
+                }else{
+                    System.out.println("##### ACK MENSAJE NO LLEGÓ AL OTRO LADO ##### ID:"+fermatEvent.getContent().getPackageId());
+                    //mensaje no llegó, acá entra en juego el agente de re envio manuel
+                    NetworkServiceType networkServiceType = messageSender.packageAck(fermatEvent.getContent().getPackageId());
+                    networkServices.get(networkServiceType).handleOnMessageSent(fermatEvent.getContent().getPackageId());
+                }
+
+
+
+
             }
         });
         eventManager.addListener(ackEventListener);
