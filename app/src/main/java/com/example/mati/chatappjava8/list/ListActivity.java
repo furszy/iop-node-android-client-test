@@ -48,7 +48,7 @@ public class ListActivity extends AppCompatActivity implements MessageReceiver, 
 
 
         navigationView = (NavigationView) findViewById(R.id.navigation);
-        navigationView.inflateMenu(R.menu.navigation_menu);
+//        navigationView.inflateMenu(R.menu.navigation_menu);
         navigationView.setNavigationItemSelectedListener(new NavigationListener(this));
         final ActionBar actionBar = getSupportActionBar();
 
