@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class NetworkServicePendingMessagesSupervisorAgent extends FermatAgent {
 
-    private AbstractNetworkService2 networkServiceRoot;
+    private AbstractNetworkService networkServiceRoot;
     private ScheduledExecutorService scheduledThreadPool;
     private List<ScheduledFuture> scheduledFutures;
     private Map<String, ProfileStatus> actorProfileStatus;
@@ -51,7 +51,7 @@ public class NetworkServicePendingMessagesSupervisorAgent extends FermatAgent {
      *
      * @param networkServiceRoot
      */
-    public NetworkServicePendingMessagesSupervisorAgent(final AbstractNetworkService2 networkServiceRoot){
+    public NetworkServicePendingMessagesSupervisorAgent(final AbstractNetworkService networkServiceRoot){
 
         super();
         this.networkServiceRoot = networkServiceRoot;
@@ -107,7 +107,7 @@ public class NetworkServicePendingMessagesSupervisorAgent extends FermatAgent {
              */
             Map<String, Boolean> receivers = networkServiceRoot.getNetworkServiceConnectionManager().getOutgoingMessagesDao().findByFailCount(countFail, countFailMax);
             //todo: esta clase va en el layer, este no deberia saber si hay o no conexión.
-            P2PLayerManager p2PLayerManager = networkServiceRoot.getConnection();
+            P2PLayerManager p2PLayerManager = null;//networkServiceRoot.get();
             boolean sendingFlag;
             IsActorOnlineMsgRequest isActorOnlineMsgRequest;
             //ProfileStatus actorProfileStatus;
