@@ -134,7 +134,6 @@ public class NetworkServicePendingMessagesSupervisorAgent extends FermatAgent {
                             //The actor is not online, I'll ask if is online
                             sendingFlag = false;
                             isActorOnlineMsgRequest = new IsActorOnlineMsgRequest(
-                                    UUID.randomUUID(),
                                     remoteParticipant);
                             p2PLayerManager.sendIsOnlineActorMessage(
                                     isActorOnlineMsgRequest,
