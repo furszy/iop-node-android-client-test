@@ -38,7 +38,7 @@ public class IsActorOnlineRespondProcessor extends PackageProcessor {
                         P2pEventType.NETWORK_CLIENT_IS_ACTOR_ONLINE,
                         NetworkClientIsActorOnlineEvent.class);
         networkClientIsActorOnlineEvent.setSource(EventSource.NETWORK_CLIENT);
-        networkClientIsActorOnlineEvent.setActorProfile(
+        networkClientIsActorOnlineEvent.setActorProfilePublicKey(
                 isActorOnlineMsgRespond.getRequestedProfile());
         networkClientIsActorOnlineEvent.setProfileStatus(
                 isActorOnlineMsgRespond.getProfileStatus());
@@ -49,7 +49,6 @@ public class IsActorOnlineRespondProcessor extends PackageProcessor {
         } catch (InvalidParameterException e) {
             e.printStackTrace();
         }
-        networkClientIsActorOnlineEvent.setQueryID(isActorOnlineMsgRespond.getQueryId());
         if(isActorOnlineMsgRespond.getStatus() == IsActorOnlineMsgRespond.STATUS.SUCCESS){
             networkClientIsActorOnlineEvent.setStatus(NetworkClientIsActorOnlineEvent.STATUS.SUCCESS);
         }else{
