@@ -885,6 +885,12 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
 
     public synchronized void onMessageFail(UUID messageId) {
 
+        try {
+            //networkServiceConnectionManager.getOutgoingMessagesDao().
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
 

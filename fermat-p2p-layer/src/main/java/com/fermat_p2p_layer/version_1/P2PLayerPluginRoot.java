@@ -14,6 +14,11 @@ import com.bitdubai.fermat_api.layer.all_definition.events.interfaces.FermatEven
 import com.bitdubai.fermat_api.layer.all_definition.events.interfaces.FermatEventListener;
 import com.bitdubai.fermat_api.layer.all_definition.network_service.enums.NetworkServiceType;
 import com.bitdubai.fermat_api.layer.all_definition.util.Version;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.Database;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.PluginDatabaseSystem;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantCreateDatabaseException;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantOpenDatabaseException;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.DatabaseNotFoundException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientACKEvent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientActorListReceivedEvent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientConnectionLostEvent;
@@ -31,6 +36,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.da
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.UpdateTypes;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.abstract_classes.AbstractNetworkService2;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.exceptions.CantInitializeNetworkServiceDatabaseException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.P2pEventType;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.events.ClientConnectionCloseNotificationEvent;
@@ -39,6 +45,9 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.events.Fai
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.events.VPNConnectionCloseNotificationEvent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.events.VPNConnectionLooseNotificationEvent;
 import com.fermat_p2p_layer.version_1.structure.MessageSender;
+import com.fermat_p2p_layer.version_1.structure.database.P2PLayerDao;
+import com.fermat_p2p_layer.version_1.structure.database.P2PLayerDatabaseConstants;
+import com.fermat_p2p_layer.version_1.structure.database.P2PLayerDatabaseFactory;
 
 import java.util.Collection;
 import java.util.List;
@@ -54,11 +63,24 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
     @NeededAddonReference(platform = Platforms.PLUG_INS_PLATFORM, layer = Layers.PLATFORM_SERVICE, addon = Addons.EVENT_MANAGER)
     private EventManager eventManager;
 
+    @NeededAddonReference(platform = Platforms.OPERATIVE_SYSTEM_API, layer = Layers.SYSTEM, addon = Addons.PLUGIN_DATABASE_SYSTEM)
+    private PluginDatabaseSystem pluginDatabaseSystem;
 
     private ConcurrentHashMap<NetworkServiceType, AbstractNetworkService2> networkServices;
     private NetworkChannel client;
 
     private MessageSender messageSender;
+
+    /**
+     * Represents the plugin database
+     */
+    private Database database;
+
+    /**
+     * Represents the plugin database dao
+     */
+    private P2PLayerDao p2PLayerDao;
+
 
     /**
      * Represent the communicationSupervisorPendingMessagesAgent
@@ -87,6 +109,13 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
         try {
 //            this.communicationSupervisorPendingMessagesAgent = new CommunicationSupervisorPendingMessagesAgent(this);
 //            this.communicationSupervisorPendingMessagesAgent.start();
+            /**
+             * Initialize Plugin Database
+             */
+            initializeDatabase();
+            //Init dao
+            p2PLayerDao = new P2PLayerDao(database);
+
         }catch (Exception e){
             e.printStackTrace();
 
@@ -96,6 +125,45 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
         super.start();
     }
 
+    private void initializeDatabase() throws CantInitializeNetworkServiceDatabaseException {
+        try {
+            /*
+             * Open new database connection
+             */
+            this.database = this.pluginDatabaseSystem.openDatabase(pluginId, P2PLayerDatabaseConstants.DATABASE_NAME);
+
+        } catch (CantOpenDatabaseException cantOpenDatabaseException) {
+
+            /*
+             * The database exists but cannot be open. I can not handle this situation.
+             */
+            throw new CantInitializeNetworkServiceDatabaseException(cantOpenDatabaseException);
+
+        } catch (DatabaseNotFoundException e) {
+
+            /*
+             * The database no exist may be the first time the plugin is running on this device,
+             * We need to create the new database
+             */
+            P2PLayerDatabaseFactory p2PLayerDatabaseFactory = new P2PLayerDatabaseFactory(pluginDatabaseSystem);
+
+            try {
+
+                /*
+                 * We create the new database
+                 */
+                this.database = p2PLayerDatabaseFactory.createDatabase(pluginId, P2PLayerDatabaseConstants.DATABASE_NAME);
+
+            } catch (CantCreateDatabaseException cantOpenDatabaseException) {
+
+                /*
+                 * The database cannot be created. I can not handle this situation.
+                 */
+                throw new CantInitializeNetworkServiceDatabaseException(cantOpenDatabaseException);
+
+            }
+        }
+    }
 
     /**
      * Initializes all event listener and configure
@@ -294,8 +362,7 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
                     } else {
                         //mensaje no llegó, acá entra en juego el agente de re envio manuel
                         System.out.println("##### ACK MENSAJE NO LLEGÓ AL OTRO LADO ##### ID:" + fermatEvent.getContent().getPackageId());
-                        abstractNetworkService2.startNetworkServicePendingMessagesSupervisorAgent();
-                        abstractNetworkService2.handleOnMessageSent(fermatEvent.getContent().getPackageId());
+                        //abstractNetworkService2.handleOnMessageFail(fermatEvent.getContent().getPackageId());
                     }
                 }else System.out.println("##### ACK MENSAJE p2p layer, ns is not started. ID:" + fermatEvent.getContent().getPackageId());
 
@@ -317,9 +384,9 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
                 AbstractNetworkService2 abstractNetworkService2 = networkServices.get(networkServiceType);
                 if(abstractNetworkService2.isStarted()){
                     System.out.println("The actor "+fermatEvent.getActorProfilePublicKey()+" is "+fermatEvent.getProfileStatus());
-                    abstractNetworkService2.putActorOnlineStatus(
+                    /*abstractNetworkService2.putActorOnlineStatus(
                             fermatEvent.getActorProfilePublicKey(),
-                            fermatEvent.getProfileStatus());
+                            fermatEvent.getProfileStatus());*/
                 }
             }
         });

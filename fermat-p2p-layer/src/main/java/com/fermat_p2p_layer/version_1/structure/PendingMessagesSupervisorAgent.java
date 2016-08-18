@@ -22,7 +22,7 @@ public class PendingMessagesSupervisorAgent extends AbstractAgent {
     private int count;
 
     public PendingMessagesSupervisorAgent() {
-        super("PenfingMessageSupervisor", SLEEP_TIME, TimeUnit.SECONDS, SLEEP_TIME);
+        super("PendingMessageSupervisor", SLEEP_TIME, TimeUnit.SECONDS, SLEEP_TIME);
     }
 
     @Override
