@@ -17,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.example.mati.app_core.Core;
@@ -89,7 +90,7 @@ public class ListActivity extends AppCompatActivity implements MessageReceiver, 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -129,9 +130,11 @@ public class ListActivity extends AppCompatActivity implements MessageReceiver, 
 
     @Override
     public void onItemClickListener(ActorProfile data, int position) {
-        Intent intent = new Intent(getApplicationContext(),ChatActivity2.class);
-        intent.putExtra(IntentConstants.PROFILE_RECEIVER,data);
-        startActivity(intent);
+        if (Core.getInstance().getProfile()!=null) {
+            Intent intent = new Intent(getApplicationContext(), ChatActivity2.class);
+            intent.putExtra(IntentConstants.PROFILE_RECEIVER, data);
+            startActivity(intent);
+        }else Toast.makeText(this,"No profile created,\nplease go to the profile screen and create one",Toast.LENGTH_SHORT).show();
     }
 
     @Override

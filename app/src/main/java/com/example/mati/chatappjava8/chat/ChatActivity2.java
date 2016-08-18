@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -53,7 +54,12 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
         }
 
         if(remote==null){
-            new AlertDialog.Builder(this).setTitle("Remote profile null, please go back to the actors list and pick one before chat").show();
+             new AlertDialog.Builder(this).setTitle("Remote profile null, please go back to the actors list and pick one before you can chat").setOnDismissListener(new DialogInterface.OnDismissListener() {
+                 @Override
+                 public void onDismiss(DialogInterface dialog) {
+                     onBackPressed();
+                 }
+             }).show();
         }else {
 
             setContentView(R.layout.activity_chat_2);

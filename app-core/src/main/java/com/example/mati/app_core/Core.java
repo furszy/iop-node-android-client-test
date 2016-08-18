@@ -11,6 +11,9 @@ import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.Data
 import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginFileSystem;
 import com.bitdubai.fermat_osa_addon.layer.android.database_system.developer.bitdubai.version_1.PluginDatabaseSystemAndroidAddonRoot;
 import com.bitdubai.fermat_osa_addon.layer.android.file_system.developer.bitdubai.version_1.PluginFileSystemAndroidAddonRoot;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantUpdateRegisteredProfileException;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.UpdateTypes;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.exceptions.CantUpdateRegisteredActorException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.bitdubai.fermat_pip_addon.layer.platform_service.error_manager.developer.bitdubai.version_1.ErrorManagerPlatformServiceAddonRoot;
 import com.bitdubai.fermat_pip_addon.layer.platform_service.event_manager.developer.bitdubai.version_1.EventManagerPlatformServiceAddonRoot;
@@ -156,6 +159,14 @@ public class Core {
         if (profile!=null) {
             this.profile = profile;
             chatNetworkServicePluginRoot.registerProfile(profile);
+        }else{
+            try {
+                chatNetworkServicePluginRoot.updateRegisteredActor(profile, UpdateTypes.FULL);
+            } catch (CantUpdateRegisteredActorException e) {
+                e.printStackTrace();
+            } catch (CantUpdateRegisteredProfileException e) {
+                e.printStackTrace();
+            }
         }
     }
 

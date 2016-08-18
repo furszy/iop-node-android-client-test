@@ -129,6 +129,11 @@ public class NetworkClientCommunicationChannel {
          */
         connection.setServerIdentity((String) session.getUserProperties().get(HeadersAttName.NPKI_ATT_HEADER_NAME));
         connection.startConnectionSuperVisorAgent();
+//        try {
+//            connection.startMessageSenderExecutor();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         //raiseClientConnectedNotificationEvent();
     }
 
@@ -159,10 +164,11 @@ public class NetworkClientCommunicationChannel {
         System.out.println("Closed session : " + session.getId() + " Code: (" + closeReason.getCloseCode() + ") - reason: "+ closeReason.getReasonPhrase());
 
         System.out.println(" --------------------------------------------------------------------- ");
-        System.out.println(" NetworkClientCommunicationChannel - Starting method onClose "+(isExternalNode ? "external node ---" : ""));
+        System.out.println(" NetworkClientCommunicationChannel - Starting method onClose " + (isExternalNode ? "external node ---" : ""));
 
         // if it is not an external node i raise the event.
         connection.stopConnectionSuperVisorAgent();
+//        connection.stopMessageSenderExecutor();
         if (!isExternalNode) {
             isRegistered = Boolean.FALSE;
 

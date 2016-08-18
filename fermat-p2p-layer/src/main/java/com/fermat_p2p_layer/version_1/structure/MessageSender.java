@@ -1,17 +1,25 @@
 package com.fermat_p2p_layer.version_1.structure;
 
 import com.bitdubai.fermat_api.FermatException;
+import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.error_manager.enums.UnexpectedPluginExceptionSeverity;
 import com.bitdubai.fermat_api.layer.all_definition.network_service.enums.NetworkServiceType;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantRegisterProfileException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantSendMessageException;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantUpdateRegisteredProfileException;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.PackageContent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.ActorListMsgRequest;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.IsActorOnlineMsgRequest;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.UpdateActorProfileMsgRequest;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.respond.MsgRespond;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.NetworkServiceProfile;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.Profile;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.MessageContentType;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.PackageType;
 import com.fermat_p2p_layer.version_1.P2PLayerPluginRoot;
 
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -46,7 +54,7 @@ public class MessageSender {
 
     public UUID sendMessage(NetworkServiceMessage networkServiceMessage, NetworkServiceType networkServiceType, String nodeDestinationPublicKey) throws CantSendMessageException {
         //todo: ver porqué el ultimo parametro del metodo sendMessage es el destination del actor,ns o lo que sea. ver si agrego el nodo ahí o que hago
-        UUID packageId = p2PLayerPluginRoot.getNetworkClient().sendMessage(networkServiceMessage, PackageType.MESSAGE_TRANSMIT,networkServiceType,networkServiceMessage.getReceiverPublicKey());
+        UUID packageId = p2PLayerPluginRoot.getNetworkClient().sendMessage(networkServiceMessage, PackageType.MESSAGE_TRANSMIT, networkServiceType, networkServiceMessage.getReceiverPublicKey());
         if (packageId != null)
             messagesSentWaitingForAck.put(packageId,networkServiceType);
         return packageId;
@@ -86,5 +94,33 @@ public class MessageSender {
             }
         }
         return null;
+    }
+
+    public UUID sendProfileToUpdate(NetworkServiceType networkServiceType,Profile profile) throws CantUpdateRegisteredProfileException, CantSendMessageException {
+        PackageType packageType = null;
+        PackageContent packageContent = null;
+        if (profile instanceof ActorProfile) {
+            packageType = PackageType.UPDATE_ACTOR_PROFILE_REQUEST;
+            UpdateActorProfileMsgRequest updateActorProfileMsgRequest = new UpdateActorProfileMsgRequest(profile);
+            updateActorProfileMsgRequest.setMessageContentType(MessageContentType.JSON);
+            packageContent = updateActorProfileMsgRequest;
+        } else {
+            CantUpdateRegisteredProfileException fermatException = new CantUpdateRegisteredProfileException(
+                    "profile:" + profile,
+                    "Unsupported profile type."
+            );
+
+            p2PLayerPluginRoot.reportError(
+                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,
+                    fermatException
+            );
+
+            throw fermatException;
+        }
+        UUID packageId = p2PLayerPluginRoot.getNetworkClient().sendMessage(packageContent, packageType);
+        if (packageId != null)
+            messagesSentWaitingForAck.put(packageId,networkServiceType);
+        return packageId;
+
     }
 }

@@ -2,6 +2,7 @@ package com.example.mati.chatappjava8.list;
 
 import android.content.Context;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.view.View;
 
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
@@ -10,6 +11,7 @@ import com.example.mati.chatappjava8.chat.FermatAdapter;
 import com.example.mati.chatappjava8.profile.ImagesUtils;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by mati on 16/08/16.
@@ -42,5 +44,14 @@ public class ListAdapter extends FermatAdapter<ActorProfile,ActorHolder> {
                 holder.img_photo.setImageDrawable(ImagesUtils.getRoundedBitmap(context.getResources(), BitmapFactory.decodeByteArray(data.getPhoto(),0,data.getPhoto().length)));
             }
         }
+        Random random = new Random();
+        int ran = random.nextInt(50);
+
+        if (ran<15) {
+            holder.itemView.setBackgroundColor(Color.CYAN);
+        }else if(ran>=15 && ran<=30){
+            holder.itemView.setBackgroundColor(Color.YELLOW);
+        }else
+            holder.itemView.setBackgroundColor(Color.MAGENTA);
     }
 }

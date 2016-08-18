@@ -969,10 +969,10 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
 
     public void startNetworkServicePendingMessagesSupervisorAgent(){
         try{
-            if(networkServicePendingMessagesSupervisorAgent == null){
-                networkServicePendingMessagesSupervisorAgent = new NetworkServicePendingMessagesSupervisorAgent(this);
-                networkServicePendingMessagesSupervisorAgent.start();
-            }
+//            if(networkServicePendingMessagesSupervisorAgent == null){
+//                networkServicePendingMessagesSupervisorAgent = new NetworkServicePendingMessagesSupervisorAgent(this);
+//                networkServicePendingMessagesSupervisorAgent.start();
+//            }
         } catch (Exception e){
             e.printStackTrace();
             reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
@@ -982,13 +982,13 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
 
     public void putActorOnlineStatus(String actorPublicKey, ProfileStatus profileStatus){
         try{
-            if(networkServicePendingMessagesSupervisorAgent == null){
-                networkServicePendingMessagesSupervisorAgent = new NetworkServicePendingMessagesSupervisorAgent(this);
-                networkServicePendingMessagesSupervisorAgent.start();
-            }
-            networkServicePendingMessagesSupervisorAgent.putActorOnlineStatus(
-                    actorPublicKey,
-                    profileStatus);
+//            if(networkServicePendingMessagesSupervisorAgent == null){
+//                networkServicePendingMessagesSupervisorAgent = new NetworkServicePendingMessagesSupervisorAgent(this);
+//                networkServicePendingMessagesSupervisorAgent.start();
+//            }
+//            networkServicePendingMessagesSupervisorAgent.putActorOnlineStatus(
+//                    actorPublicKey,
+//                    profileStatus);
         } catch (Exception e){
             e.printStackTrace();
             reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
