@@ -435,7 +435,7 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
             }
     }
 
-    UUID testID;
+//    UUID testID;
 
     @Override
     public void onNetworkServiceActorListReceived(NetworkServiceQuery query, List<ActorProfile> actorProfiles) {

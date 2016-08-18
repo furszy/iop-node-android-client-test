@@ -87,7 +87,7 @@ public class CreateIntraUserIdentityFragment extends Fragment {
     Toolbar toolbar;
 //    private IntraUserModuleIdentity identitySelected;
     private boolean isUpdate = false;
-    private EditText mBrokerPhrase;
+//    private EditText mBrokerPhrase;
 //    IntraUserIdentitySettings intraUserIdentitySettings = null;
     private boolean updateProfileImage = false;
     private boolean contextMenuInUse = false;
@@ -143,7 +143,7 @@ public class CreateIntraUserIdentityFragment extends Fragment {
     private void initViews(View layout) {
         createButton = (Button) layout.findViewById(R.id.create_crypto_broker_button);
         mBrokerName = (EditText) layout.findViewById(R.id.crypto_broker_name);
-        mBrokerPhrase = (EditText) layout.findViewById(R.id.crypto_broker_phrase);
+//        mBrokerPhrase = (EditText) layout.findViewById(R.id.crypto_broker_phrase);
         mBrokerImage = (ImageView) layout.findViewById(R.id.img_photo);
         relativeLayout = (RelativeLayout) layout.findViewById(R.id.user_image);
         mphoto_header = (ImageView) layout.findViewById(R.id.img_photo_header);
@@ -253,7 +253,7 @@ public class CreateIntraUserIdentityFragment extends Fragment {
 
         }
         mBrokerName.setText(identity.getName());
-        mBrokerPhrase.setText(identity.getExtraData());
+//        mBrokerPhrase.setText(identity.getExtraData());
     }
 
     @Override
@@ -416,7 +416,7 @@ public class CreateIntraUserIdentityFragment extends Fragment {
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
         menu.setHeaderTitle("Choose mode");
 //        menu.setHeaderIcon(getActivity().getResources().getDrawable(R.drawable.ic_camera_green));
-        menu.add(Menu.NONE, CONTEXT_MENU_CAMERA, Menu.NONE, "Camera");
+//        menu.add(Menu.NONE, CONTEXT_MENU_CAMERA, Menu.NONE, "Camera");
         menu.add(Menu.NONE, CONTEXT_MENU_GALLERY, Menu.NONE, "Gallery");
 
         super.onCreateContextMenu(menu, view, menuInfo);
@@ -453,11 +453,11 @@ public class CreateIntraUserIdentityFragment extends Fragment {
         final String brokerNameText = mBrokerName.getText().toString();
         String brokerPhraseText = "";
 
-        if (!mBrokerPhrase.getText().toString().isEmpty()){
-             brokerPhraseText = mBrokerPhrase.getText().toString();
-        }else{
-            brokerPhraseText = "Available";
-        }
+//        if (!mBrokerPhrase.getText().toString().isEmpty()){
+//             brokerPhraseText = mBrokerPhrase.getText().toString();
+//        }else{
+//            brokerPhraseText = "Available";
+//        }
 
         boolean dataIsValid = validateIdentityData(brokerNameText, brokerPhraseText, brokerImageByteArray);
 
@@ -477,6 +477,12 @@ public class CreateIntraUserIdentityFragment extends Fragment {
                 public void run() {
                     Utils.saveActorProfileSettings(getActivity(), profile);
                     Core.getInstance().setProfile(profile);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getActivity(),"Registering profile...",Toast.LENGTH_SHORT).show();
+                        }
+                    });
 //                        manager.registerActor(profile, 0, 0);
                 }
             });
@@ -570,8 +576,8 @@ public class CreateIntraUserIdentityFragment extends Fragment {
     private boolean validateIdentityData(String brokerNameText, String brokerPhraseText, byte[] brokerImageBytes) {
         if (brokerNameText.isEmpty())
             return false;
-        if (brokerPhraseText.isEmpty())
-            return false;
+//        if (brokerPhraseText.isEmpty())
+//            return false;
         if (brokerImageBytes == null)
             return true;
         if (brokerImageBytes.length > 0)
