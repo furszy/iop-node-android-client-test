@@ -13,9 +13,11 @@ import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.Cant
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
 import com.bitdubai.fermat_p2p_api.layer.p2p_communication.commons.enums.FermatMessagesStatus;
 import com.fermat_p2p_layer.version_1.structure.exceptions.CantCheckPackageIdException;
+import com.fermat_p2p_layer.version_1.structure.exceptions.CantGetNetworkServiceMessageException;
 import com.fermat_p2p_layer.version_1.structure.exceptions.CantPersistsMessageException;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -279,10 +281,10 @@ public class P2PLayerDao {
      * This method returns a NetworkServiceMessage from database
      * @param packageId
      * @return
-     * @throws CantCheckPackageIdException
+     * @throws CantGetNetworkServiceMessageException
      */
     public NetworkServiceMessage getNetworkServiceMessageById(UUID packageId)
-            throws CantCheckPackageIdException {
+            throws CantGetNetworkServiceMessageException {
         DatabaseTable table = getDatabaseTable();
         //Set filter
         table.addUUIDFilter(P2P_LAYER_PACKAGE_ID_COLUMN_NAME, packageId, DatabaseFilterType.EQUAL);
@@ -298,14 +300,53 @@ public class P2PLayerDao {
             }
 
         } catch (CantLoadTableToMemoryException e) {
-            throw new CantCheckPackageIdException(
+            throw new CantGetNetworkServiceMessageException(
                     e,
                     "Getting NetworkServiceMessage from database",
                     "Cannot load database table into memory");
         } catch (Exception e){
-            throw new CantCheckPackageIdException(
+            throw new CantGetNetworkServiceMessageException(
                     e,
                     "Getting NetworkServiceMessage from database",
+                    "Unexpected exception");
+        }
+    }
+
+    /**
+     * This method returns a NetworkServiceMessage list from database by the fail count value
+     * @param failCount
+     * @return
+     * @throws CantGetNetworkServiceMessageException
+     */
+    public List<NetworkServiceMessage> getNetworkServiceMessageByFailCount(int failCount)
+            throws CantGetNetworkServiceMessageException {
+        DatabaseTable table = getDatabaseTable();
+        //Set filter
+        table.addStringFilter(P2P_LAYER_PACKAGE_ID_COLUMN_NAME, failCount+"", DatabaseFilterType.EQUAL);
+        try{
+            table.loadToMemory();
+            List<DatabaseTableRecord> records = table.getRecords();
+            if(records.isEmpty()){
+                //Cannot find the record in database
+                return new ArrayList<>();
+            } else{
+                List<NetworkServiceMessage> networkServiceMessages = new ArrayList<>();
+                for (DatabaseTableRecord record : records) {
+                    networkServiceMessages.add(buildNetworkServiceMessage(record));
+                }
+                records=null;
+                return networkServiceMessages;
+            }
+
+        } catch (CantLoadTableToMemoryException e) {
+            throw new CantGetNetworkServiceMessageException(
+                    e,
+                    "Getting NetworkServiceMessage from database by fail count",
+                    "Cannot load database table into memory");
+        } catch (Exception e){
+            throw new CantGetNetworkServiceMessageException(
+                    e,
+                    "Getting NetworkServiceMessage from database by fail count",
                     "Unexpected exception");
         }
     }
