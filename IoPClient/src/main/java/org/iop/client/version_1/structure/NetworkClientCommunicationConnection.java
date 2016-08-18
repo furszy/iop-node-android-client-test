@@ -560,6 +560,45 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
         }
     }
 
+    public UUID sendPackageMessage(final PackageContent     packageContent              ,
+                                   final PackageType        packageType) throws CantSendMessageException, CantSendPackageException {
+        System.out.println("******* IS CONNECTED: " + isConnected() + " - TRYING NO SEND = " + packageContent.toJson());
+        if (isConnected()){
+
+            try {
+
+                //todo: esto hay que mejorarlo
+                Package pack = Package.createInstance(
+                        packageContent.toJson(),
+                        null,
+                        packageType,
+                        clientIdentity.getPrivateKey(),
+                        null
+                );
+
+                networkClientCommunicationChannel.getClientConnection().getBasicRemote().sendObject(pack);
+
+//                packagesWaitingToSend.add(pack);
+
+                return pack.getPackageId();
+            } catch (Exception exception) {
+
+                throw new CantSendMessageException(
+                        exception,
+                        "packageContent:"+packageContent,
+                        "Unhandled error trying to send the message through the session."
+                );
+            }
+        }else {
+            raiseClientConnectionLostNotificationEvent();
+
+            throw new CantSendPackageException(
+                    "packageContent: " + packageContent + " - packageType: " + packageType,
+                    "Client Connection is Closed."
+            );
+        }
+    }
+
 
     public void receiveSyncPackgageMessage(String messageId,boolean status) {
         waiterObjectsBuffer.addFullDataAndNotificateArrive(messageId, status);

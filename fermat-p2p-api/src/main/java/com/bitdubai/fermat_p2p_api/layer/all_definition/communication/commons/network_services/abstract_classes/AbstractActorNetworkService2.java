@@ -201,7 +201,7 @@ public abstract class AbstractActorNetworkService2 extends AbstractNetworkServic
                                       final String   alias    ,
                                       final Location location ,
                                       final String   extraData,
-                                      final byte[]   image    ) throws ActorNotRegisteredException, CantUpdateRegisteredActorException {
+                                      final byte[]   image    ) throws ActorNotRegisteredException, CantUpdateRegisteredActorException, CantUpdateRegisteredProfileException {
 
         //validateImageSize(image.length); TODO COMMENTED UNTIL BETTER MANAGEMENT BE IMPLEMENTED
 
@@ -225,14 +225,14 @@ public abstract class AbstractActorNetworkService2 extends AbstractNetworkServic
         if (extraData != null)
             actorToUpdate.setExtraData(extraData);
 
-        this.getConnection().update(actorToUpdate, UpdateTypes.FULL);
+        this.getConnection().update(actorToUpdate, UpdateTypes.FULL, getNetworkServiceType());
         registeredActors.get(actorToUpdate).setLastExecution(System.currentTimeMillis());
     }
 
     public void updateRegisteredActor(final ActorProfile actorToUpdate,
-                                      final UpdateTypes  type         ) throws CantUpdateRegisteredActorException {
+                                      final UpdateTypes  type         ) throws CantUpdateRegisteredActorException, CantUpdateRegisteredProfileException {
 
-        this.getConnection().update(actorToUpdate, type);
+        this.getConnection().update(actorToUpdate, type,getNetworkServiceType());
         registeredActors.get(actorToUpdate).setLastExecution(System.currentTimeMillis());
     }
 

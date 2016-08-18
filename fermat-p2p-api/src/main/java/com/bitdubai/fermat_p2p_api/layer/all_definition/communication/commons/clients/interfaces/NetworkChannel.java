@@ -27,7 +27,24 @@ public interface NetworkChannel {
 
     void updateProfile(Profile profile, UpdateTypes types) throws CantUpdateRegisteredProfileException;
 
+    /**
+     *
+     * @param packageContent
+     * @param packageType
+     * @param networkServiceType
+     * @param destinationPublicKey
+     * @return
+     * @throws CantSendMessageException
+     */
     UUID sendMessage(PackageContent packageContent, PackageType packageType, NetworkServiceType networkServiceType, String destinationPublicKey) throws CantSendMessageException;
 
+    /**
+     * Message with home node as destination
+     * @param packageContent
+     * @param packageType
+     * @return
+     * @throws CantSendMessageException
+     */
+    UUID sendMessage(PackageContent packageContent, PackageType packageType) throws CantSendMessageException;
 
 }

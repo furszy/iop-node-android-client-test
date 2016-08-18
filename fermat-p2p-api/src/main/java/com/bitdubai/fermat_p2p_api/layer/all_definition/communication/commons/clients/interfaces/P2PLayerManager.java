@@ -2,6 +2,7 @@ package com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.c
 
 import com.bitdubai.fermat_api.layer.all_definition.network_service.enums.NetworkServiceType;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantSendMessageException;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantUpdateRegisteredProfileException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.Package;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.PackageContent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.ActorListMsgRequest;
@@ -26,7 +27,7 @@ public interface P2PLayerManager {
 
     void register(ActorProfile profile);
 
-    void update(ActorProfile profile, UpdateTypes type);
+    void update(ActorProfile profile, UpdateTypes type,NetworkServiceType networkServiceType) throws CantUpdateRegisteredProfileException;
 
     void setNetworkServicesRegisteredFalse();
 

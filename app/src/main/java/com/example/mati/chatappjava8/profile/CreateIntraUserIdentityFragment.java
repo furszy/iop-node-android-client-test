@@ -168,13 +168,14 @@ public class CreateIntraUserIdentityFragment extends Fragment {
             public void onClick(View view) {
 //                CommonLogger.debug(TAG, "Entrando en createButton.setOnClickListener");
 
-                if (identity==null) {
+                if (identity == null) {
                     if (CREATE_IDENTITY_SUCCESS == createNewIdentity()) {
 //                        Intent intent = new Intent(getActivity(), ListActivity.class);
 //                        startActivity(intent);
-                        Toast.makeText(getActivity(),"Profile creado!",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Profile creado!", Toast.LENGTH_SHORT).show();
                     }
-                }else{
+                } else {
+                    updateIdentity();
                     new AlertDialog.Builder(getActivity()).setTitle("Identity exist, No podes cambiar de nombre por ahora").show();
                 }
 
@@ -481,6 +482,7 @@ public class CreateIntraUserIdentityFragment extends Fragment {
                         @Override
                         public void run() {
                             Toast.makeText(getActivity(),"Registering profile...",Toast.LENGTH_SHORT).show();
+                            createButton.setText("Save changes");
                         }
                     });
 //                        manager.registerActor(profile, 0, 0);
@@ -545,6 +547,48 @@ public class CreateIntraUserIdentityFragment extends Fragment {
         }
         return CREATE_IDENTITY_FAIL_NO_VALID_DATA;
 
+    }
+
+    public int updateIdentity(){
+        final String brokerNameText = mBrokerName.getText().toString();
+        String brokerPhraseText = "";
+
+//        if (!mBrokerPhrase.getText().toString().isEmpty()){
+//             brokerPhraseText = mBrokerPhrase.getText().toString();
+//        }else{
+//            brokerPhraseText = "Available";
+//        }
+
+        boolean dataIsValid = validateIdentityData(brokerNameText, brokerPhraseText, brokerImageByteArray);
+
+        if (dataIsValid) {
+            final ActorProfile profile = new ActorProfile();
+            profile.setIdentityPublicKey(UUID.randomUUID().toString());
+            System.out.println("I will try to register an actor with pk " + profile.getIdentityPublicKey());
+            profile.setActorType(Actors.CHAT.getCode());
+            profile.setName(mBrokerName.getText().toString());
+            profile.setAlias("Alias chat");
+            //This represents a valid image
+            profile.setPhoto(brokerImageByteArray);
+            profile.setNsIdentityPublicKey(manager.getNetWorkServicePublicKey());
+            profile.setExtraData("Test extra data");
+            executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    Utils.saveActorProfileSettings(getActivity(), profile);
+                    Core.getInstance().setProfile(profile);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getActivity(), "Registering profile...", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+//                        manager.registerActor(profile, 0, 0);
+                }
+            });
+
+            return CREATE_IDENTITY_SUCCESS;
+        }else return 0;
     }
 
     boolean exist = false;

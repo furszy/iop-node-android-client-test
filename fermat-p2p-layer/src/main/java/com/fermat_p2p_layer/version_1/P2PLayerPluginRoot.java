@@ -22,6 +22,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.cl
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientNewMessageTransmitEvent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientProfileRegisteredEvent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantSendMessageException;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantUpdateRegisteredProfileException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.NetworkChannel;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.P2PLayerManager;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.ActorListMsgRequest;
@@ -362,14 +363,11 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
 
 
     @Override
-    public void update(ActorProfile profile, UpdateTypes type) {
-
-        if (client.isConnected()) {
-            try {
-                client.updateProfile(profile, type);
-            } catch (FermatException e) {
-                e.printStackTrace();
-            }
+    public void update(ActorProfile profile, UpdateTypes type,NetworkServiceType networkServiceType) throws CantUpdateRegisteredProfileException {
+        try {
+            messageSender.sendProfileToUpdate(networkServiceType,profile);
+        } catch (CantSendMessageException e) {
+            throw new CantUpdateRegisteredProfileException(e,null,null);
         }
     }
 
@@ -415,7 +413,7 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
     public UUID sendDiscoveryMessage(ActorListMsgRequest packageContent, NetworkServiceType networkServiceType,String nodeDestinationPublicKey) throws CantSendMessageException {
         System.out.println("***P2PLayer Method sendMessage..");
         //todo: me faltan cosas
-        return messageSender.sendDiscoveryMessage(packageContent,networkServiceType,nodeDestinationPublicKey);
+        return messageSender.sendDiscoveryMessage(packageContent, networkServiceType, nodeDestinationPublicKey);
     }
 
     @Override
@@ -428,7 +426,7 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
                 isActorOnlineMsgRequest,
                 networkServiceType,
                 nodeDestinationPublicKey
-                );
+        );
     }
 
     /**
