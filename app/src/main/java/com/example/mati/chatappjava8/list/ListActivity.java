@@ -31,6 +31,7 @@ import org.iop.ns.chat.structure.test.MessageReceiver;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -79,8 +80,6 @@ public class ListActivity extends AppCompatActivity
         });
         init();
 
-        Core.getInstance().setReceiver(this);
-
         this.recyclerView = (RecyclerView) findViewById(R.id.recycler);
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -121,6 +120,7 @@ public class ListActivity extends AppCompatActivity
     }
 
     private void init(){
+        Core.getInstance().setReceiver(this);
         if (executorService==null){
             executorService = Executors.newFixedThreadPool(2);
         }else{
@@ -193,6 +193,8 @@ public class ListActivity extends AppCompatActivity
             Log.i(this.getComponentName().getClassName(),actorProfile.toString());
         }
 
+        Core.getInstance().addRemotesUsers(list);
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -228,6 +230,11 @@ public class ListActivity extends AppCompatActivity
 
     @Override
     public void onActorRegistered(ActorProfile actorProfile) {
+
+    }
+
+    @Override
+    public void onMessageFail(UUID messageId) {
 
     }
 

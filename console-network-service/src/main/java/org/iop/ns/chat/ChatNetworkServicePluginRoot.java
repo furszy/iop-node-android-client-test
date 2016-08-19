@@ -441,6 +441,12 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
         }
     }
 
+    @Override
+    public synchronized void onMessageFail(UUID messageId) {
+        super.onMessageFail(messageId);
+        messageReceiver.onMessageFail(messageId);
+    }
+
     public void registerProfile(ActorProfile actorProfile){
         if (actorProfile!=null) {
             try {

@@ -1,17 +1,11 @@
 package com.example.mati.chatappjava8.chat;
 
-import android.app.AlertDialog;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,7 +24,8 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
+import java.util.UUID;
 
 public class ChatActivity2 extends AppCompatActivity implements MessageReceiver {
 
@@ -39,30 +34,36 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
     private Button sendBtn;
     private ChatAdapter2 adapter;
     private ArrayList<ChatMessage> chatHistory;
-
     private ActorProfile remote;
+
+
+    private boolean isSearchingRemote = false;
+    private String remotePk;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.activity_chat_2);
         if (getIntent().hasExtra(IntentConstants.PROFILE_RECEIVER)) {
             remote = (ActorProfile) getIntent().getSerializableExtra(IntentConstants.PROFILE_RECEIVER);
             Core.getInstance().setLastRemoteProfile(remote);
-        }else {
+        }if (getIntent().hasExtra(IntentConstants.PROFILE_RECEIVER_NOTIFICATION_PK)){
+            String pk = getIntent().getStringExtra(IntentConstants.PROFILE_RECEIVER_NOTIFICATION_PK);
+            remote = Core.getInstance().getRemoteProfile(pk);
+            if (remote==null){
+                Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList(10000, 0);
+                isSearchingRemote = true;
+                remotePk = pk;
+            }
+        } else {
             remote = Core.getInstance().getLastRemoteProfile();
         }
 
         if(remote==null){
-             new AlertDialog.Builder(this).setTitle("Remote profile null, please go back to the actors list and pick one before you can chat").setOnDismissListener(new DialogInterface.OnDismissListener() {
-                 @Override
-                 public void onDismiss(DialogInterface dialog) {
-                     onBackPressed();
-                 }
-             }).show();
+            findViewById(R.id.black_screen).setVisibility(View.VISIBLE);
+            findViewById(R.id.chat_screen).setVisibility(View.GONE);
         }else {
-
-            setContentView(R.layout.activity_chat_2);
             initControls();
 
         }
@@ -91,33 +92,35 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
                     return;
                 }
 
-                ChatMessage chatMessage = new ChatMessage();
-                chatMessage.setId(122);//dummy
+                final ChatMessage chatMessage = new ChatMessage();
                 chatMessage.setMessage(messageText);
                 chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
                 chatMessage.setMe(true);
 
                 messageET.setText("");
 
-                displayMessage(chatMessage);
+
 
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            Core.getInstance().getChatNetworkServicePluginRoot().sendNewMessage(
+                            //este id tenes que guardarlo y chequear si no falló por el metodo onMessageFail
+                            UUID mensajeId = Core.getInstance().getChatNetworkServicePluginRoot().sendNewMessage(
                                     Core.getInstance().getInstance().getProfile(),
                                     remote,
                                     messageText,
-                                    //I'll set true for testing
                                     true
                             );
+                            //acá se le deberia setear el id, si no lo hace fijate que onda
+                            chatMessage.setId(mensajeId);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
                 }).start();
 
+                displayMessage(chatMessage);
             }
         });
     }
@@ -134,6 +137,12 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Core.getInstance().setReceiver(this);
+    }
+
     private void scroll() {
         messagesContainer.scrollToPosition(adapter.getItemCount() - 1);
     }
@@ -143,13 +152,13 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
         chatHistory = new ArrayList<ChatMessage>();
 
         ChatMessage msg = new ChatMessage();
-        msg.setId(1);
+        msg.setId(UUID.randomUUID());
         msg.setMe(false);
         msg.setMessage("Hola");
         msg.setDate(DateFormat.getDateTimeInstance().format(new Date()));
         chatHistory.add(msg);
         ChatMessage msg1 = new ChatMessage();
-        msg1.setId(2);
+        msg1.setId(UUID.randomUUID());
         msg1.setMe(false);
         msg1.setMessage("como andas??");
         msg1.setDate(DateFormat.getDateTimeInstance().format(new Date()));
@@ -168,9 +177,8 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
     @Override
     public void onMessageReceived(String senderPk,String content) {
         if (remote!=null && remote.getIdentityPublicKey().equals(senderPk)) {
-            Random random = new Random();
             ChatMessage chatMessage = new ChatMessage();
-            chatMessage.setId(random.nextInt());//dummy
+            chatMessage.setId(UUID.randomUUID());//dummy
             chatMessage.setMessage(content);
             chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
             chatMessage.setMe(false);
@@ -182,12 +190,25 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
 
     @Override
     public void onActorListReceived(List<ActorProfile> list) {
-
+        Core.getInstance().addRemotesUsers(list);
+        if (isSearchingRemote){
+            remote = Core.getInstance().getRemoteProfile(remotePk);
+            if (remote!=null){
+                findViewById(R.id.black_screen).setVisibility(View.GONE);
+                findViewById(R.id.chat_screen).setVisibility(View.VISIBLE);
+                initControls();
+            }
+        }
     }
 
     @Override
     public void onActorRegistered(ActorProfile actorProfile) {
 
+    }
+
+    @Override
+    public void onMessageFail(UUID messageId) {
+        Log.i(this.getClass().getName(),"onMessageFail: acá tengo que mostrar como que el mensaje falló");
     }
 
 }
