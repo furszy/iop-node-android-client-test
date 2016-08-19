@@ -13,6 +13,7 @@ import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.Cant
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
 import com.bitdubai.fermat_p2p_api.layer.p2p_communication.commons.enums.FermatMessagesStatus;
 import com.fermat_p2p_layer.version_1.structure.exceptions.CantCheckPackageIdException;
+import com.fermat_p2p_layer.version_1.structure.exceptions.CantDeleteRecordException;
 import com.fermat_p2p_layer.version_1.structure.exceptions.CantGetNetworkServiceMessageException;
 import com.fermat_p2p_layer.version_1.structure.exceptions.CantPersistsMessageException;
 
@@ -347,6 +348,35 @@ public class P2PLayerDao {
             throw new CantGetNetworkServiceMessageException(
                     e,
                     "Getting NetworkServiceMessage from database by fail count",
+                    "Unexpected exception");
+        }
+    }
+
+    /**
+     * This method deletes a record from database
+     * @param packageId
+     * @throws CantDeleteRecordException
+     */
+    public void deleteMessageByPackageId(UUID packageId) throws CantDeleteRecordException {
+        DatabaseTable table = getDatabaseTable();
+        //Set filter
+        table.addUUIDFilter(P2P_LAYER_PACKAGE_ID_COLUMN_NAME, packageId, DatabaseFilterType.EQUAL);
+        try{
+            table.loadToMemory();
+            List<DatabaseTableRecord> records = table.getRecords();
+            if(!records.isEmpty()){
+                //Cannot find the record in database
+                table.deleteRecord(records.get(0));
+            }
+        } catch (CantLoadTableToMemoryException e) {
+            throw new CantDeleteRecordException(
+                    e,
+                    "Deleting NetworkServiceMessage from database",
+                    "Cannot load database table into memory");
+        } catch (Exception e){
+            throw new CantDeleteRecordException(
+                    e,
+                    "Deleting NetworkServiceMessage from database",
                     "Unexpected exception");
         }
     }
