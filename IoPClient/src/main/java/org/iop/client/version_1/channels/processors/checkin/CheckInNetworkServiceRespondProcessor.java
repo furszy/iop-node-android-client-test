@@ -6,6 +6,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.da
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.respond.checkin.NetworkServiceCheckInRespond;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.P2pEventType;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.PackageType;
+
 import org.iop.client.version_1.channels.endpoints.NetworkClientCommunicationChannel;
 import org.iop.client.version_1.channels.processors.PackageProcessor;
 
@@ -37,17 +38,18 @@ public class CheckInNetworkServiceRespondProcessor extends PackageProcessor {
 
         NetworkServiceCheckInRespond clientCheckInRespond = NetworkServiceCheckInRespond.parseContent(packageReceived.getContent());
 
-         /*
-             * Create a raise a new event whit the platformComponentProfile registered
-             */
+        /*
+         * Create a raise a new event whit the platformComponentProfile registered
+         */
         NetworkClientProfileRegisteredEvent event = getEventManager().getNewEventMati(P2pEventType.NETWORK_CLIENT_NETWORK_SERVICE_PROFILE_REGISTERED, NetworkClientProfileRegisteredEvent.class);
         event.setSource(EventSource.NETWORK_CLIENT);
         event.setPackageId(clientCheckInRespond.getPackageId());
         event.setStatus(event.getStatus());
-            /*
-             * Raise the event
-             */
-        System.out.println("CheckInClientRespondProcessor - Raised a event = P2pEventType.NETWORK_CLIENT_NETWORK_SERVICE_PROFILE_REGISTERED");
+
+        /*
+         * Raise the event
+         */
+        System.out.println("CheckInNetworkServiceRespondProcessor - Raised a event = P2pEventType.NETWORK_SERVICE_PROFILE_REGISTERED");
         getEventManager().raiseEvent(event);
 
     }

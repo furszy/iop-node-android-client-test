@@ -29,6 +29,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.cl
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientNewMessageFailedEvent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientNewMessageTransmitEvent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientProfileRegisteredEvent;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantRegisterProfileException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantSendMessageException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantUpdateRegisteredProfileException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.NetworkChannel;
@@ -42,6 +43,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.ne
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.exceptions.CantInitializeNetworkServiceDatabaseException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.NetworkServiceProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.P2pEventType;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.events.ClientConnectionCloseNotificationEvent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.events.CompleteComponentConnectionRequestNotificationEvent;
@@ -236,14 +238,15 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
         });
         eventManager.addListener(networkCLientProfileRegistered);
         listenersAdded.add(networkCLientProfileRegistered);
-        /**
+
+        /*
          *  Actor registered succesfuly
          */
         networkCLientProfileRegistered = eventManager.getNewListener(P2pEventType.NETWORK_CLIENT_ACTOR_PROFILE_REGISTERED);
         networkCLientProfileRegistered.setEventHandler(new FermatEventHandler<NetworkClientProfileRegisteredEvent>() {
             @Override
             public void handleEvent(NetworkClientProfileRegisteredEvent fermatEvent) throws FermatException {
-                System.out.println("Actor registered: pk:" + fermatEvent.getPublicKey());
+                System.out.println("The Actor was registered");
                 NetworkServiceType networkServiceType = messageSender.packageAck(fermatEvent.getPackageId());
                 System.out.println("ACTOR NETWORK SERVICE TYPE : " + networkServiceType);
                 AbstractNetworkService2 abstractNetworkService2 = networkServices.get(networkServiceType);
@@ -496,8 +499,8 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
     }
 
     @Override
-    public void register(ActorProfile profile) {
-        messageSender.registerActorProfile(profile);
+    public void register(ActorProfile profile, NetworkServiceProfile networkServiceProfileRequester) throws CantRegisterProfileException {
+        messageSender.registerActorProfile(profile, networkServiceProfileRequester);
     }
 
 

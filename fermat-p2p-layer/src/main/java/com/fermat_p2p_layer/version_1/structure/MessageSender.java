@@ -45,7 +45,6 @@ public class MessageSender {
     }
 
     public UUID registerNetworkServiceProfile(NetworkServiceProfile profile) throws CantRegisterProfileException {
-        //todo: ver porqué el ultimo parametro del metodo sendMessage es el destination del actor,ns o lo que sea. ver si agrego el nodo ahí o que hago
         UUID packageId = p2PLayerPluginRoot.getNetworkClient().registerProfile(profile);
         if (packageId != null)
             messagesSentWaitingForAck.put(packageId,profile.getNetworkServiceType());
@@ -84,16 +83,27 @@ public class MessageSender {
         return messagesSentWaitingForAck.remove(packageId);
     }
 
-    public UUID registerActorProfile(ActorProfile profile) {
-        //todo: hay que dejar este memtodo como los otros, tiene que hacerse el send o crease el paquete acá.
+    /**
+     * Register a actor profile with the node
+     *
+     * @param profile
+     * @param networkServiceProfileRequester
+     * @return UUID
+     * @throws CantRegisterProfileException
+     */
+    public UUID registerActorProfile(ActorProfile profile, NetworkServiceProfile networkServiceProfileRequester) throws CantRegisterProfileException {
+
         if (p2PLayerPluginRoot.getNetworkClient().isConnected()) {
-            try {
-                p2PLayerPluginRoot.getNetworkClient().registerProfile(profile);
-            } catch (FermatException e) {
-                e.printStackTrace();
-            }
+
+            UUID packageId = p2PLayerPluginRoot.getNetworkClient().registerProfile(profile);
+            if (packageId != null)
+                messagesSentWaitingForAck.put(packageId, networkServiceProfileRequester.getNetworkServiceType());
+            return packageId;
+
+        }else {
+            throw new CantRegisterProfileException(CantRegisterProfileException.DEFAULT_MESSAGE, "The network client is not connected");
         }
-        return null;
+
     }
 
     public UUID sendProfileToUpdate(NetworkServiceType networkServiceType,Profile profile) throws CantUpdateRegisteredProfileException, CantSendMessageException {
