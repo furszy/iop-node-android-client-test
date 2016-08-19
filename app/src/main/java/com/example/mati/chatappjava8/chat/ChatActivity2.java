@@ -108,7 +108,9 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
                             Core.getInstance().getChatNetworkServicePluginRoot().sendNewMessage(
                                     Core.getInstance().getInstance().getProfile(),
                                     remote,
-                                    messageText
+                                    messageText,
+                                    //I'll set true for testing
+                                    true
                             );
                         } catch (Exception e) {
                             e.printStackTrace();

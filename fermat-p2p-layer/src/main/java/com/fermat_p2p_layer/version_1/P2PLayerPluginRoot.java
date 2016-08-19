@@ -5,6 +5,7 @@ import com.bitdubai.fermat_api.FermatException;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.abstract_classes.AbstractPlugin;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.annotations.NeededAddonReference;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.EventManager;
+import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.error_manager.enums.UnexpectedPluginExceptionSeverity;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.utils.PluginVersionReference;
 import com.bitdubai.fermat_api.layer.all_definition.enums.Addons;
 import com.bitdubai.fermat_api.layer.all_definition.enums.Layers;
@@ -16,6 +17,11 @@ import com.bitdubai.fermat_api.layer.all_definition.events.interfaces.FermatEven
 import com.bitdubai.fermat_api.layer.all_definition.network_service.enums.NetworkServiceType;
 import com.bitdubai.fermat_api.layer.all_definition.util.Version;
 import com.bitdubai.fermat_api.layer.core.PluginInfo;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.Database;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.PluginDatabaseSystem;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantCreateDatabaseException;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantOpenDatabaseException;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.DatabaseNotFoundException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientACKEvent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientActorListReceivedEvent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientConnectionLostEvent;
@@ -34,6 +40,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.en
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.UpdateTypes;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.abstract_classes.AbstractNetworkService2;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.exceptions.CantInitializeNetworkServiceDatabaseException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.P2pEventType;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.events.ClientConnectionCloseNotificationEvent;
@@ -42,9 +49,16 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.events.Fai
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.events.VPNConnectionCloseNotificationEvent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.events.VPNConnectionLooseNotificationEvent;
 import com.fermat_p2p_layer.version_1.structure.MessageSender;
+import com.fermat_p2p_layer.version_1.structure.PendingMessagesSupervisorAgent;
+import com.fermat_p2p_layer.version_1.structure.database.P2PLayerDao;
+import com.fermat_p2p_layer.version_1.structure.database.P2PLayerDatabaseConstants;
+import com.fermat_p2p_layer.version_1.structure.database.P2PLayerDatabaseFactory;
+import com.fermat_p2p_layer.version_1.structure.exceptions.CantPersistsMessageException;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -58,11 +72,27 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
     @NeededAddonReference(platform = Platforms.PLUG_INS_PLATFORM, layer = Layers.PLATFORM_SERVICE, addon = Addons.EVENT_MANAGER)
     private EventManager eventManager;
 
+    @NeededAddonReference(platform = Platforms.OPERATIVE_SYSTEM_API, layer = Layers.SYSTEM, addon = Addons.PLUGIN_DATABASE_SYSTEM)
+    private PluginDatabaseSystem pluginDatabaseSystem;
 
     private ConcurrentHashMap<NetworkServiceType, AbstractNetworkService2> networkServices;
     private NetworkChannel client;
 
     private MessageSender messageSender;
+
+    /**
+     * Represents the plugin database
+     */
+    private Database database;
+
+    /**
+     * Represents the plugin database dao
+     */
+    private P2PLayerDao p2PLayerDao;
+
+    private static final int MINIMUM_COUNT_TO_SEND_FULL_MESSAGE = 3;
+
+    private Map<UUID,Integer> packageIdNotForInstantResend;
 
     /**
      * Represent the communicationSupervisorPendingMessagesAgent
@@ -91,6 +121,20 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
         try {
 //            this.communicationSupervisorPendingMessagesAgent = new CommunicationSupervisorPendingMessagesAgent(this);
 //            this.communicationSupervisorPendingMessagesAgent.start();
+            /**
+             * Initialize Plugin Database
+             */
+            initializeDatabase();
+            //Init dao
+            p2PLayerDao = new P2PLayerDao(database);
+
+            packageIdNotForInstantResend = new HashMap<>();
+
+            //Init the Pending messages agent
+            PendingMessagesSupervisorAgent pendingMessagesSupervisorAgent =
+                    new PendingMessagesSupervisorAgent(p2PLayerDao,this);
+            pendingMessagesSupervisorAgent.start();
+
         }catch (Exception e){
             e.printStackTrace();
 
@@ -100,6 +144,45 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
         super.start();
     }
 
+    private void initializeDatabase() throws CantInitializeNetworkServiceDatabaseException {
+        try {
+            /*
+             * Open new database connection
+             */
+            this.database = this.pluginDatabaseSystem.openDatabase(pluginId, P2PLayerDatabaseConstants.DATABASE_NAME);
+
+        } catch (CantOpenDatabaseException cantOpenDatabaseException) {
+
+            /*
+             * The database exists but cannot be open. I can not handle this situation.
+             */
+            throw new CantInitializeNetworkServiceDatabaseException(cantOpenDatabaseException);
+
+        } catch (DatabaseNotFoundException e) {
+
+            /*
+             * The database no exist may be the first time the plugin is running on this device,
+             * We need to create the new database
+             */
+            P2PLayerDatabaseFactory p2PLayerDatabaseFactory = new P2PLayerDatabaseFactory(pluginDatabaseSystem);
+
+            try {
+
+                /*
+                 * We create the new database
+                 */
+                this.database = p2PLayerDatabaseFactory.createDatabase(pluginId, P2PLayerDatabaseConstants.DATABASE_NAME);
+
+            } catch (CantCreateDatabaseException cantOpenDatabaseException) {
+
+                /*
+                 * The database cannot be created. I can not handle this situation.
+                 */
+                throw new CantInitializeNetworkServiceDatabaseException(cantOpenDatabaseException);
+
+            }
+        }
+    }
 
     /**
      * Initializes all event listener and configure
@@ -315,11 +398,22 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
                         System.out.println("##### ACK MENSAJE LLEGÓ BIEN A LA LAYER!!!##### ID:" + fermatEvent.getContent().getPackageId());
                         //Mensaje llega exitoso, falta
                         abstractNetworkService2.handleOnMessageSent(fermatEvent.getContent().getPackageId());
+                        //If the sending if successful and exists in P2P layer database, we need to delete from there
+                        p2PLayerDao.deleteMessageByPackageId(fermatEvent.getContent().getPackageId());
+                        packageIdNotForInstantResend.remove(fermatEvent.getContent().getPackageId());
                     } else {
                         //mensaje no llegó, acá entra en juego el agente de re envio manuel
                         System.out.println("##### ACK MENSAJE NO LLEGÓ AL OTRO LADO ##### ID:" + fermatEvent.getContent().getPackageId());
-                        abstractNetworkService2.startNetworkServicePendingMessagesSupervisorAgent();
-                        abstractNetworkService2.handleOnMessageSent(fermatEvent.getContent().getPackageId());
+                        //If the message exists in database the layer will try to resend, in other case, I'm gonna notify to NS
+                        if(!p2PLayerDao.existsPackageId(fermatEvent.getContent().getPackageId())){
+                            //I'll notify to the NS to handle this case
+                            abstractNetworkService2.handleOnMessageFail(fermatEvent.getContent().getPackageId());
+                        } else {
+                            //I'll update the count fail
+                            p2PLayerDao.increaseCountFail(fermatEvent.getContent().getPackageId());
+                            //I'll try to resend the message if the fails are low
+                            instantMessageResend(fermatEvent.getContent().getPackageId());
+                        }
                     }
                 }else System.out.println("##### ACK MENSAJE p2p layer, ns is not started. ID:" + fermatEvent.getContent().getPackageId());
 
@@ -341,9 +435,9 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
                 AbstractNetworkService2 abstractNetworkService2 = networkServices.get(networkServiceType);
                 if(abstractNetworkService2.isStarted()){
                     System.out.println("The actor "+fermatEvent.getActorProfilePublicKey()+" is "+fermatEvent.getProfileStatus());
-                    abstractNetworkService2.putActorOnlineStatus(
+                    /*abstractNetworkService2.putActorOnlineStatus(
                             fermatEvent.getActorProfilePublicKey(),
-                            fermatEvent.getProfileStatus());
+                            fermatEvent.getProfileStatus());*/
                 }
             }
         });
@@ -352,7 +446,28 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
 
     }
 
+    private void instantMessageResend(UUID packageId){
+        try{
+            //Check if the message can be resend
+            if(packageIdNotForInstantResend.get(packageId)!=null){
+                //The message is marked for not instant resend, I let this job for the agent
+                return;
+            }
+            //The message has a low quantity of resend, I'll try to send right now
+            //get the message
+            NetworkServiceMessage networkServiceMessage = p2PLayerDao.getNetworkServiceMessageById(packageId);
+            //Get the failed count
+            int failCount = networkServiceMessage.getFailCount();
+            if(failCount<MINIMUM_COUNT_TO_SEND_FULL_MESSAGE){
+                sendMessage(networkServiceMessage,networkServiceMessage.getNetworkServiceType(),null,false);
+            } else {
+                packageIdNotForInstantResend.put(packageId, failCount);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
 
+    }
 
 
     private void distributeMessage(NetworkServiceType networkType,NetworkClientNewMessageTransmitEvent fermatEvent){
@@ -426,10 +541,20 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
 
 
     @Override
-    public UUID sendMessage(NetworkServiceMessage packageContent, NetworkServiceType networkServiceType,String nodeDestinationPublicKey) throws CantSendMessageException {
+    public UUID sendMessage(NetworkServiceMessage packageContent, NetworkServiceType networkServiceType,String nodeDestinationPublicKey, boolean layerMonitoring) throws CantSendMessageException {
         System.out.println("***P2PLayer Method sendMessage..");
         //todo: me faltan cosas
         if (packageContent.getSenderPublicKey().equals(packageContent.getReceiverPublicKey())) throw new CantSendMessageException("Sender and Receiver are the same");
+        //If the NS wants that the layer monitoring the resend process I'll persist this message in p2p layer database
+        if(layerMonitoring){
+            try {
+                p2PLayerDao.persistMessage(packageContent);
+            } catch (CantPersistsMessageException e) {
+                //I will report this error, but, the message process will continue.
+                e.printStackTrace();
+                reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,e);
+            }
+        }
         return messageSender.sendMessage(packageContent,networkServiceType,nodeDestinationPublicKey);
     }
 
@@ -543,6 +668,10 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
 
     public void setEventManager(EventManager eventManager) {
         this.eventManager = eventManager;
+    }
+
+    public void setPluginDatabaseSystem(PluginDatabaseSystem pluginDatabaseSystem) {
+        this.pluginDatabaseSystem = pluginDatabaseSystem;
     }
 
     public NetworkChannel getNetworkClient() {
