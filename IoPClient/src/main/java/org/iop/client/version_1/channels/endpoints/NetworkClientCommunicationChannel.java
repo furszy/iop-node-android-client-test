@@ -1,5 +1,6 @@
 package org.iop.client.version_1.channels.endpoints;
 
+import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.EventManager;
 import com.bitdubai.fermat_api.layer.all_definition.events.EventSource;
 import com.bitdubai.fermat_api.layer.all_definition.events.interfaces.FermatEvent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientConnectedToNodeEvent;
@@ -11,9 +12,14 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.P2pE
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.PackageType;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.exception.PackageTypeNotSupportedException;
 import com.bitdubai.fermat_p2p_api.layer.p2p_communication.CommunicationChannels;
-import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.EventManager;
+
 import org.iop.client.version_1.channels.conf.ClientChannelConfigurator;
-import org.iop.client.version_1.channels.processors.*;
+import org.iop.client.version_1.channels.processors.ACKProcessor;
+import org.iop.client.version_1.channels.processors.ActorListRespondProcessor;
+import org.iop.client.version_1.channels.processors.IsActorOnlineRespondProcessor;
+import org.iop.client.version_1.channels.processors.MessageTransmitProcessor;
+import org.iop.client.version_1.channels.processors.PackageProcessor;
+import org.iop.client.version_1.channels.processors.ServerHandshakeRespondProcessor;
 import org.iop.client.version_1.channels.processors.checkin.CheckInActorRespondProcessor;
 import org.iop.client.version_1.channels.processors.checkin.CheckInClientRespondProcessor;
 import org.iop.client.version_1.channels.processors.checkin.CheckInNetworkServiceRespondProcessor;

@@ -1,13 +1,13 @@
 package org.iop.client.version_1.util;
 
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.Package;
-import org.apache.commons.lang.ClassUtils;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.common.com.google.flatbuffers.FlatBufferBuilder;
+
+import java.nio.ByteBuffer;
 
 import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
-import java.nio.ByteBuffer;
 
 /**
  * The Class <code>com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.util.PackageEncoder</code>
