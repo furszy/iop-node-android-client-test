@@ -151,7 +151,11 @@ public abstract class AbstractActorNetworkService2 extends AbstractNetworkServic
 
         if (getConnection() != null ) {
 
-            this.getConnection().register(actorToRegister);
+            try {
+                this.getConnection().register(actorToRegister, getProfile());
+            } catch (CantRegisterProfileException e) {
+                throw new CantRegisterActorException(e.getCause(), e.getContext(), e.getPossibleReason());
+            }
             registeredActors.get(actorToRegister).setLastExecution(System.currentTimeMillis());
 
         } else {
@@ -184,7 +188,11 @@ public abstract class AbstractActorNetworkService2 extends AbstractNetworkServic
                     )
             );
 
-            this.getConnection().register(actorToRegister);
+            try {
+                this.getConnection().register(actorToRegister, getProfile());
+            } catch (CantRegisterProfileException e) {
+                throw new CantRegisterActorException(e.getCause(), e.getContext(), e.getPossibleReason());
+            }
             registeredActors.get(actorToRegister).setLastExecution(System.currentTimeMillis());
 
             System.out.println("******************* REGISTERING ACTOR: " + actorToRegister.getName() + " - type: " + actorToRegister.getActorType() + "  GO OUT METHOD");
@@ -303,7 +311,13 @@ public abstract class AbstractActorNetworkService2 extends AbstractNetworkServic
 
                     actorToRegister.getKey().setLocation(location);
 
-                    this.getConnection().register(actorToRegister.getKey());
+                    try {
+
+                        this.getConnection().register(actorToRegister.getKey(), getProfile());
+
+                    } catch (CantRegisterProfileException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
       //  }
