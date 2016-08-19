@@ -41,9 +41,11 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.ne
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.example.mati.app_core.Core;
 import com.example.mati.chatappjava8.R;
+import com.example.mati.chatappjava8.commons.Utils;
 import com.example.mati.chatappjava8.list.ListActivity;
 import com.example.mati.chatappjava8.util.BitmapWorkerTask;
 import com.example.mati.chatappjava8.util.CircleTransform;
+import com.squareup.okhttp.internal.Util;
 import com.squareup.picasso.Picasso;
 
 import org.iop.ns.chat.ChatNetworkServicePluginRoot;
@@ -85,7 +87,7 @@ public class CreateIntraUserIdentityFragment extends Fragment {
     Toolbar toolbar;
 //    private IntraUserModuleIdentity identitySelected;
     private boolean isUpdate = false;
-    private EditText mBrokerPhrase;
+//    private EditText mBrokerPhrase;
 //    IntraUserIdentitySettings intraUserIdentitySettings = null;
     private boolean updateProfileImage = false;
     private boolean contextMenuInUse = false;
@@ -141,7 +143,7 @@ public class CreateIntraUserIdentityFragment extends Fragment {
     private void initViews(View layout) {
         createButton = (Button) layout.findViewById(R.id.create_crypto_broker_button);
         mBrokerName = (EditText) layout.findViewById(R.id.crypto_broker_name);
-        mBrokerPhrase = (EditText) layout.findViewById(R.id.crypto_broker_phrase);
+//        mBrokerPhrase = (EditText) layout.findViewById(R.id.crypto_broker_phrase);
         mBrokerImage = (ImageView) layout.findViewById(R.id.img_photo);
         relativeLayout = (RelativeLayout) layout.findViewById(R.id.user_image);
         mphoto_header = (ImageView) layout.findViewById(R.id.img_photo_header);
@@ -166,13 +168,15 @@ public class CreateIntraUserIdentityFragment extends Fragment {
             public void onClick(View view) {
 //                CommonLogger.debug(TAG, "Entrando en createButton.setOnClickListener");
 
-                if (identity==null) {
+                if (identity == null) {
                     if (CREATE_IDENTITY_SUCCESS == createNewIdentity()) {
-                        Intent intent = new Intent(getActivity(), ListActivity.class);
-                        startActivity(intent);
+//                        Intent intent = new Intent(getActivity(), ListActivity.class);
+//                        startActivity(intent);
+                        Toast.makeText(getActivity(), "Profile creado!", Toast.LENGTH_SHORT).show();
                     }
-                }else{
-                    new AlertDialog.Builder(getActivity()).setTitle("Identity exist, shutdown the app to change your identity").show();
+                } else {
+                    updateIdentity();
+                    new AlertDialog.Builder(getActivity()).setTitle("Identity exist, No podes cambiar de nombre por ahora").show();
                 }
 
 
@@ -250,7 +254,7 @@ public class CreateIntraUserIdentityFragment extends Fragment {
 
         }
         mBrokerName.setText(identity.getName());
-        mBrokerPhrase.setText(identity.getExtraData());
+//        mBrokerPhrase.setText(identity.getExtraData());
     }
 
     @Override
@@ -413,7 +417,7 @@ public class CreateIntraUserIdentityFragment extends Fragment {
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
         menu.setHeaderTitle("Choose mode");
 //        menu.setHeaderIcon(getActivity().getResources().getDrawable(R.drawable.ic_camera_green));
-        menu.add(Menu.NONE, CONTEXT_MENU_CAMERA, Menu.NONE, "Camera");
+//        menu.add(Menu.NONE, CONTEXT_MENU_CAMERA, Menu.NONE, "Camera");
         menu.add(Menu.NONE, CONTEXT_MENU_GALLERY, Menu.NONE, "Gallery");
 
         super.onCreateContextMenu(menu, view, menuInfo);
@@ -450,11 +454,11 @@ public class CreateIntraUserIdentityFragment extends Fragment {
         final String brokerNameText = mBrokerName.getText().toString();
         String brokerPhraseText = "";
 
-        if (!mBrokerPhrase.getText().toString().isEmpty()){
-             brokerPhraseText = mBrokerPhrase.getText().toString();
-        }else{
-            brokerPhraseText = "Available";
-        }
+//        if (!mBrokerPhrase.getText().toString().isEmpty()){
+//             brokerPhraseText = mBrokerPhrase.getText().toString();
+//        }else{
+//            brokerPhraseText = "Available";
+//        }
 
         boolean dataIsValid = validateIdentityData(brokerNameText, brokerPhraseText, brokerImageByteArray);
 
@@ -472,14 +476,16 @@ public class CreateIntraUserIdentityFragment extends Fragment {
             executorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        Core.getInstance().setProfile(profile);
-                        manager.registerActor(profile, 0, 0);
-                    } catch (ActorAlreadyRegisteredException e) {
-                        e.printStackTrace();
-                    } catch (CantRegisterActorException e) {
-                        e.printStackTrace();
-                    }
+                    Utils.saveActorProfileSettings(getActivity(), profile);
+                    Core.getInstance().setProfile(profile);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getActivity(),"Registering profile...",Toast.LENGTH_SHORT).show();
+                            createButton.setText("Save changes");
+                        }
+                    });
+//                        manager.registerActor(profile, 0, 0);
                 }
             });
 
@@ -543,6 +549,48 @@ public class CreateIntraUserIdentityFragment extends Fragment {
 
     }
 
+    public int updateIdentity(){
+        final String brokerNameText = mBrokerName.getText().toString();
+        String brokerPhraseText = "";
+
+//        if (!mBrokerPhrase.getText().toString().isEmpty()){
+//             brokerPhraseText = mBrokerPhrase.getText().toString();
+//        }else{
+//            brokerPhraseText = "Available";
+//        }
+
+        boolean dataIsValid = validateIdentityData(brokerNameText, brokerPhraseText, brokerImageByteArray);
+
+        if (dataIsValid) {
+            final ActorProfile profile = new ActorProfile();
+            profile.setIdentityPublicKey(UUID.randomUUID().toString());
+            System.out.println("I will try to register an actor with pk " + profile.getIdentityPublicKey());
+            profile.setActorType(Actors.CHAT.getCode());
+            profile.setName(mBrokerName.getText().toString());
+            profile.setAlias("Alias chat");
+            //This represents a valid image
+            profile.setPhoto(brokerImageByteArray);
+            profile.setNsIdentityPublicKey(manager.getNetWorkServicePublicKey());
+            profile.setExtraData("Test extra data");
+            executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    Utils.saveActorProfileSettings(getActivity(), profile);
+                    Core.getInstance().updaterofile(profile);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getActivity(), "Registering profile...", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+//                        manager.registerActor(profile, 0, 0);
+                }
+            });
+
+            return CREATE_IDENTITY_SUCCESS;
+        }else return 0;
+    }
+
     boolean exist = false;
 
     private byte[] convertImage(int resImage){
@@ -572,8 +620,8 @@ public class CreateIntraUserIdentityFragment extends Fragment {
     private boolean validateIdentityData(String brokerNameText, String brokerPhraseText, byte[] brokerImageBytes) {
         if (brokerNameText.isEmpty())
             return false;
-        if (brokerPhraseText.isEmpty())
-            return false;
+//        if (brokerPhraseText.isEmpty())
+//            return false;
         if (brokerImageBytes == null)
             return true;
         if (brokerImageBytes.length > 0)

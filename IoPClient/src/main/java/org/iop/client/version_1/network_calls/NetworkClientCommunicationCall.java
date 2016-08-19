@@ -6,6 +6,8 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.cl
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.Profile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.PackageType;
+
+import org.iop.client.version_1.exceptions.CantSendPackageException;
 import org.iop.client.version_1.structure.NetworkClientCommunicationConnection;
 
 /**
@@ -36,12 +38,17 @@ public class NetworkClientCommunicationCall implements NetworkClientCall {
     @Override
     public void sendPackageMessage(final NetworkServiceMessage packageContent) throws CantSendMessageException {
 
-        connection.sendPackageMessage(
-                packageContent,
-                PackageType.MESSAGE_TRANSMIT,
-                networkServiceType,
-                profile.getIdentityPublicKey()
-        );
+
+        try {
+            connection.sendPackageMessage(
+                    packageContent,
+                    PackageType.MESSAGE_TRANSMIT,
+                    networkServiceType,
+                    profile.getIdentityPublicKey()
+            );
+        } catch (CantSendPackageException e) {
+            throw new CantSendMessageException(e);
+        }
     }
 
     @Override

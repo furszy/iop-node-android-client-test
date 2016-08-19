@@ -1,6 +1,8 @@
 package com.example.mati.chatappjava8;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -13,10 +15,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 
 import com.example.mati.app_core.Core;
 import com.example.mati.chatappjava8.chat.ChatActivity2;
 import com.example.mati.chatappjava8.commons.NavigationListener;
+import com.example.mati.chatappjava8.commons.PreferenceSettingsConstants;
+import com.example.mati.chatappjava8.commons.Utils;
 import com.example.mati.chatappjava8.profile.ProfileActivity;
 
 import java.util.List;
@@ -44,6 +49,16 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
 
+
+
+        Button button = (Button) findViewById(R.id.btn_open_drawer);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
+
         navigationView = (NavigationView) findViewById(R.id.navigation);
         navigationView.inflateMenu(R.menu.navigation_menu);
         navigationView.setNavigationItemSelectedListener(new NavigationListener(this));
@@ -67,15 +82,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 Core.getInstance().start(getApplicationContext());
+                Core.getInstance().setProfile(Utils.getActorProfileFromDisk(MainActivity.this));
             }
         }).start();
+
+
+
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 

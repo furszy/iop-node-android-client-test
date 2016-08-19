@@ -14,6 +14,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.cl
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.NetworkClientCall;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.NetworkClientConnection;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.P2PLayerManager;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.BlockPackages;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.DiscoveryQueryParameters;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.Package;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.PackageContent;
@@ -40,8 +41,13 @@ import javax.websocket.EncodeException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Iterator;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The Class <code>com.bitdubai.fermat_p2p_plugin.layer.communications.network.client.developer.bitdubai.version_1.structure.NetworkClientCommunicationConnection</code>
@@ -87,6 +93,15 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
      */
     private NetworkClientCommunicationChannel networkClientCommunicationChannel;
 
+
+    /**
+     * Message waiting to send
+     */
+    private ConcurrentLinkedQueue<Package> packagesWaitingToSend;
+
+    private ScheduledExecutorService messageSenderExecutor;
+
+
    /*
     * is used to validate if it is connection to an external node
     * when receive check-in-client then send register all profile
@@ -124,7 +139,7 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
 
         URI uri = null;
         try {
-            uri = new URI(HardcodeConstants.WS_PROTOCOL + HardcodeConstants.SERVER_IP_DEFAULT+ "/iop-node/ws/client-channel");
+            uri = new URI(HardcodeConstants.WS_PROTOCOL + HardcodeConstants.SERVER_IP_DEFAULT+":"+HardcodeConstants.DEFAULT_PORT+ "/iop-node/ws/client-channel");
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -147,6 +162,8 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
 
         this.networkClientCommunicationChannel = new NetworkClientCommunicationChannel(this, isExternalNode);
         this.waiterObjectsBuffer = new WaiterObjectsBuffer();
+
+//        packagesWaitingToSend = new ConcurrentLinkedQueue<>();
     }
 
     /*
@@ -505,7 +522,7 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
     public UUID sendPackageMessage(final PackageContent     packageContent              ,
                                    final PackageType        packageType,
                                    final NetworkServiceType networkServiceType          ,
-                                   final String             destinationIdentityPublicKey) throws CantSendMessageException {
+                                   final String             destinationIdentityPublicKey) throws CantSendMessageException, CantSendPackageException {
         System.out.println("******* IS CONNECTED: " + isConnected() + " - TRYING NO SEND = " + packageContent.toJson());
         if (isConnected()){
 
@@ -522,6 +539,8 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
 
                 networkClientCommunicationChannel.getClientConnection().getBasicRemote().sendObject(pack);
 
+//                packagesWaitingToSend.add(pack);
+
                 return pack.getPackageId();
             } catch (Exception exception) {
 
@@ -531,8 +550,54 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                         "Unhandled error trying to send the message through the session."
                 );
             }
+        }else {
+            raiseClientConnectionLostNotificationEvent();
+
+            throw new CantSendPackageException(
+                    "packageContent: " + packageContent + " - packageType: " + packageType,
+                    "Client Connection is Closed."
+            );
         }
-        return null;
+    }
+
+    public UUID sendPackageMessage(final PackageContent     packageContent              ,
+                                   final PackageType        packageType,
+                                   final NetworkServiceType networkServiceType) throws CantSendMessageException, CantSendPackageException {
+        System.out.println("******* IS CONNECTED: " + isConnected() + " - TRYING NO SEND = " + packageContent.toJson());
+        if (isConnected()){
+
+            try {
+
+                //todo: esto hay que mejorarlo
+                Package pack = Package.createInstance(
+                        packageContent.toJson(),
+                        networkServiceType,
+                        packageType,
+                        clientIdentity.getPrivateKey(),
+                        null
+                );
+
+                networkClientCommunicationChannel.getClientConnection().getBasicRemote().sendObject(pack);
+
+//                packagesWaitingToSend.add(pack);
+
+                return pack.getPackageId();
+            } catch (Exception exception) {
+
+                throw new CantSendMessageException(
+                        exception,
+                        "packageContent:"+packageContent,
+                        "Unhandled error trying to send the message through the session."
+                );
+            }
+        }else {
+            raiseClientConnectionLostNotificationEvent();
+
+            throw new CantSendPackageException(
+                    "packageContent: " + packageContent + " - packageType: " + packageType,
+                    "Client Connection is Closed."
+            );
+        }
     }
 
 
@@ -545,7 +610,7 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                                    final NetworkServiceType networkServiceType          ,
                                    final String             destinationIdentityPublicKey,
                                        UUID messageId) throws CantSendMessageException {
-        System.out.println("******* IS CONNECTED: "+ isConnected() + " - TRYING NO SEND = "+ packageContent.toJson());
+        System.out.println("******* IS CONNECTED: " + isConnected() + " - TRYING NO SEND = " + packageContent.toJson());
         if (isConnected()){
 
             try {
@@ -588,6 +653,8 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
 
     private UUID sendPackage(final PackageContent packageContent,
                              final PackageType    packageType   ) throws CantSendPackageException {
+        System.out.println("******* IS CONNECTED: " + isConnected() + " - TRYING to SEND = " + packageContent);
+
 
         if (isConnected()){
 
@@ -601,9 +668,7 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                         serverIdentity
                 );
 
-                networkClientCommunicationChannel.getClientConnection().getBasicRemote().sendObject(
-                        packagea
-                );
+                networkClientCommunicationChannel.getClientConnection().getBasicRemote().sendObject(packagea);
 
                 return packagea.getPackageId();
 
@@ -625,6 +690,19 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                     "Client Connection is Closed."
             );
         }
+
+
+//        Package packagea = Package.createInstance(
+//                packageContent.toJson(),
+//                NetworkServiceType.UNDEFINED,
+//                packageType,
+//                clientIdentity.getPrivateKey(),
+//                serverIdentity
+//        );
+//        //Agrego el paquete a la cola
+//        packagesWaitingToSend.add(packagea);
+//
+//        return packagea.getPackageId();
 
     }
 
@@ -706,5 +784,43 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
 
     public void startConnectionSuperVisorAgent(){
         pluginRoot.startConnectionSuperVisorAgent();
+    }
+
+    public void startMessageSenderExecutor() throws Exception {
+        System.out.println("******* startMessageSenderExecutor");
+        if (messageSenderExecutor!=null) throw new Exception("MessageSenderExecutor no es nulo, está mal esto");
+        this.messageSenderExecutor = Executors.newSingleThreadScheduledExecutor();
+        messageSenderExecutor.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    System.out.println("******* MessageSenderExecutor running..");
+                    if (isConnected()) {
+                        BlockPackages blockPackages = new BlockPackages();
+                        for (int i = 0; i < packagesWaitingToSend.size(); i++) {
+                            blockPackages.add(packagesWaitingToSend.poll());
+                        }
+                        if (blockPackages.size() > 0) {
+                            try {
+                                networkClientCommunicationChannel.getClientConnection().getBasicRemote().sendObject(blockPackages);
+                            } catch (Exception exception) {
+                                System.err.println("CantSendPackage: block package: " + blockPackages);
+                                exception.printStackTrace();
+                            }
+                        }
+                    } else {
+                        System.err.println("MessageSenderExecutor, connection is close and the executor is on, this is very bad");
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }, 5, 5, TimeUnit.SECONDS);
+    }
+
+    public void stopMessageSenderExecutor() {
+        System.out.println("******* stopMessageSenderExecutor");
+        this.messageSenderExecutor.shutdownNow();
+        this.messageSenderExecutor = null;
     }
 }

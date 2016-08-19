@@ -80,7 +80,7 @@ public class ProfileActivity extends AppCompatActivity implements MessageReceive
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -106,6 +106,11 @@ public class ProfileActivity extends AppCompatActivity implements MessageReceive
 
     @Override
     public void onActorListReceived(List<ActorProfile> list) {
+
+    }
+
+    @Override
+    public void onActorRegistered(ActorProfile actorProfile) {
 
     }
 }

@@ -74,6 +74,9 @@ public enum P2pEventType implements FermatEventEnum {
     NETWORK_CLIENT_CALL_CONNECTED("NCACC"){
         public NetworkClientCallConnectedEvent getNewEvent() { return new NetworkClientCallConnectedEvent(this); }
     },
+    NETWORK_CLIENT_IS_ACTOR_ONLINE("NCIAO"){
+        public NetworkClientIsActorOnlineEvent getNewEvent() { return new NetworkClientIsActorOnlineEvent(this);}
+    },
 
     /**
      * END  NETWORK NODE-CLIENT TEMPLATE EVENTS

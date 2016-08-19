@@ -1,7 +1,6 @@
 package com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.abstract_classes;
 
 import com.bitdubai.fermat_api.CantStartPluginException;
-import com.bitdubai.fermat_api.FermatException;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.abstract_classes.AbstractPlugin;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.annotations.NeededAddonReference;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.annotations.NeededPluginReference;
@@ -29,13 +28,13 @@ import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.FileNotF
 import com.bitdubai.fermat_api.layer.osa_android.location_system.Location;
 import com.bitdubai.fermat_api.layer.osa_android.location_system.LocationManager;
 import com.bitdubai.fermat_api.layer.osa_android.location_system.LocationUtil;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantRegisterProfileException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.NetworkClientCall;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.NetworkClientConnection;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.NetworkClientManager;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.P2PLayerManager;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.DiscoveryQueryParameters;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.ActorListMsgRequest;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.ProfileStatus;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.ProfileTypes;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.agents.NetworkServicePendingMessagesSupervisorAgent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.constants.NetworkServiceDatabaseConstants;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.daos.QueriesDao;
@@ -43,8 +42,6 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.ne
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceQuery;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.exceptions.*;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.factories.NetworkServiceDatabaseFactory;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.enums.QueryStatus;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.enums.QueryTypes;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.exceptions.CantInitializeIdentityException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.exceptions.CantInitializeNetworkServiceProfileException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.exceptions.CantSendMessageException;
@@ -505,6 +502,12 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
         onActorUnreachable(actorProfile);
     }
 
+    public void handleProfileRegisteredSuccesfully(ProfileTypes types, UUID packageId, String profilePublicKey) {
+        if (types.equals(ProfileTypes.NETWORK_SERVICE)){
+            onNetworkServiceRegistered();
+        }
+    }
+
     /**
      * Through this method you can handle the actor found event for the actor trace that you could have done.
      *
@@ -822,7 +825,7 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
         UUID uuid = UUID.randomUUID();
         ActorListMsgRequest actorListMsgRequest = new ActorListMsgRequest(uuid,networkServiceType.getCode(),discoveryQueryParameters);
 
-        p2PLayerManager.sendDiscoveryMessage(actorListMsgRequest,networkServiceType,null);
+        p2PLayerManager.sendDiscoveryMessage(actorListMsgRequest, networkServiceType, null);
 
         return uuid;
 
@@ -839,32 +842,32 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
         System.out.println("Me llego un nuevo mensaje" + messageReceived);
     }
 
-    public final synchronized void onNetworkServiceSentMessage(NetworkServiceMessage networkServiceMessage) {
+    public final synchronized void handleOnMessageSent(UUID messageId) {
 
-        System.out.println("Message Delivered " + networkServiceMessage);
+        System.out.println("Message Delivered id: " + messageId);
 
         //networkServiceMessage.setContent(AsymmetricCryptography.decryptMessagePrivateKey(networkServiceMessage.getContent(), this.identity.getPrivateKey()));
 
         try {
-            networkServiceConnectionManager.getOutgoingMessagesDao().markAsDelivered(networkServiceMessage);
+//            networkServiceConnectionManager.getOutgoingMessagesDao().markAsDelivered(networkServiceMessage);
 
-            onSentMessage(networkServiceMessage);
+            onSentMessage(messageId);
         } catch (Exception e) {
             this.reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
         }
 
     }
 
-    public final synchronized void onNetworkServiceSentMessageError(NetworkServiceMessage networkServiceMessage) {
+    public final synchronized void handleOnMessageFail(UUID messageId) {
 
-        System.out.println("Message not delivered " + networkServiceMessage);
+        System.out.println("Message not delivered " + messageId);
 
         //networkServiceMessage.setContent(AsymmetricCryptography.decryptMessagePrivateKey(networkServiceMessage.getContent(), this.identity.getPrivateKey()));
 
         try {
-            networkServiceConnectionManager.getOutgoingMessagesDao().markAsPendingToSend(networkServiceMessage);
+//            networkServiceConnectionManager.getOutgoingMessagesDao().markAsPendingToSend(networkServiceMessage);
 
-            onSentMessageError(networkServiceMessage);
+            onMessageFail(messageId);
         } catch (Exception e) {
             this.reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
         }
@@ -883,11 +886,11 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
 
     }
 
-    public synchronized void onSentMessage(NetworkServiceMessage networkServiceMessage) {
+    public synchronized void onSentMessage(UUID messageId) {
 
     }
 
-    public synchronized void onSentMessageError(NetworkServiceMessage networkServiceMessage) {
+    public synchronized void onMessageFail(UUID messageId) {
 
     }
 
@@ -970,5 +973,34 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
     public void setPluginDatabaseSystem(PluginDatabaseSystem pluginDatabaseSystem){
         this.pluginDatabaseSystem = pluginDatabaseSystem;
     }
+
+    public void startNetworkServicePendingMessagesSupervisorAgent(){
+        try{
+//            if(networkServicePendingMessagesSupervisorAgent == null){
+//                networkServicePendingMessagesSupervisorAgent = new NetworkServicePendingMessagesSupervisorAgent(this);
+//                networkServicePendingMessagesSupervisorAgent.start();
+//            }
+        } catch (Exception e){
+            e.printStackTrace();
+            reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
+        }
+
+    }
+
+    public void putActorOnlineStatus(String actorPublicKey, ProfileStatus profileStatus){
+        try{
+//            if(networkServicePendingMessagesSupervisorAgent == null){
+//                networkServicePendingMessagesSupervisorAgent = new NetworkServicePendingMessagesSupervisorAgent(this);
+//                networkServicePendingMessagesSupervisorAgent.start();
+//            }
+//            networkServicePendingMessagesSupervisorAgent.putActorOnlineStatus(
+//                    actorPublicKey,
+//                    profileStatus);
+        } catch (Exception e){
+            e.printStackTrace();
+            reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
+        }
+    }
+
 
 }

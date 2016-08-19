@@ -12,19 +12,19 @@ import java.util.UUID;
 public class IsActorOnlineMsgRespond extends MsgRespond {
 
     /**
-     * Represents the query Id
-     */
-    private UUID queryId;
-
-    /**
      * Represents the actor profile
      */
-    private ActorProfile requestedProfile;
+    private String requestedProfilePublicKey;
 
     /**
      * Represents the profile status from the requested profile
      */
     private ProfileStatus profileStatus;
+
+    /**
+     * Represent the networkServicePublicKey
+     */
+    private String networkServiceType;
 
     /**
      * Constructor with parameters
@@ -37,33 +37,25 @@ public class IsActorOnlineMsgRespond extends MsgRespond {
             UUID packageId,
             STATUS status,
             String details,
-            ActorProfile requestedProfile,
+            String requestedProfilePublicKey,
             ProfileStatus profileStatus,
-            UUID queryId
+            String networkServiceType
     ) {
         super(
                 packageId,
                 status,
                 details);
-        this.requestedProfile = requestedProfile;
+        this.requestedProfilePublicKey = requestedProfilePublicKey;
         this.profileStatus = profileStatus;
-        this.queryId = queryId;
-    }
-
-    /**
-     * This method returns the query Id
-     * @return
-     */
-    public UUID getQueryId() {
-        return queryId;
+        this.networkServiceType = networkServiceType;
     }
 
     /**
      * This method returns the requested profile
      * @return
      */
-    public ActorProfile getRequestedProfile() {
-        return requestedProfile;
+    public String getRequestedProfile() {
+        return requestedProfilePublicKey;
     }
 
     /**
@@ -83,6 +75,10 @@ public class IsActorOnlineMsgRespond extends MsgRespond {
         return GsonProvider.getGson().toJson(this, getClass());
     }
 
+    public String getNetworkServiceType() {
+        return networkServiceType;
+    }
+
     /**
      * Get the object
      *
@@ -91,5 +87,14 @@ public class IsActorOnlineMsgRespond extends MsgRespond {
      */
     public static IsActorOnlineMsgRespond parseContent(String content) {
         return GsonProvider.getGson().fromJson(content, IsActorOnlineMsgRespond.class);
+    }
+
+    @Override
+    public String toString() {
+        return "IsActorOnlineMsgRespond{" +
+                ", requestedProfilePublicKey=" + requestedProfilePublicKey +
+                ", profileStatus=" + profileStatus +
+                ", networkServiceType='" + networkServiceType + '\'' +
+                '}';
     }
 }

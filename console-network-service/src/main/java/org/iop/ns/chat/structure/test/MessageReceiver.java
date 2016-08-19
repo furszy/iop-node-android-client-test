@@ -14,4 +14,5 @@ public interface MessageReceiver {
 
     void onActorListReceived(List<ActorProfile> list);
 
+    void onActorRegistered(ActorProfile actorProfile);
 }

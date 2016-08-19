@@ -19,6 +19,7 @@ import com.bitdubai.fermat_api.layer.osa_android.file_system.FilePrivacy;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginFileSystem;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginTextFile;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.CantCreateFileException;
+import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.CantPersistFileException;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.FileNotFoundException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantRegisterProfileException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantSendMessageException;
@@ -35,6 +36,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.Pack
 import org.iop.client.version_1.context.ClientContext;
 import org.iop.client.version_1.context.ClientContextItem;
 import org.iop.client.version_1.exceptions.CantInitializeNetworkClientP2PDatabaseException;
+import org.iop.client.version_1.exceptions.CantSendPackageException;
 import org.iop.client.version_1.structure.NetworkClientCommunicationConnection;
 import org.iop.client.version_1.structure.NetworkClientCommunicationSupervisorConnectionAgent;
 import org.iop.client.version_1.util.HardcodeConstants;
@@ -222,7 +224,7 @@ public class IoPClientPluginRoot extends AbstractPlugin implements NetworkClient
     /**
      * Initialize the identity of this plugin
      */
-    private void initializeIdentity() throws CantInitializeNetworkClientP2PDatabaseException {
+    private void initializeIdentity() throws CantInitializeNetworkClientP2PDatabaseException, CantPersistFileException, CantCreateFileException {
 
         System.out.println("Calling the method - initializeIdentity() ");
 
@@ -269,7 +271,7 @@ public class IoPClientPluginRoot extends AbstractPlugin implements NetworkClient
                 /*
                  * The file cannot be created. I can not handle this situation.
                  */
-                throw new CantInitializeNetworkClientP2PDatabaseException(exception.getLocalizedMessage());
+                throw exception;
             }
 
 
@@ -395,7 +397,20 @@ public class IoPClientPluginRoot extends AbstractPlugin implements NetworkClient
 
     @Override
     public UUID sendMessage(PackageContent packageContent, PackageType packageType, NetworkServiceType networkServiceType, String destinationPublicKey) throws CantSendMessageException {
-        return networkClientCommunicationConnection.sendPackageMessage(packageContent,packageType,networkServiceType,destinationPublicKey);
+        try {
+            return networkClientCommunicationConnection.sendPackageMessage(packageContent,packageType,networkServiceType,destinationPublicKey);
+        } catch (CantSendPackageException e) {
+            throw new CantSendMessageException(e);
+        }
+    }
+
+    @Override
+    public UUID sendMessage(PackageContent packageContent, PackageType packageType,NetworkServiceType networkServiceType) throws CantSendMessageException {
+        try {
+            return networkClientCommunicationConnection.sendPackageMessage(packageContent,packageType,networkServiceType);
+        } catch (CantSendPackageException e) {
+            throw new CantSendMessageException(e);
+        }
     }
 
     public void setPluginFileSystem(PluginFileSystem pluginFileSystem) {

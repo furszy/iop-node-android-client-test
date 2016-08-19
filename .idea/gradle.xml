@@ -15,6 +15,24 @@
             <option value="$PROJECT_DIR$/fermat-api" />
             <option value="$PROJECT_DIR$/fermat-osa-addon-android-database-system-bitdubai" />
             <option value="$PROJECT_DIR$/fermat-osa-addon-android-file-system-bitdubai" />
+            <option value="$PROJECT_DIR$/fermat-osa-addon-linux-database-system-bitdubai" />
+            <option value="$PROJECT_DIR$/fermat-osa-addon-linux-file-system-bitdubai" />
+            <option value="$PROJECT_DIR$/fermat-p2p-api" />
+            <option value="$PROJECT_DIR$/fermat-p2p-layer" />
+            <option value="$PROJECT_DIR$/fermat-pip-api" />
+            <option value="$PROJECT_DIR$/stress" />
+          </set>
+        </option>
+        <option name="myModules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/IoPClient" />
+            <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/app-core" />
+            <option value="$PROJECT_DIR$/console-network-service" />
+            <option value="$PROJECT_DIR$/fermat-api" />
+            <option value="$PROJECT_DIR$/fermat-osa-addon-android-database-system-bitdubai" />
+            <option value="$PROJECT_DIR$/fermat-osa-addon-android-file-system-bitdubai" />
             <option value="$PROJECT_DIR$/fermat-p2p-api" />
             <option value="$PROJECT_DIR$/fermat-p2p-layer" />
             <option value="$PROJECT_DIR$/fermat-pip-api" />

@@ -3,6 +3,7 @@ package com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.d
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.PackageContent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.Profile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.util.GsonProvider;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.MessageContentType;
 
 /**
  * This class represents the the message to request if an actor is online.
@@ -13,15 +14,17 @@ public class IsActorOnlineMsgRequest extends PackageContent {
     /**
      * Represents the requested profile
      */
-    private Profile requestedProfile;
+    private String requestedProfilePublicKey;
 
     /**
-     * Default construc with parameters
+     * Default constructor with parameters
      * @param requestedProfile
      */
-    public IsActorOnlineMsgRequest(Profile requestedProfile) {
+    public IsActorOnlineMsgRequest(
+            Profile requestedProfile) {
 
-        this.requestedProfile = requestedProfile;
+        super(MessageContentType.JSON);
+        this.requestedProfilePublicKey = requestedProfile.getIdentityPublicKey();
     }
 
     /**
@@ -29,9 +32,9 @@ public class IsActorOnlineMsgRequest extends PackageContent {
      *
      * @return requestedProfile
      */
-    public Profile getRequestedProfile() {
+    public String getRequestedProfilePublicKey() {
 
-        return requestedProfile;
+        return requestedProfilePublicKey;
     }
 
     /**
@@ -51,5 +54,12 @@ public class IsActorOnlineMsgRequest extends PackageContent {
      */
     public static IsActorOnlineMsgRequest parseContent(String content) {
         return GsonProvider.getGson().fromJson(content, IsActorOnlineMsgRequest.class);
+    }
+
+    @Override
+    public String toString() {
+        return "IsActorOnlineMsgRequest{" +
+                ", requestedProfilePublicKey=" + requestedProfilePublicKey +
+                '}';
     }
 }

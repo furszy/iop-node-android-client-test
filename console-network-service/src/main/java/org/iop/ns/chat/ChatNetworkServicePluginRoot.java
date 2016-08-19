@@ -16,10 +16,13 @@ import com.bitdubai.fermat_api.layer.core.PluginInfo;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantSendMessageException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.NetworkClientManager;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.DiscoveryQueryParameters;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.IsActorOnlineMsgRequest;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.abstract_classes.AbstractActorNetworkService2;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceQuery;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.exceptions.RecordNotFoundException;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.exceptions.ActorAlreadyRegisteredException;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.exceptions.CantRegisterActorException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -201,17 +204,17 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
     }
 
     @Override
-    public void onSentMessage(NetworkServiceMessage messageSent) {
+    public void onSentMessage(UUID messageId) {
 
         try {
-            JsonObject messageData = EncodeMsjContent.decodeMsjContent(messageSent);
-            Gson gson = new Gson();
-            UUID chatId = gson.fromJson(messageData.get(ChatTransmissionJsonAttNames.ID_CHAT), UUID.class);
-            ChatMessageTransactionType chatMessageTransactionType = gson.fromJson(messageData.get(ChatTransmissionJsonAttNames.MSJ_CONTENT_TYPE), ChatMessageTransactionType.class);
-            if (chatMessageTransactionType == ChatMessageTransactionType.CHAT_METADATA_TRASMIT) {
+//            JsonObject messageData = EncodeMsjContent.decodeMsjContent(messageSent);
+//            Gson gson = new Gson();
+//            UUID chatId = gson.fromJson(messageData.get(ChatTransmissionJsonAttNames.ID_CHAT), UUID.class);
+//            ChatMessageTransactionType chatMessageTransactionType = gson.fromJson(messageData.get(ChatTransmissionJsonAttNames.MSJ_CONTENT_TYPE), ChatMessageTransactionType.class);
+//            if (chatMessageTransactionType == ChatMessageTransactionType.CHAT_METADATA_TRASMIT) {
 //                launchOutgoingChatNotification(chatId);
                 System.out.println("ChatNetworkServicePluginRoot - SALIENDO DEL HANDLE NEW SENT MESSAGE NOTIFICATION");
-            }
+//            }
 
         } catch (Exception e) {
             //quiere decir que no estoy reciviendo metadata si no una respuesta
@@ -389,6 +392,16 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
 
         System.out.println("method onNetworkServiceRegistered: chatNS");
 
+        for (ActorProfile myActorProfile : myActorProfiles) {
+            try {
+                registerActor(myActorProfile,0,0);
+            } catch (ActorAlreadyRegisteredException e) {
+                //nothing
+            } catch (CantRegisterActorException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     public void setMessageReceiver(MessageReceiver messageReceiver) {
@@ -400,7 +413,7 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
         this.networkClientManager = networkClientManager;
     }
 
-    public void requestActorProfilesList() {
+    public void requestActorProfilesList(int max, int offset) {
             try {
                 discoveryActorProfiles(new DiscoveryQueryParameters(
                         null,
@@ -413,37 +426,65 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
                         null,
                         false,
                         null,
-                        20,
-                        0,
+                        max,
+                        offset,
                         true
                 ));
+       // testDataWithoutNode(max, offset); //just use it for test without node, please comment try catch and discovery code above
             } catch (CantSendMessageException e) {
                 e.printStackTrace();
             }
     }
 
-    UUID testID;
+    @Override
+    protected void onActorRegistered(ActorProfile actorProfile) {
+
+        System.out.println("im registered : "+ actorProfile);
+        messageReceiver.onActorRegistered(actorProfile);
+    }
+
 
     @Override
     public void onNetworkServiceActorListReceived(NetworkServiceQuery query, List<ActorProfile> actorProfiles) {
-//        actorProfiles.forEach(receiver -> {
-//            if (receiver.getName().equals("Mati")){
-//                ActorProfile sender = myActorProfiles.get(0);
-//                try {
-//                    testID = sendNewMessage(sender,receiver,"Holas");
-//                } catch (com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.exceptions.CantSendMessageException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
         System.out.println("Chat OnNetworkServiceActorListReceived...");
         if (messageReceiver!=null){
             messageReceiver.onActorListReceived(actorProfiles);
         }
     }
 
-    public List<ActorProfile> getResult() {
-        return result;
+    public void registerProfile(ActorProfile actorProfile){
+        myActorProfiles.add(actorProfile);
+        try {
+            registerActor(actorProfile,0,0);
+        } catch (ActorAlreadyRegisteredException e) {
+            e.printStackTrace();
+        } catch (CantRegisterActorException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void testDataWithoutNode(int max, int offset){
+        ArrayList<ActorProfile> actorProfiles = new ArrayList<>();
+        for(int i=0; i<=10; i++){
+            try {
+                ActorProfile ac = new ActorProfile();
+                ac.setClientIdentityPublicKey("a"+String.valueOf(i+1));
+                ac.setActorType(Actors.CHAT.getCode());
+                ac.setAlias("a"+String.valueOf(i+1));
+                ac.setExtraData("a"+String.valueOf(i+1));
+                ac.setHomeNodeIdentifier("a"+String.valueOf(i+1));
+                ac.setName("a"+String.valueOf(i+1));
+                ac.setNsIdentityPublicKey("a"+String.valueOf(i+1));
+                ac.setIdentityPublicKey("a"+String.valueOf(i+1));
+                ac.setPhoto(null);
+                actorProfiles.add(ac);
+            }catch (Exception e){}
+        }
+        if(actorProfiles.size() > offset+max)
+            max = max+offset;
+        else
+            max = actorProfiles.size();
+        onNetworkServiceActorListReceived(null, actorProfiles.subList(offset, max));
     }
 
 }
