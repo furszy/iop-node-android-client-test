@@ -17,3 +17,5 @@ out/
 log/
 
 *.class
+
+gradle/
