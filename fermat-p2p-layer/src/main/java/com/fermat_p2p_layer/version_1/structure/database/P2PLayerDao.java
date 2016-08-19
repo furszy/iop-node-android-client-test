@@ -380,16 +380,21 @@ public class P2PLayerDao {
             Integer failCountMax)
             throws CantGetNetworkServiceMessageException {
         DatabaseTable table = getDatabaseTable();
-        if(failCountMin>=failCountMax){
+        if(failCountMax!=null&&failCountMin>=failCountMax){
             return getNetworkServiceMessageByFailCount(failCountMin);
         }
         //Set filters
+
         final List<DatabaseTableFilter> tableFilters = new ArrayList<>();
-        DatabaseTableFilter minFilter = table.getEmptyTableFilter();
-        minFilter.setType(DatabaseFilterType.GREATER_OR_EQUAL_THAN);
-        minFilter.setColumn(P2P_LAYER_FAIL_COUNT_COLUMN_NAME);
-        minFilter.setValue(failCountMin.toString());
-        tableFilters.add(minFilter);
+
+        if(failCountMin !=null){
+            DatabaseTableFilter minFilter = table.getEmptyTableFilter();
+            minFilter.setType(DatabaseFilterType.GREATER_OR_EQUAL_THAN);
+            minFilter.setColumn(P2P_LAYER_FAIL_COUNT_COLUMN_NAME);
+            minFilter.setValue(failCountMin.toString());
+            tableFilters.add(minFilter);
+        }
+
 
         if (failCountMax != null){
             DatabaseTableFilter maxFilter = table.getEmptyTableFilter();
