@@ -1,14 +1,11 @@
 package com.fermat_p2p_layer.version_1.structure;
 
 import com.bitdubai.fermat_api.AbstractAgent;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantSendMessageException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
 import com.fermat_p2p_layer.version_1.P2PLayerPluginRoot;
 import com.fermat_p2p_layer.version_1.structure.database.P2PLayerDao;
-import com.fermat_p2p_layer.version_1.structure.exceptions.CantGetNetworkServiceMessageException;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -57,7 +54,7 @@ public class PendingMessagesSupervisorAgent extends AbstractAgent {
         if(haveToSearchMedium){
             //I'll set medium search as 3 and 9
             try {
-                List<NetworkServiceMessage> messageList = p2PLayerDao.getNetworkServiceMessageByFailCount(MINIMUM_COUNT_TO_SEND_FULL_MESSAGE,9);
+                List<NetworkServiceMessage> messageList = p2PLayerDao.listMessagesByFailCount(MINIMUM_COUNT_TO_SEND_FULL_MESSAGE, 9);
                 for(NetworkServiceMessage networkServiceMessage : messageList){
                     p2PLayerPluginRoot.sendMessage(networkServiceMessage, networkServiceMessage.getNetworkServiceType(),null,false);
                 }
@@ -70,7 +67,7 @@ public class PendingMessagesSupervisorAgent extends AbstractAgent {
             //10 fails and upper
             try {
                 //null represents that I need a list with value 10 and upper
-                List<NetworkServiceMessage> messageList = p2PLayerDao.getNetworkServiceMessageByFailCount(10,null);
+                List<NetworkServiceMessage> messageList = p2PLayerDao.listMessagesByFailCount(10, null);
                 for(NetworkServiceMessage networkServiceMessage : messageList){
                     p2PLayerPluginRoot.sendMessage(networkServiceMessage, networkServiceMessage.getNetworkServiceType(),null,false);
                 }
