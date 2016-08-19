@@ -16,7 +16,7 @@ import com.example.mati.chatappjava8.chat.ChatActivity2;
 public class Notifications {
 
 
-    public static void pushNotification(Context context,String content){
+    public static void pushNotification(Context context, String content, String senderPk){
         Intent intent = new Intent(context, ChatActivity2.class);
         PendingIntent pi = PendingIntent
                 .getActivity(context, 0, intent, 0);

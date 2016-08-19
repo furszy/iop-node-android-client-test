@@ -165,7 +165,7 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
 
     @Override
     public void onMessageReceived(String senderPk,String content) {
-        if (remote.getIdentityPublicKey().equals(senderPk)) {
+        if (remote!=null && remote.getIdentityPublicKey().equals(senderPk)) {
             Random random = new Random();
             ChatMessage chatMessage = new ChatMessage();
             chatMessage.setId(random.nextInt());//dummy
@@ -174,7 +174,7 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
             chatMessage.setMe(false);
             displayMessage(chatMessage);
         }else {
-            Notifications.pushNotification(this,content);
+            Notifications.pushNotification(this,content,senderPk);
         }
     }
 
