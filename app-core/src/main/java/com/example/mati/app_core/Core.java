@@ -156,20 +156,20 @@ public class Core {
     }
 
     public void setProfile(ActorProfile profile) {
-        if (profile!=null) {
-            this.profile = profile;
-            chatNetworkServicePluginRoot.registerProfile(profile);
-        }else{
-            try {
-                chatNetworkServicePluginRoot.updateRegisteredActor(profile, UpdateTypes.FULL);
-            } catch (CantUpdateRegisteredActorException e) {
-                e.printStackTrace();
-            } catch (CantUpdateRegisteredProfileException e) {
-                e.printStackTrace();
-            }
-        }
+        this.profile = profile;
+        chatNetworkServicePluginRoot.registerProfile(profile);
     }
 
+    public void updaterofile(ActorProfile profile){
+        try {
+            this.profile = profile;
+            chatNetworkServicePluginRoot.updateRegisteredActor(profile, UpdateTypes.FULL);
+        } catch (CantUpdateRegisteredActorException e) {
+            e.printStackTrace();
+        } catch (CantUpdateRegisteredProfileException e) {
+            e.printStackTrace();
+        }
+    }
     public ChatNetworkServicePluginRoot getChatNetworkServicePluginRoot() {
         return chatNetworkServicePluginRoot;
     }

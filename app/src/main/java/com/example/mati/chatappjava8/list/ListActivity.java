@@ -129,6 +129,11 @@ public class ListActivity extends AppCompatActivity implements MessageReceiver, 
     }
 
     @Override
+    public void onActorRegistered(ActorProfile actorProfile) {
+
+    }
+
+    @Override
     public void onItemClickListener(ActorProfile data, int position) {
         if (Core.getInstance().getProfile()!=null) {
             Intent intent = new Intent(getApplicationContext(), ChatActivity2.class);

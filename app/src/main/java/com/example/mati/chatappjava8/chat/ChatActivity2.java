@@ -183,4 +183,9 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
 
     }
 
+    @Override
+    public void onActorRegistered(ActorProfile actorProfile) {
+
+    }
+
 }

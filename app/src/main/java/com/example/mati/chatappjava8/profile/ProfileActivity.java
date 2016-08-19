@@ -108,4 +108,9 @@ public class ProfileActivity extends AppCompatActivity implements MessageReceive
     public void onActorListReceived(List<ActorProfile> list) {
 
     }
+
+    @Override
+    public void onActorRegistered(ActorProfile actorProfile) {
+
+    }
 }

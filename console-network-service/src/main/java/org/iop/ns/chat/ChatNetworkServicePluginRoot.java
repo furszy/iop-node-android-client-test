@@ -396,7 +396,7 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
             try {
                 registerActor(myActorProfile,0,0);
             } catch (ActorAlreadyRegisteredException e) {
-                e.printStackTrace();
+                //nothing
             } catch (CantRegisterActorException e) {
                 e.printStackTrace();
             }
@@ -435,6 +435,13 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
             }
     }
 
+    @Override
+    protected void onActorRegistered(ActorProfile actorProfile) {
+
+        System.out.println("im registered : "+ actorProfile);
+        messageReceiver.onActorRegistered(actorProfile);
+    }
+
 //    UUID testID;
 
     @Override
@@ -457,6 +464,13 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
 
     public void registerProfile(ActorProfile actorProfile){
         myActorProfiles.add(actorProfile);
+        try {
+            registerActor(actorProfile,0,0);
+        } catch (ActorAlreadyRegisteredException e) {
+            e.printStackTrace();
+        } catch (CantRegisterActorException e) {
+            e.printStackTrace();
+        }
     }
 
 }
