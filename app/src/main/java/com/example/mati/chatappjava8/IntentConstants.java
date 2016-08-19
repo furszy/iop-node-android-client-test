@@ -7,5 +7,5 @@ public class IntentConstants {
 
     public static String PROFILE_RECEIVER = "RECEIVER";
 
-
+    public static String PROFILE_RECEIVER_NOTIFICATION_PK = "not";
 }
