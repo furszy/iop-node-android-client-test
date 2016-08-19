@@ -32,7 +32,17 @@ public interface P2PLayerManager {
     void setNetworkServicesRegisteredFalse();
 
     //todo: ver que poner en el destinationPublicKey, yo creo que ahí deberia ir el homeNode pero tengo que ver eso
-    UUID sendMessage(NetworkServiceMessage packageContent, NetworkServiceType networkServiceType, @Nullable  String nodeDestinationPublicKey) throws CantSendMessageException;
+
+    /**
+     * The parameter layerMonitoring sets if the Layer is going to monitoring the resend message process.
+     * @param packageContent
+     * @param networkServiceType
+     * @param nodeDestinationPublicKey
+     * @param layerMonitoring sets if the Layer is going to monitoring the resend message process.
+     * @return
+     * @throws CantSendMessageException
+     */
+    UUID sendMessage(NetworkServiceMessage packageContent, NetworkServiceType networkServiceType, @Nullable  String nodeDestinationPublicKey, boolean layerMonitoring) throws CantSendMessageException;
 
     /**
      *

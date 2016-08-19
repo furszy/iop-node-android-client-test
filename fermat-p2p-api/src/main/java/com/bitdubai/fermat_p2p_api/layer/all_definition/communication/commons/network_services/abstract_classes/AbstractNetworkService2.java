@@ -772,11 +772,12 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
 //    }
 
     /**
-     * Method tha send a new Message
+     * Method that send a new Message
      */
     public UUID sendNewMessage(final ActorProfile sender        ,
                                final ActorProfile destination   ,
-                               final String       messageContent) throws CantSendMessageException {
+                               final String       messageContent,
+                               final boolean p2pLayerMonitoring) throws CantSendMessageException {
 
         try {
 
@@ -791,7 +792,11 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
                     MessageContentType.TEXT
             );
 
-            return p2PLayerManager.sendMessage(networkServiceMessage,getNetworkServiceType(),destination.getHomeNodePublicKey());
+            return p2PLayerManager.sendMessage(
+                    networkServiceMessage,
+                    getNetworkServiceType(),
+                    destination.getHomeNodePublicKey(),
+                    p2pLayerMonitoring);
 
             /*
              * Save to the data base table
@@ -884,12 +889,6 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
     }
 
     public synchronized void onMessageFail(UUID messageId) {
-
-        try {
-            //networkServiceConnectionManager.getOutgoingMessagesDao().
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
     }
 

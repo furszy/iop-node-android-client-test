@@ -5,6 +5,7 @@ import com.bitdubai.fermat_api.FermatException;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.abstract_classes.AbstractPlugin;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.annotations.NeededAddonReference;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.EventManager;
+import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.error_manager.enums.UnexpectedPluginExceptionSeverity;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.utils.PluginVersionReference;
 import com.bitdubai.fermat_api.layer.all_definition.enums.Addons;
 import com.bitdubai.fermat_api.layer.all_definition.enums.Layers;
@@ -48,6 +49,7 @@ import com.fermat_p2p_layer.version_1.structure.MessageSender;
 import com.fermat_p2p_layer.version_1.structure.database.P2PLayerDao;
 import com.fermat_p2p_layer.version_1.structure.database.P2PLayerDatabaseConstants;
 import com.fermat_p2p_layer.version_1.structure.database.P2PLayerDatabaseFactory;
+import com.fermat_p2p_layer.version_1.structure.exceptions.CantPersistsMessageException;
 
 import java.util.Collection;
 import java.util.List;
@@ -359,10 +361,16 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
                         System.out.println("##### ACK MENSAJE LLEGÓ BIEN A LA LAYER!!!##### ID:" + fermatEvent.getContent().getPackageId());
                         //Mensaje llega exitoso, falta
                         abstractNetworkService2.handleOnMessageSent(fermatEvent.getContent().getPackageId());
+                        //If the sending if successful and exists in P2P layer database, we need to delete from there
+                        p2PLayerDao.deleteMessageByPackageId(fermatEvent.getContent().getPackageId());
                     } else {
                         //mensaje no llegó, acá entra en juego el agente de re envio manuel
                         System.out.println("##### ACK MENSAJE NO LLEGÓ AL OTRO LADO ##### ID:" + fermatEvent.getContent().getPackageId());
-                        //abstractNetworkService2.handleOnMessageFail(fermatEvent.getContent().getPackageId());
+                        //If the message exists in database the layer will try to resend, in other case, I'm gonna notify to NS
+                        if(!p2PLayerDao.existsPackageId(fermatEvent.getContent().getPackageId())){
+                            //I'll notify to the NS to handle this case
+                            abstractNetworkService2.handleOnMessageFail(fermatEvent.getContent().getPackageId());
+                        }
                     }
                 }else System.out.println("##### ACK MENSAJE p2p layer, ns is not started. ID:" + fermatEvent.getContent().getPackageId());
 
@@ -469,10 +477,20 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
 
 
     @Override
-    public UUID sendMessage(NetworkServiceMessage packageContent, NetworkServiceType networkServiceType,String nodeDestinationPublicKey) throws CantSendMessageException {
+    public UUID sendMessage(NetworkServiceMessage packageContent, NetworkServiceType networkServiceType,String nodeDestinationPublicKey, boolean layerMonitoring) throws CantSendMessageException {
         System.out.println("***P2PLayer Method sendMessage..");
         //todo: me faltan cosas
         if (packageContent.getSenderPublicKey().equals(packageContent.getReceiverPublicKey())) throw new CantSendMessageException("Sender and Receiver are the same");
+        //If the NS wants that the layer monitoring the resend process I'll persist this message in p2p layer database
+        if(layerMonitoring){
+            try {
+                p2PLayerDao.persistMessage(packageContent);
+            } catch (CantPersistsMessageException e) {
+                //I will report this error, but, the message process will continue.
+                e.printStackTrace();
+                reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,e);
+            }
+        }
         return messageSender.sendMessage(packageContent,networkServiceType,nodeDestinationPublicKey);
     }
 

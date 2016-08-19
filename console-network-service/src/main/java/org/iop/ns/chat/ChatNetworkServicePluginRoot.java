@@ -255,7 +255,9 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
             sendNewMessage(
                     sender,
                     receiver,
-                    jsonMessage
+                    jsonMessage,
+                    //I'll set true for testing
+                    true
             );
         } catch (com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.exceptions.CantSendMessageException e) {
             reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
