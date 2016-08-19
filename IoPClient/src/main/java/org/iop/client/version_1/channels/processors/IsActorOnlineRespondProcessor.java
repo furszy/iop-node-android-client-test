@@ -1,7 +1,6 @@
 package org.iop.client.version_1.channels.processors;
 
 import com.bitdubai.fermat_api.layer.all_definition.events.EventSource;
-import com.bitdubai.fermat_api.layer.all_definition.exceptions.InvalidParameterException;
 import com.bitdubai.fermat_api.layer.all_definition.network_service.enums.NetworkServiceType;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientIsActorOnlineEvent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.Package;
@@ -42,13 +41,9 @@ public class IsActorOnlineRespondProcessor extends PackageProcessor {
                 isActorOnlineMsgRespond.getRequestedProfile());
         networkClientIsActorOnlineEvent.setProfileStatus(
                 isActorOnlineMsgRespond.getProfileStatus());
-        try {
-            networkClientIsActorOnlineEvent.setNetworkServiceType(
-                    NetworkServiceType.getByCode(
-                            isActorOnlineMsgRespond.getNetworkServiceType()));
-        } catch (InvalidParameterException e) {
-            e.printStackTrace();
-        }
+
+        networkClientIsActorOnlineEvent.setNetworkServiceType(NetworkServiceType.getByCode(isActorOnlineMsgRespond.getNetworkServiceType()));
+
         if(isActorOnlineMsgRespond.getStatus() == IsActorOnlineMsgRespond.STATUS.SUCCESS){
             networkClientIsActorOnlineEvent.setStatus(NetworkClientIsActorOnlineEvent.STATUS.SUCCESS);
         }else{
