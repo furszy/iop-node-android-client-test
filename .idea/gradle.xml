@@ -3,27 +3,11 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
-        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleHome" value="$APPLICATION_HOME_DIR$/gradle/gradle-2.8" />
+        <option name="gradleJvm" value="1.7" />
         <option name="modules">
-          <set>
-            <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/IoPClient" />
-            <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/app-core" />
-            <option value="$PROJECT_DIR$/console-network-service" />
-            <option value="$PROJECT_DIR$/fermat-api" />
-            <option value="$PROJECT_DIR$/fermat-osa-addon-android-database-system-bitdubai" />
-            <option value="$PROJECT_DIR$/fermat-osa-addon-android-file-system-bitdubai" />
-            <option value="$PROJECT_DIR$/fermat-osa-addon-linux-database-system-bitdubai" />
-            <option value="$PROJECT_DIR$/fermat-osa-addon-linux-file-system-bitdubai" />
-            <option value="$PROJECT_DIR$/fermat-p2p-api" />
-            <option value="$PROJECT_DIR$/fermat-p2p-layer" />
-            <option value="$PROJECT_DIR$/fermat-pip-api" />
-            <option value="$PROJECT_DIR$/stress" />
-          </set>
-        </option>
-        <option name="myModules">
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/IoPClient" />
