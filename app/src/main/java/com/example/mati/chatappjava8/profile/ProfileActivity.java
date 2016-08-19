@@ -46,7 +46,6 @@ public class ProfileActivity extends AppCompatActivity implements MessageReceive
 //        });
 
 
-        Core.getInstance().setReceiver(this);
 
         navigationView = (NavigationView) findViewById(R.id.navigation);
         navigationView.inflateMenu(R.menu.navigation_menu);
@@ -71,6 +70,12 @@ public class ProfileActivity extends AppCompatActivity implements MessageReceive
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction().add(R.id.fragment_container,CreateIntraUserIdentityFragment.newInstance(Core.getInstance().getChatNetworkServicePluginRoot())).commit();
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Core.getInstance().setReceiver(this);
     }
 
     @Override

@@ -79,8 +79,6 @@ public class ListActivity extends AppCompatActivity
         });
         init();
 
-        Core.getInstance().setReceiver(this);
-
         this.recyclerView = (RecyclerView) findViewById(R.id.recycler);
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -121,6 +119,7 @@ public class ListActivity extends AppCompatActivity
     }
 
     private void init(){
+        Core.getInstance().setReceiver(this);
         if (executorService==null){
             executorService = Executors.newFixedThreadPool(2);
         }else{
