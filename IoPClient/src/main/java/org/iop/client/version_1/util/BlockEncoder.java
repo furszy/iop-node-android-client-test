@@ -7,7 +7,6 @@
 package org.iop.client.version_1.util;
 
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.BlockPackages;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.Package;
 import com.google.gson.Gson;
 
 import javax.websocket.EncodeException;
