@@ -3,8 +3,10 @@ package com.fermat_p2p_layer.version_1.structure.database;
 import com.bitdubai.fermat_api.layer.all_definition.exceptions.InvalidParameterException;
 import com.bitdubai.fermat_api.layer.all_definition.network_service.enums.NetworkServiceType;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.Database;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseFilterOperator;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseFilterType;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseTable;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseTableFilter;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseTableRecord;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantInsertRecordException;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantLoadTableToMemoryException;
@@ -319,11 +321,69 @@ public class P2PLayerDao {
      * @return
      * @throws CantGetNetworkServiceMessageException
      */
-    public List<NetworkServiceMessage> getNetworkServiceMessageByFailCount(int failCount)
+    public List<NetworkServiceMessage> getNetworkServiceMessageByFailCount(Integer failCount)
             throws CantGetNetworkServiceMessageException {
         DatabaseTable table = getDatabaseTable();
         //Set filter
-        table.addStringFilter(P2P_LAYER_PACKAGE_ID_COLUMN_NAME, failCount+"", DatabaseFilterType.EQUAL);
+        table.addStringFilter(P2P_LAYER_PACKAGE_ID_COLUMN_NAME, failCount.toString(), DatabaseFilterType.EQUAL);
+        try{
+            table.loadToMemory();
+            List<DatabaseTableRecord> records = table.getRecords();
+            if(records.isEmpty()){
+                //Cannot find the record in database
+                return new ArrayList<>();
+            } else{
+                List<NetworkServiceMessage> networkServiceMessages = new ArrayList<>();
+                for (DatabaseTableRecord record : records) {
+                    networkServiceMessages.add(buildNetworkServiceMessage(record));
+                }
+                records=null;
+                return networkServiceMessages;
+            }
+
+        } catch (CantLoadTableToMemoryException e) {
+            throw new CantGetNetworkServiceMessageException(
+                    e,
+                    "Getting NetworkServiceMessage from database by fail count",
+                    "Cannot load database table into memory");
+        } catch (Exception e){
+            throw new CantGetNetworkServiceMessageException(
+                    e,
+                    "Getting NetworkServiceMessage from database by fail count",
+                    "Unexpected exception");
+        }
+    }
+
+    /**
+     * This method returns a NetworkServiceMessage list from database by the fail count interval
+     * @param failCountMax
+     * @param failCountMin
+     * @return
+     * @throws CantGetNetworkServiceMessageException
+     */
+    public List<NetworkServiceMessage> getNetworkServiceMessageByFailCount(
+            Integer failCountMin,
+            Integer failCountMax)
+            throws CantGetNetworkServiceMessageException {
+        DatabaseTable table = getDatabaseTable();
+        if(failCountMin>=failCountMax){
+            return getNetworkServiceMessageByFailCount(failCountMin);
+        }
+        //Set filters
+        final List<DatabaseTableFilter> tableFilters = new ArrayList<>();
+        DatabaseTableFilter minFilter = table.getEmptyTableFilter();
+        minFilter.setType(DatabaseFilterType.GREATER_OR_EQUAL_THAN);
+        minFilter.setColumn(P2P_LAYER_FAIL_COUNT_COLUMN_NAME);
+        minFilter.setValue(failCountMin.toString());
+        tableFilters.add(minFilter);
+
+        DatabaseTableFilter maxFilter = table.getEmptyTableFilter();
+        maxFilter.setType(DatabaseFilterType.LESS_OR_EQUAL_THAN);
+        maxFilter.setColumn(P2P_LAYER_FAIL_COUNT_COLUMN_NAME);
+        maxFilter.setValue(failCountMax.toString());
+        tableFilters.add(maxFilter);
+
+        table.setFilterGroup(tableFilters,null, DatabaseFilterOperator.AND);
         try{
             table.loadToMemory();
             List<DatabaseTableRecord> records = table.getRecords();
