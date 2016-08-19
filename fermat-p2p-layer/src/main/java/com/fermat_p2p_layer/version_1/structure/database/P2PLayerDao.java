@@ -441,4 +441,41 @@ public class P2PLayerDao {
         }
     }
 
+    public void increaseCountFail(UUID packageId) throws CantPersistsMessageException {
+
+        DatabaseTable table = getDatabaseTable();
+        //Set filter
+        table.addUUIDFilter(P2P_LAYER_PACKAGE_ID_COLUMN_NAME, packageId, DatabaseFilterType.EQUAL);
+        try{
+            table.loadToMemory();
+            List<DatabaseTableRecord> records = table.getRecords();
+            if(records.isEmpty()){
+                //Cannot find the record in database
+                throw new CantPersistsMessageException("The record with packageId "+packageId+" doesn't exists");
+            } else{
+                DatabaseTableRecord record = records.get(0);
+                record.setIntegerValue(
+                        P2P_LAYER_FAIL_COUNT_COLUMN_NAME,
+                        record.getIntegerValue(P2P_LAYER_FAIL_COUNT_COLUMN_NAME)+1);
+                table.updateRecord(record);
+            }
+
+        } catch (CantUpdateRecordException e) {
+            throw new CantPersistsMessageException(
+                    e,
+                    "Increasing fail count",
+                    "Cannot update database");
+        } catch (CantLoadTableToMemoryException e) {
+            throw new CantPersistsMessageException(
+                    e,
+                    "Increasing fail count",
+                    "Cannot load database table");
+        } catch (Exception e) {
+            throw new CantPersistsMessageException(
+                    e,
+                    "Increasing fail count",
+                    "Unexpected exception");
+        }
+    }
+
 }

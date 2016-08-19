@@ -394,6 +394,9 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
                         if(!p2PLayerDao.existsPackageId(fermatEvent.getContent().getPackageId())){
                             //I'll notify to the NS to handle this case
                             abstractNetworkService2.handleOnMessageFail(fermatEvent.getContent().getPackageId());
+                        } else {
+                            //I'll update the count fail
+                            p2PLayerDao.increaseCountFail(fermatEvent.getContent().getPackageId());
                         }
                     }
                 }else System.out.println("##### ACK MENSAJE p2p layer, ns is not started. ID:" + fermatEvent.getContent().getPackageId());
