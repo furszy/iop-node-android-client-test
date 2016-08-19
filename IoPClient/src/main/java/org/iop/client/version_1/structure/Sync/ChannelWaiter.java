@@ -1,7 +1,6 @@
 package org.iop.client.version_1.structure.Sync;
 
 
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**

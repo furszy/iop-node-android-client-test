@@ -1,7 +1,5 @@
 package org.iop.client.version_1.structure.Sync;
 
-import java.util.UUID;
-
 /**
  * Created by Matias Furszyfer on 09/08/16.
  */

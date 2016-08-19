@@ -56,7 +56,7 @@ public class IsActorOnlineRespondProcessor extends PackageProcessor {
         }
         networkClientIsActorOnlineEvent.setPackageId(packageReceived.getPackageId());
         //Raise the event
-        System.out.println("ActorListRespondProcessor - Raised a event = P2pEventType.NETWORK_CLIENT_IS_ACTOR_ONLINE");
+        System.out.println("IsActorOnlineRespondProcessor - Raised a event = P2pEventType.NETWORK_CLIENT_IS_ACTOR_ONLINE");
         getEventManager().raiseEvent(networkClientIsActorOnlineEvent);
     }
 }

@@ -455,38 +455,17 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
     }
 
     public void registerProfile(ActorProfile actorProfile){
-        myActorProfiles.add(actorProfile);
-        try {
-            registerActor(actorProfile,0,0);
-        } catch (ActorAlreadyRegisteredException e) {
-            e.printStackTrace();
-        } catch (CantRegisterActorException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void testDataWithoutNode(int max, int offset){
-        ArrayList<ActorProfile> actorProfiles = new ArrayList<>();
-        for(int i=0; i<=10; i++){
+        if (actorProfile!=null) {
+            myActorProfiles.add(actorProfile);
             try {
-                ActorProfile ac = new ActorProfile();
-                ac.setClientIdentityPublicKey("a"+String.valueOf(i+1));
-                ac.setActorType(Actors.CHAT.getCode());
-                ac.setAlias("a"+String.valueOf(i+1));
-                ac.setExtraData("a"+String.valueOf(i+1));
-                ac.setHomeNodeIdentifier("a"+String.valueOf(i+1));
-                ac.setName("a"+String.valueOf(i+1));
-                ac.setNsIdentityPublicKey("a"+String.valueOf(i+1));
-                ac.setIdentityPublicKey("a"+String.valueOf(i+1));
-                ac.setPhoto(null);
-                actorProfiles.add(ac);
-            }catch (Exception e){}
+                registerActor(actorProfile, 0, 0);
+            } catch (ActorAlreadyRegisteredException e) {
+                e.printStackTrace();
+            } catch (CantRegisterActorException e) {
+                e.printStackTrace();
+            }
         }
-        if(actorProfiles.size() > offset+max)
-            max = max+offset;
-        else
-            max = actorProfiles.size();
-        onNetworkServiceActorListReceived(null, actorProfiles.subList(offset, max));
     }
+    
 
 }

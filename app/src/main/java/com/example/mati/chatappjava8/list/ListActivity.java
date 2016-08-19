@@ -1,8 +1,5 @@
 package com.example.mati.chatappjava8.list;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -156,7 +153,7 @@ public class ListActivity extends AppCompatActivity
 
     @Override
     public void onMessageReceived(String senderPk,String chatMetadataRecord) {
-        Notifications.pushNotification(this,chatMetadataRecord);
+        Notifications.pushNotification(this,chatMetadataRecord, senderPk);
     }
 
 

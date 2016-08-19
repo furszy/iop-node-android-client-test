@@ -1,8 +1,9 @@
 package org.iop.client.version_1.channels.processors;
 
+import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.EventManager;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.Package;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.PackageType;
-import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.EventManager;
+
 import org.iop.client.version_1.channels.endpoints.NetworkClientCommunicationChannel;
 import org.iop.client.version_1.context.ClientContext;
 import org.iop.client.version_1.context.ClientContextItem;

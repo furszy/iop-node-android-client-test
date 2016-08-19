@@ -9,8 +9,8 @@ package org.iop.client.version_1.channels.processors;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.Package;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.respond.ServerHandshakeRespond;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.PackageType;
-import org.iop.client.version_1.channels.endpoints.NetworkClientCommunicationChannel;
 
+import org.iop.client.version_1.channels.endpoints.NetworkClientCommunicationChannel;
 
 import javax.websocket.Session;
 
@@ -49,7 +49,7 @@ public class ServerHandshakeRespondProcessor extends PackageProcessor{
         if(serverHandshakeRespond.getStatus() == ServerHandshakeRespond.STATUS.SUCCESS) {
 
             /*
-             * Send the clienProfile
+             * Send the clientProfile
              */
             getChannel().getConnection().registerInNode();
 
