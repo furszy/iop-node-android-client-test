@@ -49,7 +49,7 @@ public class ServerHandshakeRespondProcessor extends PackageProcessor{
         if(serverHandshakeRespond.getStatus() == ServerHandshakeRespond.STATUS.SUCCESS) {
 
             /*
-             * Send the clienProfile
+             * Send the clientProfile
              */
             getChannel().getConnection().registerInNode();
 

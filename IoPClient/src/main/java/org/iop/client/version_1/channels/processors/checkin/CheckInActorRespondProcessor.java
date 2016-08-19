@@ -39,18 +39,19 @@ public class CheckInActorRespondProcessor extends PackageProcessor {
 
         ACKRespond actorCheckInRespond = ACKRespond.parseContent(packageReceived.getContent());
 
-         /*
-             * Create a raise a new event whit the platformComponentProfile registered
-             */
+        /*
+         * Create a raise a new event whit the platformComponentProfile registered
+         */
         //todo: ver algo, la pk viene en null. quizás está bien y no nos sirve.
         NetworkClientProfileRegisteredEvent event = getEventManager().getNewEventMati(P2pEventType.NETWORK_CLIENT_ACTOR_PROFILE_REGISTERED, NetworkClientProfileRegisteredEvent.class);
         event.setSource(EventSource.NETWORK_CLIENT);
         event.setPackageId(actorCheckInRespond.getPackageId());
         event.setStatus(event.getStatus());
-            /*
-             * Raise the event
-             */
-        System.out.println("MessageTransmitProcessor - Raised a event = P2pEventType.NETWORK_CLIENT_REGISTERED");
+
+        /*
+         * Raise the event
+         */
+        System.out.println("CheckInActorRespondProcessor - Raised a event = P2pEventType.NETWORK_ACTOR_REGISTERED");
         getEventManager().raiseEvent(event);
 
     }

@@ -40,18 +40,18 @@ public class ACKProcessor extends PackageProcessor{
 
         ACKRespond ackRespond = ACKRespond.parseContent(packageReceived.getContent());
 
-         /*
-             * Create a raise a new event whit the platformComponentProfile registered
-             */
+        /*
+        * Create a raise a new event whit the platformComponentProfile registered
+        */
         NetworkClientACKEvent event = getEventManager().getNewEventMati(P2pEventType.NETWORK_CLIENT_ACK, NetworkClientACKEvent.class);
         event.setSource(EventSource.NETWORK_CLIENT);
         event.setContent(ackRespond);
         event.setNetworkServiceTypeSource(packageReceived.getNetworkServiceTypeSource());
 
-            /*
-             * Raise the event
-             */
-        System.out.println("MessageTransmitProcessor - Raised a event = P2pEventType.NETWORK_CLIENT_ACK");
+        /*
+         * Raise the event
+         */
+        System.out.println("ACKProcessor - Raised a event = P2pEventType.NETWORK_CLIENT_ACK");
         getEventManager().raiseEvent(event);
 
     }
