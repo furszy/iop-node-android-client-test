@@ -176,7 +176,6 @@ public class CreateIntraUserIdentityFragment extends Fragment {
                     }
                 } else {
                     updateIdentity();
-                    new AlertDialog.Builder(getActivity()).setTitle("Identity exist, No podes cambiar de nombre por ahora").show();
                 }
 
 
@@ -466,15 +465,8 @@ public class CreateIntraUserIdentityFragment extends Fragment {
     private int createNewIdentity() {
 
         final String brokerNameText = mBrokerName.getText().toString();
-        String brokerPhraseText = "";
 
-//        if (!mBrokerPhrase.getText().toString().isEmpty()){
-//             brokerPhraseText = mBrokerPhrase.getText().toString();
-//        }else{
-//            brokerPhraseText = "Available";
-//        }
-
-        boolean dataIsValid = validateIdentityData(brokerNameText, brokerPhraseText, brokerImageByteArray);
+        boolean dataIsValid = validateIdentityData(brokerNameText, brokerImageByteArray);
 
         if (dataIsValid) {
             final ActorProfile profile = new ActorProfile();
@@ -565,21 +557,12 @@ public class CreateIntraUserIdentityFragment extends Fragment {
 
     public int updateIdentity(){
         final String brokerNameText = mBrokerName.getText().toString();
-        String brokerPhraseText = "";
 
-//        if (!mBrokerPhrase.getText().toString().isEmpty()){
-//             brokerPhraseText = mBrokerPhrase.getText().toString();
-//        }else{
-//            brokerPhraseText = "Available";
-//        }
-
-        boolean dataIsValid = validateIdentityData(brokerNameText, brokerPhraseText, brokerImageByteArray);
+        boolean dataIsValid = validateIdentityData(brokerNameText, brokerImageByteArray);
 
         if (dataIsValid) {
-            final ActorProfile profile = new ActorProfile();
-            profile.setIdentityPublicKey(UUID.randomUUID().toString());
+            final ActorProfile profile = Core.getInstance().getProfile();
             System.out.println("I will try to register an actor with pk " + profile.getIdentityPublicKey());
-            profile.setActorType(Actors.CHAT.getCode());
             profile.setName(mBrokerName.getText().toString());
             profile.setAlias("Alias chat");
             //This represents a valid image
@@ -597,7 +580,6 @@ public class CreateIntraUserIdentityFragment extends Fragment {
                             Toast.makeText(getActivity(), "Registering profile...", Toast.LENGTH_SHORT).show();
                         }
                     });
-//                        manager.registerActor(profile, 0, 0);
                 }
             });
 
@@ -631,7 +613,7 @@ public class CreateIntraUserIdentityFragment extends Fragment {
         startActivityForResult(loadImageIntent, REQUEST_LOAD_IMAGE);
     }
 
-    private boolean validateIdentityData(String brokerNameText, String brokerPhraseText, byte[] brokerImageBytes) {
+    private boolean validateIdentityData(String brokerNameText, byte[] brokerImageBytes) {
         if (brokerNameText.isEmpty())
             return false;
 //        if (brokerPhraseText.isEmpty())
