@@ -140,13 +140,27 @@ public class P2PLayerDao {
                 P2P_LAYER_RECEIVER_PUBLIC_KEY_COLUMN_NAME,
                 networkServiceMessage.getReceiverPublicKey());
         //Shipping timestamp
-        databaseTableRecord.setStringValue(
+        Long shippingLong;
+        Timestamp shippingStamp = networkServiceMessage.getShippingTimestamp();
+        if(shippingStamp!=null){
+            shippingLong = shippingStamp.getTime();
+        } else{
+            shippingLong = 0L;
+        }
+        databaseTableRecord.setLongValue(
                 P2P_LAYER_SHIPPING_TIMESTAMP_COLUMN_NAME,
-                networkServiceMessage.getShippingTimestamp().toString());
+                shippingLong);
         //Delivery timestamp
-        databaseTableRecord.setStringValue(
+        Long deliveryLong;
+        Timestamp deliveryStamp = networkServiceMessage.getDeliveryTimestamp();
+        if(deliveryStamp!=null){
+            deliveryLong = deliveryStamp.getTime();
+        } else{
+            deliveryLong = 0L;
+        }
+        databaseTableRecord.setLongValue(
                 P2P_LAYER_DELIVERY_TIMESTAMP_COLUMN_NAME,
-                networkServiceMessage.getDeliveryTimestamp().toString());
+                deliveryLong);
         //Is Between actors flag
         databaseTableRecord.setStringValue(
                 P2P_LAYER_IS_BETWEEN_ACTORS_COLUMN_NAME,
@@ -366,16 +380,21 @@ public class P2PLayerDao {
             Integer failCountMax)
             throws CantGetNetworkServiceMessageException {
         DatabaseTable table = getDatabaseTable();
-        if(failCountMin>=failCountMax){
+        if(failCountMax!=null&&failCountMin>=failCountMax){
             return getNetworkServiceMessageByFailCount(failCountMin);
         }
         //Set filters
+
         final List<DatabaseTableFilter> tableFilters = new ArrayList<>();
-        DatabaseTableFilter minFilter = table.getEmptyTableFilter();
-        minFilter.setType(DatabaseFilterType.GREATER_OR_EQUAL_THAN);
-        minFilter.setColumn(P2P_LAYER_FAIL_COUNT_COLUMN_NAME);
-        minFilter.setValue(failCountMin.toString());
-        tableFilters.add(minFilter);
+
+        if(failCountMin !=null){
+            DatabaseTableFilter minFilter = table.getEmptyTableFilter();
+            minFilter.setType(DatabaseFilterType.GREATER_OR_EQUAL_THAN);
+            minFilter.setColumn(P2P_LAYER_FAIL_COUNT_COLUMN_NAME);
+            minFilter.setValue(failCountMin.toString());
+            tableFilters.add(minFilter);
+        }
+
 
         if (failCountMax != null){
             DatabaseTableFilter maxFilter = table.getEmptyTableFilter();
