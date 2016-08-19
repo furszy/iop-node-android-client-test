@@ -345,6 +345,20 @@ public class CreateIntraUserIdentityFragment extends Fragment {
                     try {
                         if (isAdded()) {
                             ContentResolver contentResolver = getActivity().getContentResolver();
+                            String provider = "com.android.providers.media.MediaProvider";
+                            if (Build.VERSION.SDK_INT >= 23) {
+                                if (getActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                                        != PackageManager.PERMISSION_GRANTED) {
+                                    getActivity().getContentResolver().takePersistableUriPermission(selectedImage, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                            | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                                    getActivity().grantUriPermission(provider, selectedImage, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                    getActivity().grantUriPermission(provider, selectedImage, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                                    getActivity().grantUriPermission(provider, selectedImage, Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+                                    getActivity().requestPermissions(
+                                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                                            REQUEST_LOAD_IMAGE);
+                                }
+                            }
                             imageBitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImage);
                             imageBitmap = Bitmap.createScaledBitmap(imageBitmap, mBrokerImage.getWidth(), mBrokerImage.getHeight(), true);
                             brokerImageByteArray = toByteArray(imageBitmap);

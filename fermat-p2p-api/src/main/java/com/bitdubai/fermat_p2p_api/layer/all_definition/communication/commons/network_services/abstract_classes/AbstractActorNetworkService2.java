@@ -321,13 +321,6 @@ public abstract class AbstractActorNetworkService2 extends AbstractNetworkServic
                 }
             }
       //  }
-
-       /* try {
-            actorLocationUpdaterAgent.start();
-        } catch (Exception exception) {
-            this.reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, exception,"Plugin: "+pluginVersionReference.toString3());
-        }*/
-
         onActorNetworkServiceRegistered();
     }
 
