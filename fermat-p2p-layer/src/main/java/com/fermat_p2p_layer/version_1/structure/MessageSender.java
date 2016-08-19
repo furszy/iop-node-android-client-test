@@ -117,7 +117,7 @@ public class MessageSender {
 
             throw fermatException;
         }
-        UUID packageId = p2PLayerPluginRoot.getNetworkClient().sendMessage(packageContent, packageType);
+        UUID packageId = p2PLayerPluginRoot.getNetworkClient().sendMessage(packageContent, packageType,networkServiceType);
         if (packageId != null)
             messagesSentWaitingForAck.put(packageId,networkServiceType);
         return packageId;

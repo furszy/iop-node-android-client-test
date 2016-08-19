@@ -10,11 +10,13 @@ import com.bitdubai.fermat_api.layer.all_definition.common.system.utils.PluginVe
 import com.bitdubai.fermat_api.layer.all_definition.enums.Addons;
 import com.bitdubai.fermat_api.layer.all_definition.enums.Layers;
 import com.bitdubai.fermat_api.layer.all_definition.enums.Platforms;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Plugins;
 import com.bitdubai.fermat_api.layer.all_definition.events.interfaces.FermatEvent;
 import com.bitdubai.fermat_api.layer.all_definition.events.interfaces.FermatEventHandler;
 import com.bitdubai.fermat_api.layer.all_definition.events.interfaces.FermatEventListener;
 import com.bitdubai.fermat_api.layer.all_definition.network_service.enums.NetworkServiceType;
 import com.bitdubai.fermat_api.layer.all_definition.util.Version;
+import com.bitdubai.fermat_api.layer.core.PluginInfo;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.Database;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.PluginDatabaseSystem;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantCreateDatabaseException;
@@ -34,6 +36,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.cl
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.ActorListMsgRequest;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.IsActorOnlineMsgRequest;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.respond.MsgRespond;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.ProfileTypes;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.UpdateTypes;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.abstract_classes.AbstractNetworkService2;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
@@ -60,6 +63,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * Created by Matias Furszyfer on 2016.07.06..
  */
+@PluginInfo(createdBy = "mati",layer = Layers.COMMUNICATION ,plugin = Plugins.P2P_LAYER, platform = Platforms.COMMUNICATION_PLATFORM, maintainerMail = "mati@notevoyadarmimail.com")
 public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManager {
 
     @NeededAddonReference(platform = Platforms.PLUG_INS_PLATFORM, layer = Layers.PLATFORM_SERVICE, addon = Addons.EVENT_MANAGER)
@@ -206,14 +210,34 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
         networkCLientProfileRegistered.setEventHandler(new FermatEventHandler<NetworkClientProfileRegisteredEvent>() {
             @Override
             public void handleEvent(NetworkClientProfileRegisteredEvent fermatEvent) throws FermatException {
-                System.out.println("NETWORK SERVICES STARTED:" + networkServices.size());
+                System.out.println("NETWORK SERVICES registered event");
                 NetworkServiceType networkServiceType = messageSender.packageAck(fermatEvent.getPackageId());
-                System.out.println("NETWORK SERVICE TYPE ? "+networkServiceType);
+                System.out.println("NETWORK SERVICE TYPE ? " + networkServiceType);
                 AbstractNetworkService2 abstractNetworkService2 = networkServices.get(networkServiceType);
-                if (abstractNetworkService2.isStarted()){
+                if (abstractNetworkService2.isStarted()) {
                     abstractNetworkService2.handleNetworkServiceRegisteredEvent();
-                }else{
-                    System.out.println("NetworkClientProfileRegisteredEvent Ns: "+abstractNetworkService2.getNetworkServiceType()+" is not started");
+                } else {
+                    System.out.println("NetworkClientProfileRegisteredEvent Ns: " + abstractNetworkService2.getNetworkServiceType() + " is not started");
+                }
+            }
+        });
+        eventManager.addListener(networkCLientProfileRegistered);
+        listenersAdded.add(networkCLientProfileRegistered);
+        /**
+         *  Actor registered succesfuly
+         */
+        networkCLientProfileRegistered = eventManager.getNewListener(P2pEventType.NETWORK_CLIENT_ACTOR_PROFILE_REGISTERED);
+        networkCLientProfileRegistered.setEventHandler(new FermatEventHandler<NetworkClientProfileRegisteredEvent>() {
+            @Override
+            public void handleEvent(NetworkClientProfileRegisteredEvent fermatEvent) throws FermatException {
+                System.out.println("Actor registered: pk:" + fermatEvent.getPublicKey());
+                NetworkServiceType networkServiceType = messageSender.packageAck(fermatEvent.getPackageId());
+                System.out.println("ACTOR NETWORK SERVICE TYPE : " + networkServiceType);
+                AbstractNetworkService2 abstractNetworkService2 = networkServices.get(networkServiceType);
+                if (abstractNetworkService2.isStarted()) {
+                    abstractNetworkService2.handleProfileRegisteredSuccesfully(ProfileTypes.ACTOR, fermatEvent.getPackageId(), fermatEvent.getPublicKey());
+                } else {
+                    System.out.println("respond registering actors NetworkClientProfileRegisteredEvent Actor Ns: " + abstractNetworkService2.getNetworkServiceType() + " is not started");
                 }
             }
         });

@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -33,12 +34,21 @@ import org.iop.ns.chat.structure.test.MessageReceiver;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListActivity extends AppCompatActivity implements MessageReceiver, FermatListItemListeners<ActorProfile> {
+public class ListActivity extends AppCompatActivity
+        implements MessageReceiver, FermatListItemListeners<ActorProfile>
+        /*,SwipeRefreshLayout.OnRefreshListener */{
 
     RecyclerView recyclerView;
     ListAdapter listAdapter;
+    List<ActorProfile> listActors;
     private DrawerLayout drawerLayout;
+    private LinearLayoutManager linearLayoutManager;
     private NavigationView navigationView;
+    private SwipeRefreshLayout swipeRefresh;
+    private int max = 3;
+    private int offset = 0;
+    int pastVisiblesItems, visibleItemCount, totalItemCount;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,21 +80,56 @@ public class ListActivity extends AppCompatActivity implements MessageReceiver, 
         Core.getInstance().setReceiver(this);
 
         this.recyclerView = (RecyclerView) findViewById(R.id.recycler);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         this.recyclerView.setLayoutManager(linearLayoutManager);
-        List<ActorProfile>  list = new ArrayList<>();
-        listAdapter = new ListAdapter(getApplicationContext(),list);
+        listActors = new ArrayList<>();
+        listAdapter = new ListAdapter(getApplicationContext(),listActors);
         listAdapter.setFermatListEventListener(this);
-        this.recyclerView.setAdapter(listAdapter);
-
-
-        new Thread(new Runnable() {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void run() {
-                Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList();
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (dy > 0) {
+                    visibleItemCount = linearLayoutManager.getChildCount();
+                    totalItemCount = linearLayoutManager.getItemCount();
+                    pastVisiblesItems = linearLayoutManager.findFirstVisibleItemPosition();
+                    offset = totalItemCount;
+                    final int lastItem = pastVisiblesItems + visibleItemCount;
+                    if (lastItem == totalItemCount) {
+                        onRefreshList();
+                    }
+                }
             }
-        }).start();
+        });
+        this.recyclerView.setLayoutManager(linearLayoutManager);
+        this.recyclerView.setHasFixedSize(true);
+        this.recyclerView.setAdapter(listAdapter);
+        this.recyclerView.scrollToPosition(0);
+        //Set up swipeRefresher
+        swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe);
+        swipeRefresh.setColorSchemeColors(Color.BLUE, Color.BLUE);
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                offset = 0;
+                onRefreshList();
+            }
+        });
+        onRefreshList();
+    }
+
+    public void onRefreshList() {
+        try {
+            swipeRefresh.setRefreshing(false);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList(max, offset);
+                }
+            }).start();
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
     }
 
     @Override
@@ -120,11 +165,38 @@ public class ListActivity extends AppCompatActivity implements MessageReceiver, 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                listAdapter.changeDataSet(list);
-                listAdapter.notifyDataSetChanged();
-//                recyclerView.setAdapter(listAdapter);
+                if (offset == 0) {
+                    if (listActors != null) {
+                        listActors.clear();
+                        listActors.addAll(list);
+                    } else {
+                        listActors = list;
+                    }
+                    listAdapter.changeDataSet(listActors);
+                    listAdapter.notifyDataSetChanged();
+                } else {
+                    List<ActorProfile> temp = list;
+                    for (ActorProfile info : temp)
+                        if (notInList(info)) {
+                            listActors.add(info);
+                        }
+                    listAdapter.notifyItemRangeInserted(offset, listActors.size() - 1);
+                }
             }
         });
+        offset = listActors.size();
+    }
+
+    private boolean notInList(ActorProfile info) {
+        for (ActorProfile contact : listActors) {
+            if (contact.getIdentityPublicKey().equals(info.getIdentityPublicKey()))
+                return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onActorRegistered(ActorProfile actorProfile) {
 
     }
 

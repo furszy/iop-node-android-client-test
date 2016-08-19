@@ -14,6 +14,7 @@ import com.bitdubai.fermat_api.layer.osa_android.location_system.utils.LocationU
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantRegisterProfileException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantRequestActorFullPhotoException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantUpdateRegisteredProfileException;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.ProfileTypes;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.UpdateTypes;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.agents.NetworkServiceActorLocationUpdaterAgent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.event_handlers.NetworkClientActorProfileRegisteredEventHandler;
@@ -25,6 +26,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.pr
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.P2pEventType;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -279,7 +281,7 @@ public abstract class AbstractActorNetworkService2 extends AbstractNetworkServic
 
     protected final void onNetworkServiceRegistered() {
 
-        System.out.println(" ESTOY PASANDO POR ACÁ!");
+        System.out.println(" ESTOY PASANDO POR ACA!");
 
         if (registeredActors != null) {
 
@@ -305,7 +307,7 @@ public abstract class AbstractActorNetworkService2 extends AbstractNetworkServic
         onActorNetworkServiceRegistered();
     }
 
-    public final void onActorRegistered(String publicKey) {
+    public final void onActorRegistered(UUID packageId, String publicKey) {
 
         ActorProfile registeredActor = (registeredActors != null ? getRegisteredActorByPublicKey(publicKey) : null);
 
@@ -416,6 +418,15 @@ public abstract class AbstractActorNetworkService2 extends AbstractNetworkServic
 
     protected void onActorNetworkServiceRegistered() {
 
+    }
+
+    @Override
+    public void handleProfileRegisteredSuccesfully(ProfileTypes types, UUID packageId, String profilePublicKey) {
+        if (types.equals(ProfileTypes.ACTOR)){
+            onActorRegistered(packageId,profilePublicKey);
+        }else {
+            super.handleProfileRegisteredSuccesfully(types, packageId, profilePublicKey);
+        }
     }
 
     public ConcurrentHashMap<ActorProfile, RefreshParameters> getRegisteredActors() {

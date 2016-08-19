@@ -405,9 +405,9 @@ public class IoPClientPluginRoot extends AbstractPlugin implements NetworkClient
     }
 
     @Override
-    public UUID sendMessage(PackageContent packageContent, PackageType packageType) throws CantSendMessageException {
+    public UUID sendMessage(PackageContent packageContent, PackageType packageType,NetworkServiceType networkServiceType) throws CantSendMessageException {
         try {
-            return networkClientCommunicationConnection.sendPackageMessage(packageContent,packageType);
+            return networkClientCommunicationConnection.sendPackageMessage(packageContent,packageType,networkServiceType);
         } catch (CantSendPackageException e) {
             throw new CantSendMessageException(e);
         }

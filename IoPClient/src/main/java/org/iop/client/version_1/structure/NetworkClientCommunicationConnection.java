@@ -561,7 +561,8 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
     }
 
     public UUID sendPackageMessage(final PackageContent     packageContent              ,
-                                   final PackageType        packageType) throws CantSendMessageException, CantSendPackageException {
+                                   final PackageType        packageType,
+                                   final NetworkServiceType networkServiceType) throws CantSendMessageException, CantSendPackageException {
         System.out.println("******* IS CONNECTED: " + isConnected() + " - TRYING NO SEND = " + packageContent.toJson());
         if (isConnected()){
 
@@ -570,7 +571,7 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                 //todo: esto hay que mejorarlo
                 Package pack = Package.createInstance(
                         packageContent.toJson(),
-                        null,
+                        networkServiceType,
                         packageType,
                         clientIdentity.getPrivateKey(),
                         null

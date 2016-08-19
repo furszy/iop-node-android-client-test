@@ -576,7 +576,7 @@ public class CreateIntraUserIdentityFragment extends Fragment {
                 @Override
                 public void run() {
                     Utils.saveActorProfileSettings(getActivity(), profile);
-                    Core.getInstance().setProfile(profile);
+                    Core.getInstance().updaterofile(profile);
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
