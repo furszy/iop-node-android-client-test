@@ -413,7 +413,7 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
         this.networkClientManager = networkClientManager;
     }
 
-    public void requestActorProfilesList() {
+    public void requestActorProfilesList(int max, int offset) {
             try {
                 discoveryActorProfiles(new DiscoveryQueryParameters(
                         null,
@@ -426,10 +426,11 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
                         null,
                         false,
                         null,
-                        20,
-                        0,
+                        max,
+                        offset,
                         true
                 ));
+       // testDataWithoutNode(max, offset); //just use it for test without node, please comment try catch and discovery code above
             } catch (CantSendMessageException e) {
                 e.printStackTrace();
             }
@@ -442,20 +443,9 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
         messageReceiver.onActorRegistered(actorProfile);
     }
 
-//    UUID testID;
 
     @Override
     public void onNetworkServiceActorListReceived(NetworkServiceQuery query, List<ActorProfile> actorProfiles) {
-//        actorProfiles.forEach(receiver -> {
-//            if (receiver.getName().equals("Mati")){
-//                ActorProfile sender = myActorProfiles.get(0);
-//                try {
-//                    testID = sendNewMessage(sender,receiver,"Holas");
-//                } catch (com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.exceptions.CantSendMessageException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
         System.out.println("Chat OnNetworkServiceActorListReceived...");
         if (messageReceiver!=null){
             messageReceiver.onActorListReceived(actorProfiles);
@@ -471,6 +461,30 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
         } catch (CantRegisterActorException e) {
             e.printStackTrace();
         }
+    }
+
+    public void testDataWithoutNode(int max, int offset){
+        ArrayList<ActorProfile> actorProfiles = new ArrayList<>();
+        for(int i=0; i<=10; i++){
+            try {
+                ActorProfile ac = new ActorProfile();
+                ac.setClientIdentityPublicKey("a"+String.valueOf(i+1));
+                ac.setActorType(Actors.CHAT.getCode());
+                ac.setAlias("a"+String.valueOf(i+1));
+                ac.setExtraData("a"+String.valueOf(i+1));
+                ac.setHomeNodeIdentifier("a"+String.valueOf(i+1));
+                ac.setName("a"+String.valueOf(i+1));
+                ac.setNsIdentityPublicKey("a"+String.valueOf(i+1));
+                ac.setIdentityPublicKey("a"+String.valueOf(i+1));
+                ac.setPhoto(null);
+                actorProfiles.add(ac);
+            }catch (Exception e){}
+        }
+        if(actorProfiles.size() > offset+max)
+            max = max+offset;
+        else
+            max = actorProfiles.size();
+        onNetworkServiceActorListReceived(null, actorProfiles.subList(offset, max));
     }
 
 }

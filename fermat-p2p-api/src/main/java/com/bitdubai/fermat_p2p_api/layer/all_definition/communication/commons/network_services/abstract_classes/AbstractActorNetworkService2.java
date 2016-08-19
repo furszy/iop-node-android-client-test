@@ -281,7 +281,7 @@ public abstract class AbstractActorNetworkService2 extends AbstractNetworkServic
 
     protected final void onNetworkServiceRegistered() {
 
-        System.out.println(" ESTOY PASANDO POR ACÁ!");
+        System.out.println(" ESTOY PASANDO POR ACA!");
 
         if (registeredActors != null) {
 
