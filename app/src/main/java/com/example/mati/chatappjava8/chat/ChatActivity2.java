@@ -6,7 +6,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -76,6 +78,16 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
         messagesContainer = (RecyclerView) findViewById(R.id.messagesContainer);
         messagesContainer.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false));
         messageET = (EditText) findViewById(R.id.messageEdit);
+        messageET.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    sendBtn.performClick();
+                    return true;
+                }
+                return false;
+            }
+        });
         sendBtn = (Button) findViewById(R.id.chatSendButton);
 
         TextView meLabel = (TextView) findViewById(R.id.meLbl);
