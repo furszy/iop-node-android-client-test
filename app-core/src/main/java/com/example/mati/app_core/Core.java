@@ -83,6 +83,7 @@ public class Core {
             //layer
             P2PLayerPluginRoot p2PLayerPluginRoot = new P2PLayerPluginRoot();
             p2PLayerPluginRoot.setEventManager((EventManager) eventManagerPlatformServiceAddonRoot.getManager());
+            p2PLayerPluginRoot.setPluginDatabaseSystem((PluginDatabaseSystem) pluginDatabaseSystemAndroidAddonRoot.getManager());
             p2PLayerPluginRoot.start();
 
             //node

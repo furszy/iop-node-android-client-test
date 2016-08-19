@@ -588,6 +588,10 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
         this.eventManager = eventManager;
     }
 
+    public void setPluginDatabaseSystem(PluginDatabaseSystem pluginDatabaseSystem) {
+        this.pluginDatabaseSystem = pluginDatabaseSystem;
+    }
+
     public NetworkChannel getNetworkClient() {
         return client;
     }
