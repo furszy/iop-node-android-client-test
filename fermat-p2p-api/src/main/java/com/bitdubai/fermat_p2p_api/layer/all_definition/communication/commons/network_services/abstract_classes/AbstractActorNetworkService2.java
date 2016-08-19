@@ -165,27 +165,37 @@ public abstract class AbstractActorNetworkService2 extends AbstractNetworkServic
                               final long         refreshInterval,
                               final long         accuracy       ) throws ActorAlreadyRegisteredException, CantRegisterActorException {
 
-        System.out.println("******************* REGISTERING ACTOR: " + actorToRegister.getName() + " - type: " + actorToRegister.getActorType() + "  ENTER METHOD");
 
-        //validateImageSize(image.length); TODO COMMENTED UNTIL BETTER MANAGEMENT BE IMPLEMENTED
+        if (actorToRegister != null){
 
-        if (registeredActors.get(actorToRegister) != null)
-            throw new ActorAlreadyRegisteredException("publicKey: " + actorToRegister.getIdentityPublicKey() + " - name: " + actorToRegister.getName(), "An actor is already registered with the given public key.");
+            System.out.println("******************* REGISTERING ACTOR: " + actorToRegister.getName() + " - type: " + actorToRegister.getActorType() + "  ENTER METHOD");
 
-        registeredActors.put(
-                actorToRegister,
-                new RefreshParameters(
-                        1,
-                        refreshInterval,
-                        accuracy
-                )
-        );
+            //validateImageSize(image.length); TODO COMMENTED UNTIL BETTER MANAGEMENT BE IMPLEMENTED
 
-        this.getConnection().register(actorToRegister);
-        registeredActors.get(actorToRegister).setLastExecution(System.currentTimeMillis());
+            if (registeredActors.get(actorToRegister) != null)
+                throw new ActorAlreadyRegisteredException("publicKey: " + actorToRegister.getIdentityPublicKey() + " - name: " + actorToRegister.getName(), "An actor is already registered with the given public key.");
 
-        System.out.println("******************* REGISTERING ACTOR: " + actorToRegister.getName() + " - type: " + actorToRegister.getActorType() + "  GO OUT METHOD");
-    }
+            registeredActors.put(
+                    actorToRegister,
+                    new RefreshParameters(
+                            1,
+                            refreshInterval,
+                            accuracy
+                    )
+            );
+
+            this.getConnection().register(actorToRegister);
+            registeredActors.get(actorToRegister).setLastExecution(System.currentTimeMillis());
+
+            System.out.println("******************* REGISTERING ACTOR: " + actorToRegister.getName() + " - type: " + actorToRegister.getActorType() + "  GO OUT METHOD");
+
+        }else {
+
+            System.out.println("******************* REGISTERING ACTOR IS NULL ");
+
+        }
+
+       }
 
     private ActorProfile getRegisteredActorByPublicKey(final String publicKey) {
 
