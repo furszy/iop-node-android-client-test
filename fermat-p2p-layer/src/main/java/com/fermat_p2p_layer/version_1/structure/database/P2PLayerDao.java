@@ -377,11 +377,13 @@ public class P2PLayerDao {
         minFilter.setValue(failCountMin.toString());
         tableFilters.add(minFilter);
 
-        DatabaseTableFilter maxFilter = table.getEmptyTableFilter();
-        maxFilter.setType(DatabaseFilterType.LESS_OR_EQUAL_THAN);
-        maxFilter.setColumn(P2P_LAYER_FAIL_COUNT_COLUMN_NAME);
-        maxFilter.setValue(failCountMax.toString());
-        tableFilters.add(maxFilter);
+        if (failCountMax != null){
+            DatabaseTableFilter maxFilter = table.getEmptyTableFilter();
+            maxFilter.setType(DatabaseFilterType.LESS_OR_EQUAL_THAN);
+            maxFilter.setColumn(P2P_LAYER_FAIL_COUNT_COLUMN_NAME);
+            maxFilter.setValue(failCountMax.toString());
+            tableFilters.add(maxFilter);
+        }
 
         table.setFilterGroup(tableFilters,null, DatabaseFilterOperator.AND);
         try{

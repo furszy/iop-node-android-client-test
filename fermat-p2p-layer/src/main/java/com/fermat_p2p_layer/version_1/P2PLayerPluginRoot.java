@@ -49,13 +49,16 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.events.Fai
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.events.VPNConnectionCloseNotificationEvent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.events.VPNConnectionLooseNotificationEvent;
 import com.fermat_p2p_layer.version_1.structure.MessageSender;
+import com.fermat_p2p_layer.version_1.structure.PendingMessagesSupervisorAgent;
 import com.fermat_p2p_layer.version_1.structure.database.P2PLayerDao;
 import com.fermat_p2p_layer.version_1.structure.database.P2PLayerDatabaseConstants;
 import com.fermat_p2p_layer.version_1.structure.database.P2PLayerDatabaseFactory;
 import com.fermat_p2p_layer.version_1.structure.exceptions.CantPersistsMessageException;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -87,6 +90,9 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
      */
     private P2PLayerDao p2PLayerDao;
 
+    private static final int MINIMUM_COUNT_TO_SEND_FULL_MESSAGE = 3;
+
+    private Map<UUID,Integer> packageIdNotForInstantResend;
 
     /**
      * Represent the communicationSupervisorPendingMessagesAgent
@@ -121,6 +127,13 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
             initializeDatabase();
             //Init dao
             p2PLayerDao = new P2PLayerDao(database);
+
+            packageIdNotForInstantResend = new HashMap<>();
+
+            //Init the Pending messages agent
+            PendingMessagesSupervisorAgent pendingMessagesSupervisorAgent =
+                    new PendingMessagesSupervisorAgent(p2PLayerDao,this);
+            pendingMessagesSupervisorAgent.start();
 
         }catch (Exception e){
             e.printStackTrace();
@@ -387,6 +400,7 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
                         abstractNetworkService2.handleOnMessageSent(fermatEvent.getContent().getPackageId());
                         //If the sending if successful and exists in P2P layer database, we need to delete from there
                         p2PLayerDao.deleteMessageByPackageId(fermatEvent.getContent().getPackageId());
+                        packageIdNotForInstantResend.remove(fermatEvent.getContent().getPackageId());
                     } else {
                         //mensaje no llegó, acá entra en juego el agente de re envio manuel
                         System.out.println("##### ACK MENSAJE NO LLEGÓ AL OTRO LADO ##### ID:" + fermatEvent.getContent().getPackageId());
@@ -397,6 +411,8 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
                         } else {
                             //I'll update the count fail
                             p2PLayerDao.increaseCountFail(fermatEvent.getContent().getPackageId());
+                            //I'll try to resend the message if the fails are low
+                            instantMessageResend(fermatEvent.getContent().getPackageId());
                         }
                     }
                 }else System.out.println("##### ACK MENSAJE p2p layer, ns is not started. ID:" + fermatEvent.getContent().getPackageId());
@@ -430,7 +446,28 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
 
     }
 
+    private void instantMessageResend(UUID packageId){
+        try{
+            //Check if the message can be resend
+            if(packageIdNotForInstantResend.get(packageId)!=null){
+                //The message is marked for not instant resend, I let this job for the agent
+                return;
+            }
+            //The message has a low quantity of resend, I'll try to send right now
+            //get the message
+            NetworkServiceMessage networkServiceMessage = p2PLayerDao.getNetworkServiceMessageById(packageId);
+            //Get the failed count
+            int failCount = networkServiceMessage.getFailCount();
+            if(failCount<MINIMUM_COUNT_TO_SEND_FULL_MESSAGE){
+                sendMessage(networkServiceMessage,networkServiceMessage.getNetworkServiceType(),null,false);
+            } else {
+                packageIdNotForInstantResend.put(packageId, failCount);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
 
+    }
 
 
     private void distributeMessage(NetworkServiceType networkType,NetworkClientNewMessageTransmitEvent fermatEvent){
