@@ -53,7 +53,7 @@ public enum FermatMessagesStatus implements FermatEnum {
      * @return MessagesStatus enum
      * @throws InvalidParameterException error with is no a valid code
      */
-    public static FermatMessagesStatus getByCode(String code) throws InvalidParameterException {
+    public static FermatMessagesStatus getByCode(String code) {
 
         switch (code) {
             case "PTS": return PENDING_TO_SEND;
@@ -62,12 +62,8 @@ public enum FermatMessagesStatus implements FermatEnum {
             case "NR":  return NEW_RECEIVED;
             case "R":   return READ;
             case "F":   return FAILED;
+            default:    return FAILED;
         }
-
-        /**
-         * If we try to convert am invalid string.
-         */
-        throw new InvalidParameterException(code);
     };
 
     /**
