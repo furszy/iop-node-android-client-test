@@ -21,6 +21,7 @@ import com.example.mati.chatappjava8.commons.Notifications;
 import org.iop.ns.chat.structure.test.MessageReceiver;
 
 import java.util.List;
+import java.util.UUID;
 
 public class ProfileActivity extends AppCompatActivity implements MessageReceiver {
 
@@ -112,6 +113,11 @@ public class ProfileActivity extends AppCompatActivity implements MessageReceive
 
     @Override
     public void onActorRegistered(ActorProfile actorProfile) {
+
+    }
+
+    @Override
+    public void onMessageFail(UUID messageId) {
 
     }
 }

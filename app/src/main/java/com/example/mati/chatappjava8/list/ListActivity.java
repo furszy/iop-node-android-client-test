@@ -31,6 +31,7 @@ import org.iop.ns.chat.structure.test.MessageReceiver;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -229,6 +230,11 @@ public class ListActivity extends AppCompatActivity
 
     @Override
     public void onActorRegistered(ActorProfile actorProfile) {
+
+    }
+
+    @Override
+    public void onMessageFail(UUID messageId) {
 
     }
 
