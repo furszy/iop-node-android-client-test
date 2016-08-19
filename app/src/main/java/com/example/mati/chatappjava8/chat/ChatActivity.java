@@ -15,6 +15,7 @@ import com.example.mati.chatappjava8.R;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.UUID;
 
 public class ChatActivity extends ActionBarActivity {
 
@@ -51,7 +52,7 @@ public class ChatActivity extends ActionBarActivity {
                 }
 
                 ChatMessage chatMessage = new ChatMessage();
-                chatMessage.setId(122);//dummy
+                chatMessage.setId(UUID.randomUUID());//dummy
                 chatMessage.setMessage(messageText);
                 chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
                 chatMessage.setMe(true);
@@ -78,13 +79,13 @@ public class ChatActivity extends ActionBarActivity {
         chatHistory = new ArrayList<ChatMessage>();
 
         ChatMessage msg = new ChatMessage();
-        msg.setId(1);
+        msg.setId(UUID.randomUUID());
         msg.setMe(false);
         msg.setMessage("Hi");
         msg.setDate(DateFormat.getDateTimeInstance().format(new Date()));
         chatHistory.add(msg);
         ChatMessage msg1 = new ChatMessage();
-        msg1.setId(2);
+        msg1.setId(UUID.randomUUID());
         msg1.setMe(false);
         msg1.setMessage("How r u doing???");
         msg1.setDate(DateFormat.getDateTimeInstance().format(new Date()));

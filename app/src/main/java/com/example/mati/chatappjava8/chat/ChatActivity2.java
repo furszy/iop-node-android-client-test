@@ -62,7 +62,7 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
 
         if(remote==null){
             findViewById(R.id.black_screen).setVisibility(View.VISIBLE);
-            findViewById(R.id.chat_screen).setVisibility(View.VISIBLE);
+            findViewById(R.id.chat_screen).setVisibility(View.GONE);
         }else {
             initControls();
 
