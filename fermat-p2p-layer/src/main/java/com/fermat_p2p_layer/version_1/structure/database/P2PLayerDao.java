@@ -140,20 +140,27 @@ public class P2PLayerDao {
                 P2P_LAYER_RECEIVER_PUBLIC_KEY_COLUMN_NAME,
                 networkServiceMessage.getReceiverPublicKey());
         //Shipping timestamp
-        databaseTableRecord.setStringValue(
+        Long shippingLong;
+        Timestamp shippingStamp = networkServiceMessage.getShippingTimestamp();
+        if(shippingStamp!=null){
+            shippingLong = shippingStamp.getTime();
+        } else{
+            shippingLong = 0L;
+        }
+        databaseTableRecord.setLongValue(
                 P2P_LAYER_SHIPPING_TIMESTAMP_COLUMN_NAME,
-                networkServiceMessage.getShippingTimestamp().toString());
+                shippingLong);
         //Delivery timestamp
-        String deliveryString;
+        Long deliveryLong;
         Timestamp deliveryStamp = networkServiceMessage.getDeliveryTimestamp();
         if(deliveryStamp!=null){
-            deliveryString = deliveryStamp.toString();
+            deliveryLong = deliveryStamp.getTime();
         } else{
-            deliveryString = "0";
+            deliveryLong = 0L;
         }
-        databaseTableRecord.setStringValue(
+        databaseTableRecord.setLongValue(
                 P2P_LAYER_DELIVERY_TIMESTAMP_COLUMN_NAME,
-                deliveryString);
+                deliveryLong);
         //Is Between actors flag
         databaseTableRecord.setStringValue(
                 P2P_LAYER_IS_BETWEEN_ACTORS_COLUMN_NAME,
