@@ -57,8 +57,6 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
 
     private MessageReceiver messageReceiver;
 
-    private List<ActorProfile> myActorProfiles;
-
 
     Timer timer = new Timer();
 
@@ -107,7 +105,6 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
             //declare a schedule to process waiting request message
 //            this.startTimer();
 
-            myActorProfiles = new ArrayList<>();
 
         } catch (Exception e) {
             reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
@@ -394,16 +391,6 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
 
         System.out.println("method onNetworkServiceRegistered: chatNS");
 
-        for (ActorProfile myActorProfile : myActorProfiles) {
-            try {
-                registerActor(myActorProfile,0,0);
-            } catch (ActorAlreadyRegisteredException e) {
-                //nothing
-            } catch (CantRegisterActorException e) {
-                e.printStackTrace();
-            }
-        }
-
     }
 
     public void setMessageReceiver(MessageReceiver messageReceiver) {
@@ -456,7 +443,6 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
 
     public void registerProfile(ActorProfile actorProfile){
         if (actorProfile!=null) {
-            myActorProfiles.add(actorProfile);
             try {
                 registerActor(actorProfile, 0, 0);
             } catch (ActorAlreadyRegisteredException e) {

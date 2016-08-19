@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +31,8 @@ import org.iop.ns.chat.structure.test.MessageReceiver;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ListActivity extends AppCompatActivity
         implements MessageReceiver, FermatListItemListeners<ActorProfile>
@@ -42,9 +45,10 @@ public class ListActivity extends AppCompatActivity
     private LinearLayoutManager linearLayoutManager;
     private NavigationView navigationView;
     private SwipeRefreshLayout swipeRefresh;
-    private int max = 3;
+    private int max = 10;
     private int offset = 0;
     int pastVisiblesItems, visibleItemCount, totalItemCount;
+    ExecutorService executorService;
 
 
     @Override
@@ -73,6 +77,7 @@ public class ListActivity extends AppCompatActivity
                 drawerLayout.openDrawer(GravityCompat.START);
             }
         });
+        init();
 
         Core.getInstance().setReceiver(this);
 
@@ -115,15 +120,37 @@ public class ListActivity extends AppCompatActivity
         onRefreshList();
     }
 
+    private void init(){
+        if (executorService==null){
+            executorService = Executors.newFixedThreadPool(2);
+        }else{
+            if (executorService.isShutdown()){
+                executorService =  Executors.newFixedThreadPool(2);
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        init();
+    }
+
+    @Override
+    protected void onStop() {
+        executorService.shutdownNow();
+        super.onStop();
+    }
+
     public void onRefreshList() {
         try {
             swipeRefresh.setRefreshing(false);
-            new Thread(new Runnable() {
+            executorService.submit(new Runnable() {
                 @Override
                 public void run() {
                     Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList(max, offset);
                 }
-            }).start();
+            });
         } catch (Exception e) {
             System.out.println(e.toString());
         }
@@ -159,6 +186,13 @@ public class ListActivity extends AppCompatActivity
 
     @Override
     public void onActorListReceived(final List<ActorProfile> list) {
+        if (list.size()==0){
+            Log.i(this.getComponentName().getClassName(),"ActorList empty");
+        }
+        for (ActorProfile actorProfile : list) {
+            Log.i(this.getComponentName().getClassName(),actorProfile.toString());
+        }
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

@@ -97,7 +97,7 @@ public class ProfileActivity extends AppCompatActivity implements MessageReceive
 
     @Override
     public void onMessageReceived(String sender, String chatMetadataRecord) {
-        Notifications.pushNotification(this,chatMetadataRecord, senderPk);
+        Notifications.pushNotification(this,chatMetadataRecord, sender);
     }
 
     @Override
