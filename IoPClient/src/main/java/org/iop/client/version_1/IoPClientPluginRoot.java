@@ -19,6 +19,7 @@ import com.bitdubai.fermat_api.layer.osa_android.file_system.FilePrivacy;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginFileSystem;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginTextFile;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.CantCreateFileException;
+import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.CantPersistFileException;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.FileNotFoundException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantRegisterProfileException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantSendMessageException;
@@ -223,7 +224,7 @@ public class IoPClientPluginRoot extends AbstractPlugin implements NetworkClient
     /**
      * Initialize the identity of this plugin
      */
-    private void initializeIdentity() throws CantInitializeNetworkClientP2PDatabaseException {
+    private void initializeIdentity() throws CantInitializeNetworkClientP2PDatabaseException, CantPersistFileException, CantCreateFileException {
 
         System.out.println("Calling the method - initializeIdentity() ");
 
@@ -270,7 +271,7 @@ public class IoPClientPluginRoot extends AbstractPlugin implements NetworkClient
                 /*
                  * The file cannot be created. I can not handle this situation.
                  */
-                throw new CantInitializeNetworkClientP2PDatabaseException(exception.getLocalizedMessage());
+                throw exception;
             }
 
 
