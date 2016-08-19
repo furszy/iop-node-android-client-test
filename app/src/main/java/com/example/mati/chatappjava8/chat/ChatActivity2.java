@@ -1,19 +1,14 @@
 package com.example.mati.chatappjava8.chat;
 
-import android.app.AlertDialog;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -31,7 +26,8 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
+import java.util.UUID;
 
 public class ChatActivity2 extends AppCompatActivity implements MessageReceiver {
 
@@ -68,7 +64,7 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
 
         if(remote==null){
             findViewById(R.id.black_screen).setVisibility(View.VISIBLE);
-            findViewById(R.id.chat_screen).setVisibility(View.VISIBLE);
+            findViewById(R.id.chat_screen).setVisibility(View.GONE);
         }else {
             initControls();
 
@@ -82,6 +78,16 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
         messagesContainer = (RecyclerView) findViewById(R.id.messagesContainer);
         messagesContainer.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false));
         messageET = (EditText) findViewById(R.id.messageEdit);
+        messageET.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    sendBtn.performClick();
+                    return true;
+                }
+                return false;
+            }
+        });
         sendBtn = (Button) findViewById(R.id.chatSendButton);
 
         TextView meLabel = (TextView) findViewById(R.id.meLbl);
@@ -98,33 +104,35 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
                     return;
                 }
 
-                ChatMessage chatMessage = new ChatMessage();
-                chatMessage.setId(122);//dummy
+                final ChatMessage chatMessage = new ChatMessage();
                 chatMessage.setMessage(messageText);
                 chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
                 chatMessage.setMe(true);
 
                 messageET.setText("");
 
-                displayMessage(chatMessage);
+
 
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            Core.getInstance().getChatNetworkServicePluginRoot().sendNewMessage(
+                            //este id tenes que guardarlo y chequear si no falló por el metodo onMessageFail
+                            UUID mensajeId = Core.getInstance().getChatNetworkServicePluginRoot().sendNewMessage(
                                     Core.getInstance().getInstance().getProfile(),
                                     remote,
                                     messageText,
-                                    //I'll set true for testing
                                     true
                             );
+                            //acá se le deberia setear el id, si no lo hace fijate que onda
+                            chatMessage.setId(mensajeId);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
                 }).start();
 
+                displayMessage(chatMessage);
             }
         });
     }
@@ -156,13 +164,13 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
         chatHistory = new ArrayList<ChatMessage>();
 
         ChatMessage msg = new ChatMessage();
-        msg.setId(1);
+        msg.setId(UUID.randomUUID());
         msg.setMe(false);
         msg.setMessage("Hola");
         msg.setDate(DateFormat.getDateTimeInstance().format(new Date()));
         chatHistory.add(msg);
         ChatMessage msg1 = new ChatMessage();
-        msg1.setId(2);
+        msg1.setId(UUID.randomUUID());
         msg1.setMe(false);
         msg1.setMessage("como andas??");
         msg1.setDate(DateFormat.getDateTimeInstance().format(new Date()));
@@ -181,9 +189,8 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
     @Override
     public void onMessageReceived(String senderPk,String content) {
         if (remote!=null && remote.getIdentityPublicKey().equals(senderPk)) {
-            Random random = new Random();
             ChatMessage chatMessage = new ChatMessage();
-            chatMessage.setId(random.nextInt());//dummy
+            chatMessage.setId(UUID.randomUUID());//dummy
             chatMessage.setMessage(content);
             chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
             chatMessage.setMe(false);
@@ -209,6 +216,11 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
     @Override
     public void onActorRegistered(ActorProfile actorProfile) {
 
+    }
+
+    @Override
+    public void onMessageFail(UUID messageId) {
+        Log.i(this.getClass().getName(),"onMessageFail: acá tengo que mostrar como que el mensaje falló");
     }
 
 }

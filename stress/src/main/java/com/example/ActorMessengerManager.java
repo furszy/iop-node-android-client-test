@@ -1,6 +1,5 @@
 package com.example;
 
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.exceptions.CantSendMessageException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 
 import org.iop.ns.chat.structure.test.MessageReceiver;
@@ -8,9 +7,7 @@ import org.iop.ns.chat.structure.test.MessageReceiver;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.UUID;
 
 /**
  * Created by mati on 18/08/16.
@@ -29,7 +26,7 @@ public class ActorMessengerManager implements MessageReceiver {
     }
 
     public void startActorStressTest(){
-        core.chatNetworkServicePluginRoot.requestActorProfilesList();
+//        core.chatNetworkServicePluginRoot.requestActorProfilesList();
         synchronized (this) {
             while (remoteProfiles.isEmpty()) {
                 try {
@@ -40,12 +37,12 @@ public class ActorMessengerManager implements MessageReceiver {
             }
         }
         ActorProfile remoteProfile = pickRamdomProfile();
-        try {
-            count++;
-            core.chatNetworkServicePluginRoot.sendNewMessage(core.getProfile(),remoteProfile,"holas "+count);
-        } catch (CantSendMessageException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            count++;
+//            core.chatNetworkServicePluginRoot.sendNewMessage(core.getProfile(),remoteProfile,"holas "+count);
+//        } catch (CantSendMessageException e) {
+//            e.printStackTrace();
+//        }
 
     }
 
@@ -66,11 +63,11 @@ public class ActorMessengerManager implements MessageReceiver {
     public void onMessageReceived(String sender, String chatMetadataRecord) {
         System.out.println(chatMetadataRecord);
 
-        try {
-            core.chatNetworkServicePluginRoot.sendNewMessage(core.getProfile(),getRemoteProfile(sender),"holas "+count);
-        } catch (CantSendMessageException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            core.chatNetworkServicePluginRoot.sendNewMessage(core.getProfile(),getRemoteProfile(sender),"holas "+count);
+//        } catch (CantSendMessageException e) {
+//            e.printStackTrace();
+//        }
     }
 
     private ActorProfile getRemoteProfile(String pk){
@@ -90,5 +87,10 @@ public class ActorMessengerManager implements MessageReceiver {
     @Override
     public void onActorRegistered(ActorProfile actorProfile) {
         startActorStressTest();
+    }
+
+    @Override
+    public void onMessageFail(UUID messageId) {
+
     }
 }

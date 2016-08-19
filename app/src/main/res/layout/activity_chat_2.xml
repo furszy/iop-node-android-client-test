@@ -23,7 +23,9 @@
             android:layout_alignParentBottom="true"
             android:layout_toLeftOf="@+id/chatSendButton"
             android:autoText="true"
-            android:hint="type message" />
+            android:hint="type message"
+            android:singleLine="true"
+            android:imeOptions="actionDone" />
 
         <Button
             android:id="@+id/chatSendButton"

@@ -1,16 +1,18 @@
 package com.example.mati.chatappjava8.chat;
 
+import java.util.UUID;
+
 public class ChatMessage {
-    private long id;
+    private UUID id;
     private boolean isMe;
     private String message;
     private Long userId;
     private String dateTime;
 
-    public long getId() {
+    public UUID getId() {
         return id;
     }
-    public void setId(long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
     public boolean getIsme() {
