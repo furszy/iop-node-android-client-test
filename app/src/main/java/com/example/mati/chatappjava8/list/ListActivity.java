@@ -192,6 +192,8 @@ public class ListActivity extends AppCompatActivity
             Log.i(this.getComponentName().getClassName(),actorProfile.toString());
         }
 
+        Core.getInstance().addRemotesUsers(list);
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

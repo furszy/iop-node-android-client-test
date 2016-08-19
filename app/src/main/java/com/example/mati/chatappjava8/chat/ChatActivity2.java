@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -39,30 +40,36 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
     private Button sendBtn;
     private ChatAdapter2 adapter;
     private ArrayList<ChatMessage> chatHistory;
-
     private ActorProfile remote;
+
+
+    private boolean isSearchingRemote = false;
+    private String remotePk;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.activity_chat_2);
         if (getIntent().hasExtra(IntentConstants.PROFILE_RECEIVER)) {
             remote = (ActorProfile) getIntent().getSerializableExtra(IntentConstants.PROFILE_RECEIVER);
             Core.getInstance().setLastRemoteProfile(remote);
-        }else {
+        }if (getIntent().hasExtra(IntentConstants.PROFILE_RECEIVER_NOTIFICATION_PK)){
+            String pk = getIntent().getStringExtra(IntentConstants.PROFILE_RECEIVER_NOTIFICATION_PK);
+            remote = Core.getInstance().getRemoteProfile(pk);
+            if (remote==null){
+                Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList(10000, 0);
+                isSearchingRemote = true;
+                remotePk = pk;
+            }
+        } else {
             remote = Core.getInstance().getLastRemoteProfile();
         }
 
         if(remote==null){
-             new AlertDialog.Builder(this).setTitle("Remote profile null, please go back to the actors list and pick one before you can chat").setOnDismissListener(new DialogInterface.OnDismissListener() {
-                 @Override
-                 public void onDismiss(DialogInterface dialog) {
-                     onBackPressed();
-                 }
-             }).show();
+            findViewById(R.id.black_screen).setVisibility(View.VISIBLE);
+            findViewById(R.id.chat_screen).setVisibility(View.VISIBLE);
         }else {
-
-            setContentView(R.layout.activity_chat_2);
             initControls();
 
         }
@@ -188,7 +195,15 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
 
     @Override
     public void onActorListReceived(List<ActorProfile> list) {
-
+        Core.getInstance().addRemotesUsers(list);
+        if (isSearchingRemote){
+            remote = Core.getInstance().getRemoteProfile(remotePk);
+            if (remote!=null){
+                findViewById(R.id.black_screen).setVisibility(View.GONE);
+                findViewById(R.id.chat_screen).setVisibility(View.VISIBLE);
+                initControls();
+            }
+        }
     }
 
     @Override

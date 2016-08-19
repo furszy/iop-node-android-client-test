@@ -23,6 +23,10 @@ import org.iop.client.version_1.IoPClientPluginRoot;
 import org.iop.ns.chat.ChatNetworkServicePluginRoot;
 import org.iop.ns.chat.structure.test.MessageReceiver;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -39,8 +43,10 @@ public class Core {
     private ActorProfile profile;
     private ActorProfile lastRemoteProfile;
 
-    private Core() {
+    Map<String,ActorProfile> listActors;
 
+    private Core() {
+        listActors = new HashMap<>();
     }
 
 
@@ -193,5 +199,17 @@ public class Core {
 
     public boolean isConnected(){
         return ioPClientPluginRoot.isConnected();
+    }
+
+    public void addRemotesUsers(List<ActorProfile> listActors) {
+        for (ActorProfile listActor : listActors) {
+            if (!listActors.contains(listActor.getIdentityPublicKey())){
+                this.listActors.put(listActor.getIdentityPublicKey(),listActor);
+            }
+        }
+    }
+
+    public ActorProfile getRemoteProfile(String pk) {
+        return listActors.get(pk);
     }
 }
