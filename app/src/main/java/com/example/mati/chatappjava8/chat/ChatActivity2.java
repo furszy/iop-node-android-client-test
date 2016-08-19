@@ -134,6 +134,12 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Core.getInstance().setReceiver(this);
+    }
+
     private void scroll() {
         messagesContainer.scrollToPosition(adapter.getItemCount() - 1);
     }
