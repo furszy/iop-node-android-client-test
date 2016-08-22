@@ -26,13 +26,13 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.mylyn.github</groupId>
-      <artifactId>org.eclipse.egit.github.core</artifactId>
+      <artifactId>org.eclipse.egit.github.stressAppCore</artifactId>
       <version>2.1.5</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.bitcoinj</groupId>
-      <artifactId>bitcoinj-core</artifactId>
+      <artifactId>bitcoinj-stressAppCore</artifactId>
       <version>0.13.3</version>
       <scope>runtime</scope>
       <exclusions>
