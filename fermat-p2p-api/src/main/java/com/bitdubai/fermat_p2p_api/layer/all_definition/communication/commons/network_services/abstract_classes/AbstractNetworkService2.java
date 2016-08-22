@@ -34,6 +34,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.cl
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.DiscoveryQueryParameters;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.ActorListMsgRequest;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.ProfileStatus;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.ProfileTypes;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.agents.NetworkServicePendingMessagesSupervisorAgent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.constants.NetworkServiceDatabaseConstants;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.daos.QueriesDao;
@@ -501,6 +502,12 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
         onActorUnreachable(actorProfile);
     }
 
+    public void handleProfileRegisteredSuccesfully(ProfileTypes types, UUID packageId, String profilePublicKey) {
+        if (types.equals(ProfileTypes.NETWORK_SERVICE)){
+            onNetworkServiceRegistered();
+        }
+    }
+
     /**
      * Through this method you can handle the actor found event for the actor trace that you could have done.
      *
@@ -772,11 +779,12 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
 //    }
 
     /**
-     * Method tha send a new Message
+     * Method that send a new Message
      */
     public UUID sendNewMessage(final ActorProfile sender        ,
                                final ActorProfile destination   ,
-                               final String       messageContent) throws CantSendMessageException {
+                               final String       messageContent,
+                               final boolean p2pLayerMonitoring) throws CantSendMessageException {
 
         try {
 
@@ -791,7 +799,11 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
                     MessageContentType.TEXT
             );
 
-            return p2PLayerManager.sendMessage(networkServiceMessage,getNetworkServiceType(),destination.getHomeNodePublicKey());
+            return p2PLayerManager.sendMessage(
+                    networkServiceMessage,
+                    getNetworkServiceType(),
+                    destination.getHomeNodePublicKey(),
+                    p2pLayerMonitoring);
 
             /*
              * Save to the data base table
@@ -818,7 +830,7 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
         UUID uuid = UUID.randomUUID();
         ActorListMsgRequest actorListMsgRequest = new ActorListMsgRequest(uuid,networkServiceType.getCode(),discoveryQueryParameters);
 
-        p2PLayerManager.sendDiscoveryMessage(actorListMsgRequest,networkServiceType,null);
+        p2PLayerManager.sendDiscoveryMessage(actorListMsgRequest, networkServiceType, null);
 
         return uuid;
 
@@ -994,5 +1006,6 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
             reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
         }
     }
+
 
 }

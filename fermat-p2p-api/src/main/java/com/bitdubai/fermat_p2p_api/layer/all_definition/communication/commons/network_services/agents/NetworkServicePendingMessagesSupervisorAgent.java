@@ -154,7 +154,8 @@ public class NetworkServicePendingMessagesSupervisorAgent extends FermatAgent {
                             p2PLayerManager.sendMessage(
                                     networkServiceMessage,
                                     networkServiceMessage.getNetworkServiceType(),
-                                    null);
+                                    null,
+                                    false);
                         }
                         actorProfileStatus.put(receiver.getKey(),ProfileStatus.UNKNOWN);
                     }

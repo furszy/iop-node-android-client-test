@@ -45,6 +45,6 @@ public interface NetworkChannel {
      * @return
      * @throws CantSendMessageException
      */
-    UUID sendMessage(PackageContent packageContent, PackageType packageType) throws CantSendMessageException;
+    UUID sendMessage(PackageContent packageContent, PackageType packageType,NetworkServiceType networkServiceType) throws CantSendMessageException;
 
 }

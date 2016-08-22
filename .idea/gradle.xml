@@ -4,41 +4,41 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="distributionType" value="DEFAULT_WRAPPED" />
-        <option name="externalProjectPath" value="Y:/" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="Y:/" />
-            <option value="Y:/IoPClient" />
-            <option value="Y:/app" />
-            <option value="Y:/app-core" />
-            <option value="Y:/console-network-service" />
-            <option value="Y:/fermat-api" />
-            <option value="Y:/fermat-osa-addon-android-database-system-bitdubai" />
-            <option value="Y:/fermat-osa-addon-android-file-system-bitdubai" />
-            <option value="Y:/fermat-osa-addon-linux-database-system-bitdubai" />
-            <option value="Y:/fermat-osa-addon-linux-file-system-bitdubai" />
-            <option value="Y:/fermat-p2p-api" />
-            <option value="Y:/fermat-p2p-layer" />
-            <option value="Y:/fermat-pip-api" />
-            <option value="Y:/stress" />
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/IoPClient" />
+            <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/app-core" />
+            <option value="$PROJECT_DIR$/console-network-service" />
+            <option value="$PROJECT_DIR$/fermat-api" />
+            <option value="$PROJECT_DIR$/fermat-osa-addon-android-database-system-bitdubai" />
+            <option value="$PROJECT_DIR$/fermat-osa-addon-android-file-system-bitdubai" />
+            <option value="$PROJECT_DIR$/fermat-osa-addon-linux-database-system-bitdubai" />
+            <option value="$PROJECT_DIR$/fermat-osa-addon-linux-file-system-bitdubai" />
+            <option value="$PROJECT_DIR$/fermat-p2p-api" />
+            <option value="$PROJECT_DIR$/fermat-p2p-layer" />
+            <option value="$PROJECT_DIR$/fermat-pip-api" />
+            <option value="$PROJECT_DIR$/stress" />
           </set>
         </option>
         <option name="myModules">
           <set>
-            <option value="Y:/" />
-            <option value="Y:/IoPClient" />
-            <option value="Y:/app" />
-            <option value="Y:/app-core" />
-            <option value="Y:/console-network-service" />
-            <option value="Y:/fermat-api" />
-            <option value="Y:/fermat-osa-addon-android-database-system-bitdubai" />
-            <option value="Y:/fermat-osa-addon-android-file-system-bitdubai" />
-            <option value="Y:/fermat-osa-addon-linux-database-system-bitdubai" />
-            <option value="Y:/fermat-osa-addon-linux-file-system-bitdubai" />
-            <option value="Y:/fermat-p2p-api" />
-            <option value="Y:/fermat-p2p-layer" />
-            <option value="Y:/fermat-pip-api" />
-            <option value="Y:/stress" />
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/IoPClient" />
+            <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/app-core" />
+            <option value="$PROJECT_DIR$/console-network-service" />
+            <option value="$PROJECT_DIR$/fermat-api" />
+            <option value="$PROJECT_DIR$/fermat-osa-addon-android-database-system-bitdubai" />
+            <option value="$PROJECT_DIR$/fermat-osa-addon-android-file-system-bitdubai" />
+            <option value="$PROJECT_DIR$/fermat-osa-addon-linux-database-system-bitdubai" />
+            <option value="$PROJECT_DIR$/fermat-osa-addon-linux-file-system-bitdubai" />
+            <option value="$PROJECT_DIR$/fermat-p2p-api" />
+            <option value="$PROJECT_DIR$/fermat-p2p-layer" />
+            <option value="$PROJECT_DIR$/fermat-pip-api" />
+            <option value="$PROJECT_DIR$/stress" />
           </set>
         </option>
       </GradleProjectSettings>

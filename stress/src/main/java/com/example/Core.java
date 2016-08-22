@@ -35,6 +35,8 @@ public class Core {
     private ActorProfile profile;
     private ActorProfile lastRemoteProfile;
 
+    private ActorMessengerManager actorMessengerManager;
+
     public Core() {
 
     }
@@ -89,10 +91,12 @@ public class Core {
 
             System.out.println("FERMAT - Networ Core - started satisfactory...");
 
-//            while (!ioPNodePluginRoot.isConnected()) {
-//                System.out.println("Not connected yet");
-//                Thread.sleep(500);
-//            }
+            while (!ioPClientPluginRoot.isConnected()) {
+                System.out.println("Not connected yet");
+                Thread.sleep(5000);
+            }
+            //
+            actorMessengerManager = new ActorMessengerManager(this);
 
 //
 //            //Register an actor for testing
@@ -100,7 +104,7 @@ public class Core {
             profile.setIdentityPublicKey(UUID.randomUUID().toString());
             System.out.println("I will try to register an actor with pk " + profile.getIdentityPublicKey());
             profile.setActorType(Actors.CHAT.getCode());
-            profile.setName("Juan_"+Thread.currentThread().getId());
+            profile.setName("Juan_" + Thread.currentThread().getId());
             profile.setAlias("Alias chat");
             //This represents a valid image
             profile.setPhoto(new byte[]{-119, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82,
@@ -113,7 +117,9 @@ public class Core {
                     0, 73, 69, 78, 68, -82, 66, 96, -126});
             profile.setNsIdentityPublicKey(chatNetworkServicePluginRoot.getNetWorkServicePublicKey());
             profile.setExtraData("Test extra data");
-            chatNetworkServicePluginRoot.registerActor(profile,0,0);
+            chatNetworkServicePluginRoot.registerActor(profile, 0, 0);
+
+
 //            chatNetworkServicePluginRoot.getConnection().reg();
 
 

@@ -23,6 +23,10 @@ import org.iop.client.version_1.IoPClientPluginRoot;
 import org.iop.ns.chat.ChatNetworkServicePluginRoot;
 import org.iop.ns.chat.structure.test.MessageReceiver;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -39,8 +43,10 @@ public class Core {
     private ActorProfile profile;
     private ActorProfile lastRemoteProfile;
 
-    private Core() {
+    Map<String,ActorProfile> listActors;
 
+    private Core() {
+        listActors = new HashMap<>();
     }
 
 
@@ -83,6 +89,7 @@ public class Core {
             //layer
             P2PLayerPluginRoot p2PLayerPluginRoot = new P2PLayerPluginRoot();
             p2PLayerPluginRoot.setEventManager((EventManager) eventManagerPlatformServiceAddonRoot.getManager());
+            p2PLayerPluginRoot.setPluginDatabaseSystem((PluginDatabaseSystem) pluginDatabaseSystemAndroidAddonRoot.getManager());
             p2PLayerPluginRoot.start();
 
             //node
@@ -156,20 +163,20 @@ public class Core {
     }
 
     public void setProfile(ActorProfile profile) {
-        if (profile!=null) {
-            this.profile = profile;
-            chatNetworkServicePluginRoot.registerProfile(profile);
-        }else{
-            try {
-                chatNetworkServicePluginRoot.updateRegisteredActor(profile, UpdateTypes.FULL);
-            } catch (CantUpdateRegisteredActorException e) {
-                e.printStackTrace();
-            } catch (CantUpdateRegisteredProfileException e) {
-                e.printStackTrace();
-            }
-        }
+        this.profile = profile;
+        chatNetworkServicePluginRoot.registerProfile(profile);
     }
 
+    public void updaterofile(ActorProfile profile){
+        try {
+            this.profile = profile;
+            chatNetworkServicePluginRoot.updateRegisteredActor(profile, UpdateTypes.FULL);
+        } catch (CantUpdateRegisteredActorException e) {
+            e.printStackTrace();
+        } catch (CantUpdateRegisteredProfileException e) {
+            e.printStackTrace();
+        }
+    }
     public ChatNetworkServicePluginRoot getChatNetworkServicePluginRoot() {
         return chatNetworkServicePluginRoot;
     }
@@ -192,5 +199,17 @@ public class Core {
 
     public boolean isConnected(){
         return ioPClientPluginRoot.isConnected();
+    }
+
+    public void addRemotesUsers(List<ActorProfile> listActors) {
+        for (ActorProfile listActor : listActors) {
+            if (!listActors.contains(listActor.getIdentityPublicKey())){
+                this.listActors.put(listActor.getIdentityPublicKey(),listActor);
+            }
+        }
+    }
+
+    public ActorProfile getRemoteProfile(String pk) {
+        return listActors.get(pk);
     }
 }

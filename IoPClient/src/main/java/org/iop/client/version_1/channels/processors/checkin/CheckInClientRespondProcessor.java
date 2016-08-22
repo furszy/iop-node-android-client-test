@@ -3,10 +3,10 @@ package org.iop.client.version_1.channels.processors.checkin;
 import com.bitdubai.fermat_api.layer.all_definition.events.EventSource;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientRegisteredEvent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.Package;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.respond.checkin.ClientCheckInRespond;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.P2pEventType;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.PackageType;
 import com.bitdubai.fermat_p2p_api.layer.p2p_communication.CommunicationChannels;
+
 import org.iop.client.version_1.channels.endpoints.NetworkClientCommunicationChannel;
 import org.iop.client.version_1.channels.processors.PackageProcessor;
 
@@ -36,17 +36,18 @@ public class CheckInClientRespondProcessor extends PackageProcessor {
 
         System.out.println("Processing new package received, packageType: " + packageReceived.getPackageType()+", content: "+packageReceived.getContent());
 
-        ClientCheckInRespond clientCheckInRespond = ClientCheckInRespond.parseContent(packageReceived.getContent());
+        //ClientCheckInRespond clientCheckInRespond = ClientCheckInRespond.parseContent(packageReceived.getContent());
 
-         /*
-             * Create a raise a new event whit the platformComponentProfile registered
-             */
+        /*
+         * Create a raise a new event whit the platformComponentProfile registered
+         */
         NetworkClientRegisteredEvent event = getEventManager().getNewEventMati(P2pEventType.NETWORK_CLIENT_REGISTERED, NetworkClientRegisteredEvent.class);
         event.setSource(EventSource.NETWORK_CLIENT);
         event.setCommunicationChannel(CommunicationChannels.P2P_SERVERS);
-            /*
-             * Raise the event
-             */
+
+        /*
+         * Raise the event
+         */
         System.out.println("CheckInClientRespondProcessor - Raised a event = P2pEventType.NETWORK_CLIENT_REGISTERED");
         getEventManager().raiseEvent(event);
 

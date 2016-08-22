@@ -1,8 +1,5 @@
 package com.example.mati.chatappjava8.list;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -15,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,6 +31,9 @@ import org.iop.ns.chat.structure.test.MessageReceiver;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ListActivity extends AppCompatActivity
         implements MessageReceiver, FermatListItemListeners<ActorProfile>
@@ -45,9 +46,10 @@ public class ListActivity extends AppCompatActivity
     private LinearLayoutManager linearLayoutManager;
     private NavigationView navigationView;
     private SwipeRefreshLayout swipeRefresh;
-    private int max = 3;
+    private int max = 10;
     private int offset = 0;
     int pastVisiblesItems, visibleItemCount, totalItemCount;
+    ExecutorService executorService;
 
 
     @Override
@@ -76,8 +78,7 @@ public class ListActivity extends AppCompatActivity
                 drawerLayout.openDrawer(GravityCompat.START);
             }
         });
-
-        Core.getInstance().setReceiver(this);
+        init();
 
         this.recyclerView = (RecyclerView) findViewById(R.id.recycler);
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -118,15 +119,38 @@ public class ListActivity extends AppCompatActivity
         onRefreshList();
     }
 
+    private void init(){
+        Core.getInstance().setReceiver(this);
+        if (executorService==null){
+            executorService = Executors.newFixedThreadPool(2);
+        }else{
+            if (executorService.isShutdown()){
+                executorService =  Executors.newFixedThreadPool(2);
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        init();
+    }
+
+    @Override
+    protected void onStop() {
+        executorService.shutdownNow();
+        super.onStop();
+    }
+
     public void onRefreshList() {
         try {
             swipeRefresh.setRefreshing(false);
-            new Thread(new Runnable() {
+            executorService.submit(new Runnable() {
                 @Override
                 public void run() {
                     Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList(max, offset);
                 }
-            }).start();
+            });
         } catch (Exception e) {
             System.out.println(e.toString());
         }
@@ -156,12 +180,21 @@ public class ListActivity extends AppCompatActivity
 
     @Override
     public void onMessageReceived(String senderPk,String chatMetadataRecord) {
-        Notifications.pushNotification(this,chatMetadataRecord);
+        Notifications.pushNotification(this,chatMetadataRecord, senderPk);
     }
 
 
     @Override
     public void onActorListReceived(final List<ActorProfile> list) {
+        if (list.size()==0){
+            Log.i(this.getComponentName().getClassName(),"ActorList empty");
+        }
+        for (ActorProfile actorProfile : list) {
+            Log.i(this.getComponentName().getClassName(),actorProfile.toString());
+        }
+
+        Core.getInstance().addRemotesUsers(list);
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -193,6 +226,16 @@ public class ListActivity extends AppCompatActivity
                 return false;
         }
         return true;
+    }
+
+    @Override
+    public void onActorRegistered(ActorProfile actorProfile) {
+
+    }
+
+    @Override
+    public void onMessageFail(UUID messageId) {
+
     }
 
     @Override

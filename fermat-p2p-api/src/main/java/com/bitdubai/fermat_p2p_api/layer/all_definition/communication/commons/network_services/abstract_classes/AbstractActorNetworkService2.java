@@ -14,6 +14,7 @@ import com.bitdubai.fermat_api.layer.osa_android.location_system.utils.LocationU
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantRegisterProfileException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantRequestActorFullPhotoException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantUpdateRegisteredProfileException;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.ProfileTypes;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.UpdateTypes;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.agents.NetworkServiceActorLocationUpdaterAgent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.event_handlers.NetworkClientActorProfileRegisteredEventHandler;
@@ -25,6 +26,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.pr
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.P2pEventType;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -149,7 +151,11 @@ public abstract class AbstractActorNetworkService2 extends AbstractNetworkServic
 
         if (getConnection() != null ) {
 
-            this.getConnection().register(actorToRegister);
+            try {
+                this.getConnection().register(actorToRegister, getProfile());
+            } catch (CantRegisterProfileException e) {
+                throw new CantRegisterActorException(e.getCause(), e.getContext(), e.getPossibleReason());
+            }
             registeredActors.get(actorToRegister).setLastExecution(System.currentTimeMillis());
 
         } else {
@@ -163,27 +169,41 @@ public abstract class AbstractActorNetworkService2 extends AbstractNetworkServic
                               final long         refreshInterval,
                               final long         accuracy       ) throws ActorAlreadyRegisteredException, CantRegisterActorException {
 
-        System.out.println("******************* REGISTERING ACTOR: " + actorToRegister.getName() + " - type: " + actorToRegister.getActorType() + "  ENTER METHOD");
 
-        //validateImageSize(image.length); TODO COMMENTED UNTIL BETTER MANAGEMENT BE IMPLEMENTED
+        if (actorToRegister != null){
 
-        if (registeredActors.get(actorToRegister) != null)
-            throw new ActorAlreadyRegisteredException("publicKey: " + actorToRegister.getIdentityPublicKey() + " - name: " + actorToRegister.getName(), "An actor is already registered with the given public key.");
+            System.out.println("******************* REGISTERING ACTOR: " + actorToRegister.getName() + " - type: " + actorToRegister.getActorType() + "  ENTER METHOD");
 
-        registeredActors.put(
-                actorToRegister,
-                new RefreshParameters(
-                        1,
-                        refreshInterval,
-                        accuracy
-                )
-        );
+            //validateImageSize(image.length); TODO COMMENTED UNTIL BETTER MANAGEMENT BE IMPLEMENTED
 
-        this.getConnection().register(actorToRegister);
-        registeredActors.get(actorToRegister).setLastExecution(System.currentTimeMillis());
+            if (registeredActors.get(actorToRegister) != null)
+                throw new ActorAlreadyRegisteredException("publicKey: " + actorToRegister.getIdentityPublicKey() + " - name: " + actorToRegister.getName(), "An actor is already registered with the given public key.");
 
-        System.out.println("******************* REGISTERING ACTOR: " + actorToRegister.getName() + " - type: " + actorToRegister.getActorType() + "  GO OUT METHOD");
-    }
+            registeredActors.put(
+                    actorToRegister,
+                    new RefreshParameters(
+                            1,
+                            refreshInterval,
+                            accuracy
+                    )
+            );
+
+            try {
+                this.getConnection().register(actorToRegister, getProfile());
+            } catch (CantRegisterProfileException e) {
+                throw new CantRegisterActorException(e.getCause(), e.getContext(), e.getPossibleReason());
+            }
+            registeredActors.get(actorToRegister).setLastExecution(System.currentTimeMillis());
+
+            System.out.println("******************* REGISTERING ACTOR: " + actorToRegister.getName() + " - type: " + actorToRegister.getActorType() + "  GO OUT METHOD");
+
+        }else {
+
+            System.out.println("******************* REGISTERING ACTOR IS NULL ");
+
+        }
+
+       }
 
     private ActorProfile getRegisteredActorByPublicKey(final String publicKey) {
 
@@ -291,21 +311,20 @@ public abstract class AbstractActorNetworkService2 extends AbstractNetworkServic
 
                     actorToRegister.getKey().setLocation(location);
 
-                    this.getConnection().register(actorToRegister.getKey());
+                    try {
+
+                        this.getConnection().register(actorToRegister.getKey(), getProfile());
+
+                    } catch (CantRegisterProfileException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
       //  }
-
-       /* try {
-            actorLocationUpdaterAgent.start();
-        } catch (Exception exception) {
-            this.reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, exception,"Plugin: "+pluginVersionReference.toString3());
-        }*/
-
         onActorNetworkServiceRegistered();
     }
 
-    public final void onActorRegistered(String publicKey) {
+    public final void onActorRegistered(UUID packageId, String publicKey) {
 
         ActorProfile registeredActor = (registeredActors != null ? getRegisteredActorByPublicKey(publicKey) : null);
 
@@ -416,6 +435,15 @@ public abstract class AbstractActorNetworkService2 extends AbstractNetworkServic
 
     protected void onActorNetworkServiceRegistered() {
 
+    }
+
+    @Override
+    public void handleProfileRegisteredSuccesfully(ProfileTypes types, UUID packageId, String profilePublicKey) {
+        if (types.equals(ProfileTypes.ACTOR)){
+            onActorRegistered(packageId,profilePublicKey);
+        }else {
+            super.handleProfileRegisteredSuccesfully(types, packageId, profilePublicKey);
+        }
     }
 
     public ConcurrentHashMap<ActorProfile, RefreshParameters> getRegisteredActors() {

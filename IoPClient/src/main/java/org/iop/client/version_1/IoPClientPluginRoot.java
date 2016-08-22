@@ -30,9 +30,9 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.cl
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.P2PLayerManager;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.PackageContent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.UpdateTypes;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.NetworkServiceProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.Profile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.PackageType;
+
 import org.iop.client.version_1.context.ClientContext;
 import org.iop.client.version_1.context.ClientContextItem;
 import org.iop.client.version_1.exceptions.CantInitializeNetworkClientP2PDatabaseException;
@@ -40,7 +40,6 @@ import org.iop.client.version_1.exceptions.CantSendPackageException;
 import org.iop.client.version_1.structure.NetworkClientCommunicationConnection;
 import org.iop.client.version_1.structure.NetworkClientCommunicationSupervisorConnectionAgent;
 import org.iop.client.version_1.util.HardcodeConstants;
-
 
 import java.util.List;
 import java.util.UUID;
@@ -405,9 +404,9 @@ public class IoPClientPluginRoot extends AbstractPlugin implements NetworkClient
     }
 
     @Override
-    public UUID sendMessage(PackageContent packageContent, PackageType packageType) throws CantSendMessageException {
+    public UUID sendMessage(PackageContent packageContent, PackageType packageType,NetworkServiceType networkServiceType) throws CantSendMessageException {
         try {
-            return networkClientCommunicationConnection.sendPackageMessage(packageContent,packageType);
+            return networkClientCommunicationConnection.sendPackageMessage(packageContent,packageType,networkServiceType);
         } catch (CantSendPackageException e) {
             throw new CantSendMessageException(e);
         }

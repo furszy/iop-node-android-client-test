@@ -1,11 +1,8 @@
 package com.example.mati.chatappjava8.profile;
 
 import android.app.FragmentManager;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -18,13 +15,13 @@ import android.view.View;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.example.mati.app_core.Core;
 import com.example.mati.chatappjava8.R;
-import com.example.mati.chatappjava8.chat.ChatActivity2;
 import com.example.mati.chatappjava8.commons.NavigationListener;
 import com.example.mati.chatappjava8.commons.Notifications;
 
 import org.iop.ns.chat.structure.test.MessageReceiver;
 
 import java.util.List;
+import java.util.UUID;
 
 public class ProfileActivity extends AppCompatActivity implements MessageReceiver {
 
@@ -50,7 +47,6 @@ public class ProfileActivity extends AppCompatActivity implements MessageReceive
 //        });
 
 
-        Core.getInstance().setReceiver(this);
 
         navigationView = (NavigationView) findViewById(R.id.navigation);
         navigationView.inflateMenu(R.menu.navigation_menu);
@@ -78,6 +74,12 @@ public class ProfileActivity extends AppCompatActivity implements MessageReceive
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        Core.getInstance().setReceiver(this);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
 //        getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -101,11 +103,21 @@ public class ProfileActivity extends AppCompatActivity implements MessageReceive
 
     @Override
     public void onMessageReceived(String sender, String chatMetadataRecord) {
-        Notifications.pushNotification(this,chatMetadataRecord);
+        Notifications.pushNotification(this,chatMetadataRecord, sender);
     }
 
     @Override
     public void onActorListReceived(List<ActorProfile> list) {
+
+    }
+
+    @Override
+    public void onActorRegistered(ActorProfile actorProfile) {
+
+    }
+
+    @Override
+    public void onMessageFail(UUID messageId) {
 
     }
 }

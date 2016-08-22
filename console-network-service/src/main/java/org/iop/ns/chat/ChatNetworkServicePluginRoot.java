@@ -57,8 +57,6 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
 
     private MessageReceiver messageReceiver;
 
-    private List<ActorProfile> myActorProfiles;
-
 
     Timer timer = new Timer();
 
@@ -107,7 +105,6 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
             //declare a schedule to process waiting request message
 //            this.startTimer();
 
-            myActorProfiles = new ArrayList<>();
 
         } catch (Exception e) {
             reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
@@ -255,7 +252,9 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
             sendNewMessage(
                     sender,
                     receiver,
-                    jsonMessage
+                    jsonMessage,
+                    //I'll set true for testing
+                    true
             );
         } catch (com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.exceptions.CantSendMessageException e) {
             reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
@@ -392,16 +391,6 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
 
         System.out.println("method onNetworkServiceRegistered: chatNS");
 
-        for (ActorProfile myActorProfile : myActorProfiles) {
-            try {
-                registerActor(myActorProfile,0,0);
-            } catch (ActorAlreadyRegisteredException e) {
-                e.printStackTrace();
-            } catch (CantRegisterActorException e) {
-                e.printStackTrace();
-            }
-        }
-
     }
 
     public void setMessageReceiver(MessageReceiver messageReceiver) {
@@ -414,6 +403,34 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
     }
 
     public void requestActorProfilesList(int max, int offset) {
+        testDataOrNodeData(max, offset, false);//test = true; node = false
+    }
+
+    public void testDataOrNodeData(int max, int offset, boolean testData){
+        if(testData) {
+            ArrayList<ActorProfile> actorProfiles = new ArrayList<>();
+            for (int i = 0; i <= 20; i++) {
+                try {
+                    ActorProfile ac = new ActorProfile();
+                    ac.setClientIdentityPublicKey("a" + String.valueOf(i + 1));
+                    ac.setActorType(Actors.CHAT.getCode());
+                    ac.setAlias("a" + String.valueOf(i + 1));
+                    ac.setExtraData("a" + String.valueOf(i + 1));
+                    ac.setHomeNodeIdentifier("a" + String.valueOf(i + 1));
+                    ac.setName("a" + String.valueOf(i + 1));
+                    ac.setNsIdentityPublicKey("a" + String.valueOf(i + 1));
+                    ac.setIdentityPublicKey("a" + String.valueOf(i + 1));
+                    ac.setPhoto(null);
+                    actorProfiles.add(ac);
+                } catch (Exception e) {
+                }
+            }
+            if (actorProfiles.size() > offset + max)
+                max = max + offset;
+            else
+                max = actorProfiles.size();
+            onNetworkServiceActorListReceived(null, actorProfiles.subList(offset, max));
+        } else {
             try {
                 discoveryActorProfiles(new DiscoveryQueryParameters(
                         null,
@@ -430,56 +447,46 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
                         offset,
                         true
                 ));
-       // testDataWithoutNode(max, offset); //just use it for test without node, please comment try catch and discovery code above
             } catch (CantSendMessageException e) {
                 e.printStackTrace();
             }
+        }
     }
+
+
+    @Override
+    protected void onActorRegistered(ActorProfile actorProfile) {
+
+        System.out.println("im registered : "+ actorProfile);
+        messageReceiver.onActorRegistered(actorProfile);
+    }
+
 
     @Override
     public void onNetworkServiceActorListReceived(NetworkServiceQuery query, List<ActorProfile> actorProfiles) {
-//        actorProfiles.forEach(receiver -> {
-//            if (receiver.getName().equals("Mati")){
-//                ActorProfile sender = myActorProfiles.get(0);
-//                try {
-//                    testID = sendNewMessage(sender,receiver,"Holas");
-//                } catch (com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.exceptions.CantSendMessageException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
         System.out.println("Chat OnNetworkServiceActorListReceived...");
         if (messageReceiver!=null){
             messageReceiver.onActorListReceived(actorProfiles);
         }
     }
 
-    public void registerProfile(ActorProfile actorProfile){
-        myActorProfiles.add(actorProfile);
+    @Override
+    public synchronized void onMessageFail(UUID messageId) {
+        super.onMessageFail(messageId);
+        messageReceiver.onMessageFail(messageId);
     }
 
-    public void testDataWithoutNode(int max, int offset){
-        ArrayList<ActorProfile> actorProfiles = new ArrayList<>();
-        for(int i=0; i<=10; i++){
+    public void registerProfile(ActorProfile actorProfile){
+        if (actorProfile!=null) {
             try {
-                ActorProfile ac = new ActorProfile();
-                ac.setClientIdentityPublicKey("a"+String.valueOf(i+1));
-                ac.setActorType(Actors.CHAT.getCode());
-                ac.setAlias("a"+String.valueOf(i+1));
-                ac.setExtraData("a"+String.valueOf(i+1));
-                ac.setHomeNodeIdentifier("a"+String.valueOf(i+1));
-                ac.setName("a"+String.valueOf(i+1));
-                ac.setNsIdentityPublicKey("a"+String.valueOf(i+1));
-                ac.setIdentityPublicKey("a"+String.valueOf(i+1));
-                ac.setPhoto(null);
-                actorProfiles.add(ac);
-            }catch (Exception e){}
+                registerActor(actorProfile, 0, 0);
+            } catch (ActorAlreadyRegisteredException e) {
+                e.printStackTrace();
+            } catch (CantRegisterActorException e) {
+                e.printStackTrace();
+            }
         }
-        if(actorProfiles.size() > offset+max)
-            max = max+offset;
-        else
-            max = actorProfiles.size();
-        onNetworkServiceActorListReceived(null, actorProfiles.subList(offset, max));
     }
+    
 
 }
