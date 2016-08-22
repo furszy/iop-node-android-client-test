@@ -502,7 +502,6 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
 
         //todo: esto cambiarlo por un DiscoveryMsg o algo así
         ActorListMsgRequest actorListMsgRequest = new ActorListMsgRequest(
-                queryId,
                 networkServicePublicKey,
                 discoveryQueryParameters,
                 requesterPublicKey
@@ -811,23 +810,23 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                 try {
                     System.out.println("******* MessageSenderExecutor running..");
                     if (isConnected()) {
-                        BlockPackages blockPackages = new BlockPackages();
                         boolean flag = false;
                         while (!flag){
                             Package pack = packagesWaitingToSend.poll();
                             if (pack==null){
                                 flag = true;
-                            }else blockPackages.add(pack);
-                        }
-
-                        if (blockPackages.size() > 0) {
-                            try {
-                                networkClientCommunicationChannel.getClientConnection().getBasicRemote().sendObject(blockPackages);
-                            } catch (Exception exception) {
-                                System.err.println("CantSendPackage: block package: " + blockPackages);
-                                exception.printStackTrace();
+                            }else{
+                                try {
+                                    networkClientCommunicationChannel.getClientConnection().getBasicRemote().sendObject(pack);
+                                } catch (Exception exception) {
+                                    System.err.println("CantSendPackage: block package: " + pack);
+                                    exception.printStackTrace();
+                                }
                             }
                         }
+
+
+
                     } else {
                         System.err.println("MessageSenderExecutor, connection is close and the executor is on, this is very bad");
                     }

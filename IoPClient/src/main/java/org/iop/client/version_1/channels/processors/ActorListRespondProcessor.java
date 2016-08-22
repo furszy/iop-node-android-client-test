@@ -56,7 +56,6 @@ public class ActorListRespondProcessor extends PackageProcessor {
         actorListReceived.setActorList(actorListMsgRespond.getActors());
         actorListReceived.setNetworkServiceType(NetworkServiceType.getByCode(actorListMsgRespond.getNetworkServiceType()));
 
-        actorListReceived.setQueryID(actorListMsgRespond.getQueryId());
 
         if(actorListMsgRespond.getStatus() == ActorListMsgRespond.STATUS.SUCCESS){
             actorListReceived.setStatus(NetworkClientActorListReceivedEvent.STATUS.SUCCESS);

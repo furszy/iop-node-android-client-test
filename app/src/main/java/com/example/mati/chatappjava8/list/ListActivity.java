@@ -186,7 +186,7 @@ public class ListActivity extends AppCompatActivity
                 public boolean onQueryTextChange(String newText) {
                     if (newText.equals(searchView.getQuery().toString())) {
                         Log.i("onQueryTextChange", newText);
-                        listAdapter.changeDataSet(listActors);
+//                        listAdapter.changeDataSet(listActors);
                         listAdapter.getFilter().filter(newText);
                     }
                     return false;
