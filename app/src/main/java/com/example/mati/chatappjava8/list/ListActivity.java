@@ -121,6 +121,10 @@ public class ListActivity extends AppCompatActivity
                 onRefreshList();
             }
         });
+        if (listActors.isEmpty()){
+            findViewById(R.id.black_screen).setVisibility(View.VISIBLE);
+        }
+
         onRefreshList();
     }
 
@@ -256,6 +260,7 @@ public class ListActivity extends AppCompatActivity
                         }
                     listAdapter.notifyItemRangeInserted(offset, listActors.size() - 1);
                 }
+                findViewById(R.id.black_screen).setVisibility(View.GONE);
             }
         });
         offset = listActors.size();
