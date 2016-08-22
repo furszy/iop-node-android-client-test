@@ -6,6 +6,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 /**
+ * This class represents the Tab Pane controller.
+ * All the tabs to add to the main tab pane must the implemented in FXML format in resources/fxml/TabPane.fxml
  * Created by Manuel Perez P. (darkpriestrelative@gmail.com) on 22/08/16.
  */
 public class TabPaneController implements Initializable {

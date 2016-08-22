@@ -21,11 +21,12 @@ public class Main extends Application {
         //Set the FXML file
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/TabPane.fxml"));
 
-        Scene scene = new Scene(root, 300, 275);
+        Scene scene = new Scene(root, 360, 275);
 
         stage.setTitle("IoP Stress App");
         stage.setScene(scene);
         stage.setResizable(false);
+        stage.setOnCloseRequest(e -> System.exit(0));
         stage.show();
     }
 
