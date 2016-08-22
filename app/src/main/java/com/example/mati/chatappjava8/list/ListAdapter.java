@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.view.View;
+import android.widget.Filter;
+import android.widget.Filterable;
 
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.example.mati.chatappjava8.R;
@@ -16,7 +18,12 @@ import java.util.Random;
 /**
  * Created by mati on 16/08/16.
  */
-public class ListAdapter extends FermatAdapter<ActorProfile,ActorHolder> {
+public class ListAdapter
+        extends FermatAdapter<ActorProfile,ActorHolder>
+        implements Filterable {
+
+    List<ActorProfile> filteredData;
+    private String filterString;
 
     public ListAdapter(Context context) {
         super(context);
@@ -43,15 +50,32 @@ public class ListAdapter extends FermatAdapter<ActorProfile,ActorHolder> {
             if (data.getPhoto().length>0){
                 holder.img_photo.setImageDrawable(ImagesUtils.getRoundedBitmap(context.getResources(), BitmapFactory.decodeByteArray(data.getPhoto(),0,data.getPhoto().length)));
             }
-        }
-        Random random = new Random();
-        int ran = random.nextInt(50);
-
-        if (ran<15) {
-            holder.itemView.setBackgroundColor(Color.CYAN);
-        }else if(ran>=15 && ran<=30){
-            holder.itemView.setBackgroundColor(Color.YELLOW);
         }else
-            holder.itemView.setBackgroundColor(Color.MAGENTA);
+            holder.img_photo.setImageDrawable(ImagesUtils.getRoundedBitmap(context.getResources(), R.drawable.image_profile));
+//        Random random = new Random();
+//        int ran = random.nextInt(50);
+
+//        if (ran<15) {
+//            holder.itemView.setBackgroundColor(Color.CYAN);
+//        }else if(ran>=15 && ran<=30){
+//            holder.itemView.setBackgroundColor(Color.YELLOW);
+//        }else
+//            holder.itemView.setBackgroundColor(Color.MAGENTA);
+    }
+
+    public void setData(List<ActorProfile> data) {
+        this.filteredData = data;
+    }
+
+    public Filter getFilter() {
+        return new ListFilter(dataSet, this);
+    }
+
+    public void setFilterString(String filterString) {
+        this.filterString = filterString;
+    }
+
+    public String getFilterString() {
+        return filterString;
     }
 }

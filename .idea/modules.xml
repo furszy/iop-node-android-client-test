@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ChatAppJava8.iml" filepath="$PROJECT_DIR$/ChatAppJava8.iml" />
       <module fileurl="file://$PROJECT_DIR$/IoPClient/IoPClient.iml" filepath="$PROJECT_DIR$/IoPClient/IoPClient.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/app-core/app-core.iml" filepath="$PROJECT_DIR$/app-core/app-core.iml" />

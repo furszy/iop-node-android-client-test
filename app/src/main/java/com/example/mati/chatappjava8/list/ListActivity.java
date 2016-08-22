@@ -1,5 +1,7 @@
 package com.example.mati.chatappjava8.list;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -11,9 +13,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -50,7 +55,8 @@ public class ListActivity extends AppCompatActivity
     private int offset = 0;
     int pastVisiblesItems, visibleItemCount, totalItemCount;
     ExecutorService executorService;
-
+    private SearchView searchView = null;
+    private SearchView.OnQueryTextListener queryTextListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +64,6 @@ public class ListActivity extends AppCompatActivity
         setContentView(R.layout.activity_list_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
         navigationView = (NavigationView) findViewById(R.id.navigation);
 //        navigationView.inflateMenu(R.menu.navigation_menu);
@@ -160,7 +165,36 @@ public class ListActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
 //        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+
+        if (searchItem != null) {
+            searchView = (SearchView) searchItem.getActionView();
+            searchView.setQueryHint("Search...");
+        }
+        if (searchView != null) {
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+            queryTextListener = new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    if (newText.equals(searchView.getQuery().toString())) {
+                        Log.i("onQueryTextChange", newText);
+                        listAdapter.changeDataSet(listActors);
+                        listAdapter.getFilter().filter(newText);
+                    }
+                    return false;
+                }
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    return false;
+                }
+            };
+            searchView.setOnQueryTextListener(queryTextListener);
+        }
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -171,9 +205,16 @@ public class ListActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
+            case R.id.action_search:
+                // Not implemented here
+                return false;
+            default:
+                break;
         }
+        searchView.setOnQueryTextListener(queryTextListener);
 
         return super.onOptionsItemSelected(item);
     }
