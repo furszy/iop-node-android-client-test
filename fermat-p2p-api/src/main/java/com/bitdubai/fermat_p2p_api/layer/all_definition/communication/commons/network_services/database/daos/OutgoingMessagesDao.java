@@ -14,8 +14,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.ne
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.exceptions.CantUpdateRecordDataBaseException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.exceptions.RecordNotFoundException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.MessageContentType;
-import com.bitdubai.fermat_p2p_api.layer.p2p_communication.MessagesStatus;
-import com.bitdubai.fermat_p2p_api.layer.p2p_communication.commons.enums.FermatMessagesStatus;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.MessageStatus;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -77,7 +76,7 @@ public class OutgoingMessagesDao extends AbstractBaseDao<NetworkServiceMessage> 
             else
                 networkServiceMessage.setDeliveryTimestamp(new Timestamp(record.getLongValue(OUTGOING_MESSAGES_DELIVERY_TIMESTAMP_COLUMN_NAME)));
 
-            networkServiceMessage.setFermatMessagesStatus(FermatMessagesStatus.getByCode(record.getStringValue(OUTGOING_MESSAGES_STATUS_COLUMN_NAME)));
+            networkServiceMessage.setMessageStatus(MessageStatus.getByCode(record.getStringValue(OUTGOING_MESSAGES_STATUS_COLUMN_NAME)));
 
             networkServiceMessage.setFailCount(record.getIntegerValue(OUTGOING_MESSAGES_FAIL_COUNT_COLUMN_NAME));
 
@@ -116,7 +115,7 @@ public class OutgoingMessagesDao extends AbstractBaseDao<NetworkServiceMessage> 
             entityRecord.setLongValue(OUTGOING_MESSAGES_DELIVERY_TIMESTAMP_COLUMN_NAME, (long) 0);
         }
 
-        entityRecord.setStringValue(OUTGOING_MESSAGES_STATUS_COLUMN_NAME, entity.getFermatMessagesStatus().getCode());
+        entityRecord.setStringValue(OUTGOING_MESSAGES_STATUS_COLUMN_NAME, entity.getMessageStatus().getCode());
 
         entityRecord.setStringValue(OUTGOING_MESSAGES_IS_BETWEEN_ACTORS_COLUMN_NAME, entity.isBetweenActors().toString());
 
@@ -142,7 +141,7 @@ public class OutgoingMessagesDao extends AbstractBaseDao<NetworkServiceMessage> 
             if (!records.isEmpty()) {
                 DatabaseTableRecord record = records.get(0);
 
-                record.setFermatEnum(OUTGOING_MESSAGES_STATUS_COLUMN_NAME, FermatMessagesStatus.DELIVERED);
+                record.setFermatEnum(OUTGOING_MESSAGES_STATUS_COLUMN_NAME, MessageStatus.DELIVERED);
                 record.setLongValue(OUTGOING_MESSAGES_DELIVERY_TIMESTAMP_COLUMN_NAME, System.currentTimeMillis());
 
                 table.updateRecord(record);
@@ -178,7 +177,7 @@ public class OutgoingMessagesDao extends AbstractBaseDao<NetworkServiceMessage> 
             if (!records.isEmpty()) {
                 DatabaseTableRecord record = records.get(0);
 
-                record.setFermatEnum(OUTGOING_MESSAGES_STATUS_COLUMN_NAME, FermatMessagesStatus.PENDING_TO_SEND);
+                record.setFermatEnum(OUTGOING_MESSAGES_STATUS_COLUMN_NAME, MessageStatus.PENDING_TO_SEND);
                 record.setIntegerValue(OUTGOING_MESSAGES_FAIL_COUNT_COLUMN_NAME, record.getIntegerValue(OUTGOING_MESSAGES_FAIL_COUNT_COLUMN_NAME)+1);
 
                 table.updateRecord(record);
@@ -201,7 +200,7 @@ public class OutgoingMessagesDao extends AbstractBaseDao<NetworkServiceMessage> 
         }
 
         fermatMessage.setDeliveryTimestamp(new Timestamp(System.currentTimeMillis()));
-        fermatMessage.setFermatMessagesStatus(FermatMessagesStatus.FAILED);
+        fermatMessage.setMessageStatus(MessageStatus.FAILED);
         update(fermatMessage);
 
     }
@@ -225,7 +224,7 @@ public class OutgoingMessagesDao extends AbstractBaseDao<NetworkServiceMessage> 
                 DatabaseTableFilter newFilter = templateTable.getEmptyTableFilter();
                 newFilter.setType(DatabaseFilterType.EQUAL);
                 newFilter.setColumn(OUTGOING_MESSAGES_STATUS_COLUMN_NAME);
-                newFilter.setValue(MessagesStatus.PENDING_TO_SEND.getCode());
+                newFilter.setValue(MessageStatus.PENDING_TO_SEND.getCode());
                 tableFilters.add(newFilter);
             }
 
@@ -283,7 +282,7 @@ public class OutgoingMessagesDao extends AbstractBaseDao<NetworkServiceMessage> 
                 DatabaseTableFilter newFilter = templateTable.getEmptyTableFilter();
                 newFilter.setType(DatabaseFilterType.EQUAL);
                 newFilter.setColumn(OUTGOING_MESSAGES_STATUS_COLUMN_NAME);
-                newFilter.setValue(MessagesStatus.PENDING_TO_SEND.getCode());
+                newFilter.setValue(MessageStatus.PENDING_TO_SEND.getCode());
                 tableFilters.add(newFilter);
             }
 
@@ -338,7 +337,7 @@ public class OutgoingMessagesDao extends AbstractBaseDao<NetworkServiceMessage> 
                 DatabaseTableFilter newFilter = templateTable.getEmptyTableFilter();
                 newFilter.setType(DatabaseFilterType.EQUAL);
                 newFilter.setColumn(OUTGOING_MESSAGES_STATUS_COLUMN_NAME);
-                newFilter.setValue(MessagesStatus.SENT.getCode());
+                newFilter.setValue(MessageStatus.SENT.getCode());
                 tableFilters.add(newFilter);
             }
 

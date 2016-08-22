@@ -8,7 +8,11 @@ import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.Eve
 import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.error_manager.enums.UnexpectedPluginExceptionSeverity;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.utils.PluginVersionReference;
 import com.bitdubai.fermat_api.layer.all_definition.crypto.asymmetric.ECCKeyPair;
-import com.bitdubai.fermat_api.layer.all_definition.enums.*;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Addons;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Layers;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Platforms;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Plugins;
+import com.bitdubai.fermat_api.layer.all_definition.enums.ServiceStatus;
 import com.bitdubai.fermat_api.layer.all_definition.events.EventSource;
 import com.bitdubai.fermat_api.layer.all_definition.events.interfaces.FermatEventListener;
 import com.bitdubai.fermat_api.layer.all_definition.network_service.enums.NetworkServiceType;
@@ -40,7 +44,11 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.ne
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.daos.QueriesDao;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceQuery;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.exceptions.*;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.exceptions.CantDeleteRecordDataBaseException;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.exceptions.CantInitializeNetworkServiceDatabaseException;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.exceptions.CantReadRecordDataBaseException;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.exceptions.CantUpdateRecordDataBaseException;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.exceptions.RecordNotFoundException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.factories.NetworkServiceDatabaseFactory;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.exceptions.CantInitializeIdentityException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.exceptions.CantInitializeNetworkServiceProfileException;
@@ -51,9 +59,8 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.ne
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.NetworkServiceProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.MessageContentType;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.MessageStatus;
 import com.bitdubai.fermat_p2p_api.layer.p2p_communication.CommunicationChannels;
-import com.bitdubai.fermat_p2p_api.layer.p2p_communication.MessagesStatus;
-import com.bitdubai.fermat_p2p_api.layer.p2p_communication.commons.enums.FermatMessagesStatus;
 
 import java.util.HashMap;
 import java.util.List;
@@ -429,14 +436,14 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
                  */
                 for (NetworkServiceMessage message : messages) {
 
-                    if (networkClientCall.isConnected() && (message.getFermatMessagesStatus() == FermatMessagesStatus.PENDING_TO_SEND)) {
+                    if (networkClientCall.isConnected() && (message.getMessageStatus() == MessageStatus.PENDING_TO_SEND)) {
 
                         networkClientCall.sendPackageMessage(message);
 
                         /*
                          * Change the message and update in the data base
                          */
-                        message.setFermatMessagesStatus(FermatMessagesStatus.SENT);
+                        message.setMessageStatus(MessageStatus.SENT);
                         getNetworkServiceConnectionManager().getOutgoingMessagesDao().update(message);
 
                     } else {
@@ -532,7 +539,7 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
            /*
             * process the new message receive
             */
-            networkServiceMessage.setFermatMessagesStatus(FermatMessagesStatus.NEW_RECEIVED);
+            networkServiceMessage.setMessageStatus(MessageStatus.NEW_RECEIVED);
 
             NetworkServiceMessage networkServiceMessageOld;
 
@@ -706,7 +713,7 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
              */
             Map<String, Object> filters = new HashMap<>();
             filters.put(NetworkServiceDatabaseConstants.OUTGOING_MESSAGES_RECEIVER_PUBLIC_KEY_COLUMN_NAME, destinationPublicKey);
-            filters.put(NetworkServiceDatabaseConstants.OUTGOING_MESSAGES_STATUS_COLUMN_NAME, MessagesStatus.PENDING_TO_SEND.getCode());
+            filters.put(NetworkServiceDatabaseConstants.OUTGOING_MESSAGES_STATUS_COLUMN_NAME, MessageStatus.PENDING_TO_SEND.getCode());
 
             List<NetworkServiceMessage> messages = getNetworkServiceConnectionManager().getOutgoingMessagesDao().findAll(filters);
 
@@ -822,13 +829,18 @@ public abstract class AbstractNetworkService2 extends AbstractPlugin implements 
         }
     }
 
-    protected UUID discoveryActorProfiles(final DiscoveryQueryParameters discoveryQueryParameters) throws com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantSendMessageException {
+    protected UUID discoveryActorProfiles(final DiscoveryQueryParameters discoveryQueryParameters,
+                                          final String                   requesterPublicKey      ) throws com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantSendMessageException {
 
          /*
          * Create the query
          */
         UUID uuid = UUID.randomUUID();
-        ActorListMsgRequest actorListMsgRequest = new ActorListMsgRequest(uuid,networkServiceType.getCode(),discoveryQueryParameters);
+        ActorListMsgRequest actorListMsgRequest = new ActorListMsgRequest(
+                uuid,networkServiceType.getCode(),
+                discoveryQueryParameters,
+                requesterPublicKey
+        );
 
         p2PLayerManager.sendDiscoveryMessage(actorListMsgRequest, networkServiceType, null);
 

@@ -54,7 +54,7 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
             String pk = getIntent().getStringExtra(IntentConstants.PROFILE_RECEIVER_NOTIFICATION_PK);
             remote = Core.getInstance().getRemoteProfile(pk);
             if (remote==null){
-                Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList(10000, 0);
+                Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList(10000, 0, Core.getInstance().getProfile().getIdentityPublicKey());
                 isSearchingRemote = true;
                 remotePk = pk;
             }

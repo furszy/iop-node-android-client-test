@@ -11,7 +11,7 @@ import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.Cant
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantLoadTableToMemoryException;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantUpdateRecordException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
-import com.bitdubai.fermat_p2p_api.layer.p2p_communication.commons.enums.FermatMessagesStatus;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.MessageStatus;
 import com.fermat_p2p_layer.version_1.structure.exceptions.CantCheckPackageIdException;
 import com.fermat_p2p_layer.version_1.structure.exceptions.CantDeleteRecordException;
 import com.fermat_p2p_layer.version_1.structure.exceptions.CantGetNetworkServiceMessageException;
@@ -133,7 +133,7 @@ public class P2PLayerDao {
         databaseTableRecord.setLongValue   (P2P_LAYER_SHIPPING_TIMESTAMP_COLUMN_NAME   , getLongValueFromTimestamp(networkServiceMessage.getShippingTimestamp()));
         databaseTableRecord.setLongValue   (P2P_LAYER_DELIVERY_TIMESTAMP_COLUMN_NAME   , getLongValueFromTimestamp(networkServiceMessage.getDeliveryTimestamp()));
         databaseTableRecord.setBooleanValue(P2P_LAYER_IS_BETWEEN_ACTORS_COLUMN_NAME    , networkServiceMessage.isBetweenActors());
-        databaseTableRecord.setFermatEnum  (P2P_LAYER_FERMAT_MESSAGE_STATUS_COLUMN_NAME, networkServiceMessage.getFermatMessagesStatus());
+        databaseTableRecord.setFermatEnum  (P2P_LAYER_FERMAT_MESSAGE_STATUS_COLUMN_NAME, networkServiceMessage.getMessageStatus());
         databaseTableRecord.setStringValue (P2P_LAYER_SIGNATURE_COLUMN_NAME            , networkServiceMessage.getSignature());
         databaseTableRecord.setIntegerValue(P2P_LAYER_FAIL_COUNT_COLUMN_NAME           , networkServiceMessage.getFailCount());
 
@@ -169,7 +169,7 @@ public class P2PLayerDao {
 
         //Fermat Message Status
         String fmString = databaseTableRecord.getStringValue(P2P_LAYER_FERMAT_MESSAGE_STATUS_COLUMN_NAME);
-        networkServiceMessage.setFermatMessagesStatus(FermatMessagesStatus.getByCode(fmString));
+        networkServiceMessage.setMessageStatus(MessageStatus.getByCode(fmString));
 
         //Signature
         networkServiceMessage.setSignature(databaseTableRecord.getStringValue(P2P_LAYER_SIGNATURE_COLUMN_NAME));

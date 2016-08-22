@@ -402,11 +402,11 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
         this.networkClientManager = networkClientManager;
     }
 
-    public void requestActorProfilesList(int max, int offset) {
-        testDataOrNodeData(max, offset, false);//test = true; node = false
+    public void requestActorProfilesList(int max, int offset, String requesterPublicKey) {
+        testDataOrNodeData(max, offset, false, requesterPublicKey);//test = true; node = false
     }
 
-    public void testDataOrNodeData(int max, int offset, boolean testData){
+    public void testDataOrNodeData(int max, int offset, boolean testData, String requesterPublicKey){
         if(testData) {
             ArrayList<ActorProfile> actorProfiles = new ArrayList<>();
             for (int i = 0; i <= 20; i++) {
@@ -446,7 +446,7 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
                         max,
                         offset,
                         true
-                ));
+                ), requesterPublicKey);
             } catch (CantSendMessageException e) {
                 e.printStackTrace();
             }

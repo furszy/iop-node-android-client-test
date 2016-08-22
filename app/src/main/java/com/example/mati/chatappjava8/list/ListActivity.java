@@ -16,7 +16,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -153,7 +152,7 @@ public class ListActivity extends AppCompatActivity
             executorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList(max, offset);
+                    Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList(max, offset, Core.getInstance().getProfile().getIdentityPublicKey());
                 }
             });
         } catch (Exception e) {
