@@ -403,6 +403,34 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
     }
 
     public void requestActorProfilesList(int max, int offset) {
+        testDataOrNodeData(max, offset, false);//test = true; node = false
+    }
+
+    public void testDataOrNodeData(int max, int offset, boolean testData){
+        if(testData) {
+            ArrayList<ActorProfile> actorProfiles = new ArrayList<>();
+            for (int i = 0; i <= 20; i++) {
+                try {
+                    ActorProfile ac = new ActorProfile();
+                    ac.setClientIdentityPublicKey("a" + String.valueOf(i + 1));
+                    ac.setActorType(Actors.CHAT.getCode());
+                    ac.setAlias("a" + String.valueOf(i + 1));
+                    ac.setExtraData("a" + String.valueOf(i + 1));
+                    ac.setHomeNodeIdentifier("a" + String.valueOf(i + 1));
+                    ac.setName("a" + String.valueOf(i + 1));
+                    ac.setNsIdentityPublicKey("a" + String.valueOf(i + 1));
+                    ac.setIdentityPublicKey("a" + String.valueOf(i + 1));
+                    ac.setPhoto(null);
+                    actorProfiles.add(ac);
+                } catch (Exception e) {
+                }
+            }
+            if (actorProfiles.size() > offset + max)
+                max = max + offset;
+            else
+                max = actorProfiles.size();
+            onNetworkServiceActorListReceived(null, actorProfiles.subList(offset, max));
+        } else {
             try {
                 discoveryActorProfiles(new DiscoveryQueryParameters(
                         null,
@@ -419,11 +447,12 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
                         offset,
                         true
                 ));
-       // testDataWithoutNode(max, offset); //just use it for test without node, please comment try catch and discovery code above
             } catch (CantSendMessageException e) {
                 e.printStackTrace();
             }
+        }
     }
+
 
     @Override
     protected void onActorRegistered(ActorProfile actorProfile) {
