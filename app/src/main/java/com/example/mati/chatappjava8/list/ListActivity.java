@@ -16,7 +16,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,6 +31,7 @@ import com.example.mati.chatappjava8.chat.FermatListItemListeners;
 import com.example.mati.chatappjava8.commons.NavigationListener;
 import com.example.mati.chatappjava8.commons.Notifications;
 
+import org.iop.ns.chat.structure.ChatMetadataRecord;
 import org.iop.ns.chat.structure.test.MessageReceiver;
 
 import java.util.ArrayList;
@@ -153,7 +153,7 @@ public class ListActivity extends AppCompatActivity
             executorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList(max, offset);
+                    Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList(max, offset, Core.getInstance().getProfile().getIdentityPublicKey());
                 }
             });
         } catch (Exception e) {
@@ -220,8 +220,8 @@ public class ListActivity extends AppCompatActivity
     }
 
     @Override
-    public void onMessageReceived(String senderPk,String chatMetadataRecord) {
-        Notifications.pushNotification(this,chatMetadataRecord, senderPk);
+    public void onMessageReceived(String senderPk,ChatMetadataRecord chatMetadataRecord) {
+        Notifications.pushNotification(this,chatMetadataRecord.getMessage(), senderPk);
     }
 
 

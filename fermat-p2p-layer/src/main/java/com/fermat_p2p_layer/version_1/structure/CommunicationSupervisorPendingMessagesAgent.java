@@ -20,7 +20,7 @@
 //import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.network_services.data_base.CommunicationNetworkServiceDatabaseConstants;
 //import com.bitdubai.fermat_p2p_api.layer.p2p_communication.MessagesStatus;
 //import com.bitdubai.fermat_p2p_api.layer.p2p_communication.commons.contents.FermatMessage;
-//import com.bitdubai.fermat_p2p_api.layer.p2p_communication.commons.enums.FermatMessagesStatus;
+//import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.MessageStatus;
 //import com.fermat_p2p_layer.version_1.P2PLayerPluginRoot;
 //
 //import java.util.ArrayList;
@@ -100,7 +100,7 @@
 ////
 ////                networkServiceRoot.onNewMessagesReceive(fermatMessage);
 ////
-////                ((FermatMessageCommunication) fermatMessage).setFermatMessagesStatus(FermatMessagesStatus.READ);
+////                ((FermatMessageCommunication) fermatMessage).setMessageStatus(MessageStatus.READ);
 ////                networkServiceRoot.getCommunicationNetworkServiceConnectionManager().getIncomingMessageDao().update(fermatMessage);
 ////
 ////            }

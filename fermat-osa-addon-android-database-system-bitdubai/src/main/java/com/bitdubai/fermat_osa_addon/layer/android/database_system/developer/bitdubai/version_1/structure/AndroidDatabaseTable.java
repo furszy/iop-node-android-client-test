@@ -8,7 +8,6 @@ import android.util.Log;
 
 import com.bitdubai.fermat_api.FermatException;
 import com.bitdubai.fermat_api.layer.all_definition.enums.interfaces.FermatEnum;
-import com.bitdubai.fermat_api.layer.all_definition.exceptions.InvalidParameterException;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DataBaseAggregateFunctionType;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DataBaseTableOrder;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseAggregateFunction;
@@ -344,6 +343,7 @@ public class AndroidDatabaseTable implements DatabaseTable {
             database = this.database.getReadableDatabase();
             List<String> columns = getColumns(database);
             String queryString = "SELECT *" + makeOutputColumns() + " FROM " + tableName + makeFilter() + makeOrder() + topSentence + offsetSentence;
+
             cursor = database.rawQuery(queryString, null);
             while (cursor.moveToNext()) {
                 AndroidDatabaseRecord tableRecord = new AndroidDatabaseRecord();
@@ -685,7 +685,12 @@ public class AndroidDatabaseTable implements DatabaseTable {
         } else {
             //if set group filter
             if (this.tableFilterGroup != null) {
-                return makeGroupFilters(this.tableFilterGroup);
+
+                String groupFilters = makeGroupFilters(this.tableFilterGroup);
+                if (groupFilters.trim().isEmpty())
+                    return "";
+                else
+                    return " WHERE " +groupFilters;
             } else {
                 return filter;
             }
@@ -725,18 +730,19 @@ public class AndroidDatabaseTable implements DatabaseTable {
     public String makeGroupFilters(DatabaseTableFilterGroup databaseTableFilterGroup) {
 
         StringBuilder strFilter = new StringBuilder();
-        String filter;
 
         if (databaseTableFilterGroup != null && (databaseTableFilterGroup.getFilters().size() > 0 || databaseTableFilterGroup.getSubGroups().size() > 0)) {
             strFilter.append("(");
-            strFilter.append(makeInternalConditionGroup(databaseTableFilterGroup.getFilters(), databaseTableFilterGroup.getOperator()));
+
+            if (databaseTableFilterGroup.getFilters() != null && !databaseTableFilterGroup.getFilters().isEmpty())
+                strFilter.append(makeInternalConditionGroup(databaseTableFilterGroup.getFilters(), databaseTableFilterGroup.getOperator()));
 
             int ix = 0;
 
             if (databaseTableFilterGroup.getSubGroups() != null){
 
                 for (DatabaseTableFilterGroup subGroup : databaseTableFilterGroup.getSubGroups()) {
-                    if (subGroup.getFilters().size() > 0 || ix > 0) {
+                    if (subGroup.getFilters().size() > 0 && ix > 0) {
                         switch (databaseTableFilterGroup.getOperator()) {
                             case AND:
                                 strFilter.append(" AND ");
@@ -748,9 +754,13 @@ public class AndroidDatabaseTable implements DatabaseTable {
                                 strFilter.append(" ");
                         }
                     }
-                    strFilter.append("(");
+                    if (databaseTableFilterGroup.getFilters() != null)
+                        strFilter.append("(");
+
                     strFilter.append(makeGroupFilters(subGroup));
-                    strFilter.append(")");
+
+                    if (databaseTableFilterGroup.getFilters() != null)
+                        strFilter.append(")");
                     ix++;
                 }
 
@@ -759,10 +769,7 @@ public class AndroidDatabaseTable implements DatabaseTable {
             strFilter.append(")");
         }
 
-        filter = strFilter.toString();
-        if (strFilter.length() > 0) filter = " WHERE " + filter;
-
-        return filter;
+        return strFilter.toString();
     }
 
     public String makeGroupFilters2(DatabaseTableFilterGroup databaseTableFilterGroup) {

@@ -7,7 +7,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.ne
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.exceptions.CantUpdateRecordDataBaseException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.exceptions.RecordNotFoundException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.MessageContentType;
-import com.bitdubai.fermat_p2p_api.layer.p2p_communication.commons.enums.FermatMessagesStatus;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.MessageStatus;
 
 import java.sql.Timestamp;
 import java.util.UUID;
@@ -47,7 +47,7 @@ public class IncomingMessagesDao extends AbstractBaseDao<NetworkServiceMessage> 
         if (fermatMessage == null) {
             throw new IllegalArgumentException("The id is required, can not be null");
         }
-        fermatMessage.setFermatMessagesStatus(FermatMessagesStatus.READ);
+        fermatMessage.setMessageStatus(MessageStatus.READ);
         update(fermatMessage);
 
     }
@@ -72,7 +72,7 @@ public class IncomingMessagesDao extends AbstractBaseDao<NetworkServiceMessage> 
             else
                 networkServiceMessage.setDeliveryTimestamp(new Timestamp(record.getLongValue(INCOMING_MESSAGES_DELIVERY_TIMESTAMP_COLUMN_NAME)));
 
-            networkServiceMessage.setFermatMessagesStatus(FermatMessagesStatus.getByCode(record.getStringValue(INCOMING_MESSAGES_STATUS_COLUMN_NAME)));
+            networkServiceMessage.setMessageStatus(MessageStatus.getByCode(record.getStringValue(INCOMING_MESSAGES_STATUS_COLUMN_NAME)));
 
         } catch (InvalidParameterException e) {
             //this should not happen, but if it happens return null
@@ -106,7 +106,7 @@ public class IncomingMessagesDao extends AbstractBaseDao<NetworkServiceMessage> 
             entityRecord.setLongValue(INCOMING_MESSAGES_DELIVERY_TIMESTAMP_COLUMN_NAME, (long) 0);
         }
 
-        entityRecord.setStringValue(INCOMING_MESSAGES_STATUS_COLUMN_NAME, entity.getFermatMessagesStatus().getCode());
+        entityRecord.setStringValue(INCOMING_MESSAGES_STATUS_COLUMN_NAME, entity.getMessageStatus().getCode());
 
         return entityRecord;
     }
