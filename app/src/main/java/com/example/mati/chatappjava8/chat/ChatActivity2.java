@@ -20,13 +20,13 @@ import com.example.mati.chatappjava8.IntentConstants;
 import com.example.mati.chatappjava8.R;
 import com.example.mati.chatappjava8.commons.Notifications;
 
+import org.iop.ns.chat.structure.ChatMetadataRecord;
 import org.iop.ns.chat.structure.test.MessageReceiver;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public class ChatActivity2 extends AppCompatActivity implements MessageReceiver {
@@ -35,7 +35,6 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
     private RecyclerView messagesContainer;
     private Button sendBtn;
     private ChatAdapter2 adapter;
-    private ArrayList<ChatMessage> chatHistory;
     private ActorProfile remote;
 
 
@@ -90,9 +89,7 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
         });
         sendBtn = (Button) findViewById(R.id.chatSendButton);
 
-        TextView meLabel = (TextView) findViewById(R.id.meLbl);
         TextView companionLabel = (TextView) findViewById(R.id.friendLabel);
-        RelativeLayout container = (RelativeLayout) findViewById(R.id.container);
         companionLabel.setText(remote.getName());// Hard Coded
         loadDummyHistory();
 
@@ -111,18 +108,15 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
 
                 messageET.setText("");
 
-
-
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         try {
                             //este id tenes que guardarlo y chequear si no falló por el metodo onMessageFail
-                            UUID mensajeId = Core.getInstance().getChatNetworkServicePluginRoot().sendNewMessage(
-                                    Core.getInstance().getInstance().getProfile(),
-                                    remote,
+                            UUID mensajeId = Core.getInstance().getChatNetworkServicePluginRoot().sendMessage(
                                     messageText,
-                                    true
+                                    Core.getInstance().getInstance().getProfile().getIdentityPublicKey(),
+                                    remote.getIdentityPublicKey()
                             );
                             //acá se le deberia setear el id, si no lo hace fijate que onda
                             chatMessage.setId(mensajeId);
@@ -161,42 +155,45 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
 
     private void loadDummyHistory(){
 
-        chatHistory = new ArrayList<ChatMessage>();
-
-        ChatMessage msg = new ChatMessage();
-        msg.setId(UUID.randomUUID());
-        msg.setMe(false);
-        msg.setMessage("Hola");
-        msg.setDate(DateFormat.getDateTimeInstance().format(new Date()));
-        chatHistory.add(msg);
-        ChatMessage msg1 = new ChatMessage();
-        msg1.setId(UUID.randomUUID());
-        msg1.setMe(false);
-        msg1.setMessage("como andas??");
-        msg1.setDate(DateFormat.getDateTimeInstance().format(new Date()));
-        chatHistory.add(msg1);
-
         adapter = new ChatAdapter2(ChatActivity2.this, new ArrayList<ChatMessage>());
         messagesContainer.setAdapter(adapter);
 
-        for(int i=0; i<chatHistory.size(); i++) {
-            ChatMessage message = chatHistory.get(i);
-            displayMessage(message);
+        try {
+
+            String localPK = Core.getInstance().getProfile().getIdentityPublicKey();
+            List<ChatMetadataRecord> listMessages = Core.getInstance().getChatNetworkServicePluginRoot().listMessages(
+                    localPK,
+                    remote.getIdentityPublicKey(),
+                    null,
+                    null
+            );
+
+            for (ChatMetadataRecord record : listMessages) {
+                ChatMessage chatMessage = new ChatMessage();
+                chatMessage.setId(record.getId());
+                chatMessage.setMessage(record.getMessage());
+                chatMessage.setDate(DateFormat.getDateTimeInstance().format(record.getDate()));
+                chatMessage.setMe(localPK.equals(record.getLocalActorPublicKey()));
+                displayMessage(chatMessage);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
 
     @Override
-    public void onMessageReceived(String senderPk,String content) {
+    public void onMessageReceived(String senderPk,ChatMetadataRecord content) {
+
         if (remote!=null && remote.getIdentityPublicKey().equals(senderPk)) {
             ChatMessage chatMessage = new ChatMessage();
-            chatMessage.setId(UUID.randomUUID());//dummy
-            chatMessage.setMessage(content);
-            chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
+            chatMessage.setId(content.getId());
+            chatMessage.setMessage(content.getMessage());
+            chatMessage.setDate(DateFormat.getDateTimeInstance().format(content.getDate()));
             chatMessage.setMe(false);
             displayMessage(chatMessage);
         }else {
-            Notifications.pushNotification(this,content,senderPk);
+            Notifications.pushNotification(this,content.getMessage(),senderPk);
         }
     }
 

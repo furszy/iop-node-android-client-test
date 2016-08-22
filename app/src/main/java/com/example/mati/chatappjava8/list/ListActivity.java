@@ -31,6 +31,7 @@ import com.example.mati.chatappjava8.chat.FermatListItemListeners;
 import com.example.mati.chatappjava8.commons.NavigationListener;
 import com.example.mati.chatappjava8.commons.Notifications;
 
+import org.iop.ns.chat.structure.ChatMetadataRecord;
 import org.iop.ns.chat.structure.test.MessageReceiver;
 
 import java.util.ArrayList;
@@ -219,8 +220,8 @@ public class ListActivity extends AppCompatActivity
     }
 
     @Override
-    public void onMessageReceived(String senderPk,String chatMetadataRecord) {
-        Notifications.pushNotification(this,chatMetadataRecord, senderPk);
+    public void onMessageReceived(String senderPk,ChatMetadataRecord chatMetadataRecord) {
+        Notifications.pushNotification(this,chatMetadataRecord.getMessage(), senderPk);
     }
 
 

@@ -18,6 +18,7 @@ import com.example.mati.chatappjava8.R;
 import com.example.mati.chatappjava8.commons.NavigationListener;
 import com.example.mati.chatappjava8.commons.Notifications;
 
+import org.iop.ns.chat.structure.ChatMetadataRecord;
 import org.iop.ns.chat.structure.test.MessageReceiver;
 
 import java.util.List;
@@ -102,8 +103,8 @@ public class ProfileActivity extends AppCompatActivity implements MessageReceive
     }
 
     @Override
-    public void onMessageReceived(String sender, String chatMetadataRecord) {
-        Notifications.pushNotification(this,chatMetadataRecord, sender);
+    public void onMessageReceived(String sender, ChatMetadataRecord chatMetadataRecord) {
+        Notifications.pushNotification(this,chatMetadataRecord.getMessage(), sender);
     }
 
     @Override
