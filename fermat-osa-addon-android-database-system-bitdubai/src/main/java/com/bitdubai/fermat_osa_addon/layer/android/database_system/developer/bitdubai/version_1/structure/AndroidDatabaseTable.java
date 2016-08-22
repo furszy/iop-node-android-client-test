@@ -104,7 +104,28 @@ public class AndroidDatabaseTable implements DatabaseTable {
 
     @Override
     public long getCount() throws CantLoadTableToMemoryException {
-        return this.records.size();
+
+        Cursor cursor = null;
+
+        SQLiteDatabase database = null;
+        try {
+            database = this.database.getReadableDatabase();
+            String queryString = "SELECT COUNT(*) FROM " + tableName + makeFilter();
+            cursor = database.rawQuery(queryString, null);
+            if (cursor.moveToNext()) {
+                return cursor.getLong(0);
+            } else {
+                return 0;
+            }
+        } catch (Exception e) {
+
+            throw new CantLoadTableToMemoryException(e, null, "Check the cause for this error");
+        } finally {
+            if (cursor != null)
+                cursor.close();
+            if (database != null)
+                database.close();
+        }
     }
 
     /**
@@ -802,7 +823,7 @@ public class AndroidDatabaseTable implements DatabaseTable {
 
     @Override
     public void deleteRecord(DatabaseTableRecord record) throws CantDeleteRecordException {
-        if(record==null) throw new CantDeleteRecordException(CantDeleteRecordException.DEFAULT_MESSAGE, new InvalidParameterException("Record null"), null, "Check the cause for this error");;
+
         SQLiteDatabase database = null;
         try {
             database = this.database.getWritableDatabase();

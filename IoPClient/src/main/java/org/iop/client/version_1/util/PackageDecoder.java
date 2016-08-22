@@ -1,7 +1,6 @@
 package org.iop.client.version_1.util;
 
 
-import com.bitdubai.fermat_api.layer.all_definition.exceptions.InvalidParameterException;
 import com.bitdubai.fermat_api.layer.all_definition.network_service.enums.NetworkServiceType;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.Package;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.PackageType;
@@ -42,19 +41,14 @@ public class PackageDecoder implements Decoder.Binary<Package>{
     @Override
     public Package decode(ByteBuffer bytes) throws DecodeException {
         com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.common.Package pack = com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.common.Package.getRootAsPackage(bytes);
-        try {
-            return Package.rebuildInstance(
-                    UUID.fromString(pack.id()),
-                    pack.content(),
-                    NetworkServiceType.getByCode(pack.networkServiceType()),
-                    PackageType.buildWithInt(pack.packageType()),
-                    pack.destinationPk()
-            );
-        } catch (InvalidParameterException e) {
-            e.printStackTrace();
-        }
-        return null;
 
+        return Package.rebuildInstance(
+                UUID.fromString(pack.id()),
+                pack.content(),
+                NetworkServiceType.getByCode(pack.networkServiceType()),
+                PackageType.buildWithInt(pack.packageType()),
+                pack.destinationPk()
+        );
     }
 
     @Override
