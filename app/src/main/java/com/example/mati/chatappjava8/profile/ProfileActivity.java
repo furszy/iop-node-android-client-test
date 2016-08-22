@@ -18,9 +18,11 @@ import com.example.mati.chatappjava8.R;
 import com.example.mati.chatappjava8.commons.NavigationListener;
 import com.example.mati.chatappjava8.commons.Notifications;
 
+import org.iop.ns.chat.structure.ChatMetadataRecord;
 import org.iop.ns.chat.structure.test.MessageReceiver;
 
 import java.util.List;
+import java.util.UUID;
 
 public class ProfileActivity extends AppCompatActivity implements MessageReceiver {
 
@@ -46,7 +48,6 @@ public class ProfileActivity extends AppCompatActivity implements MessageReceive
 //        });
 
 
-        Core.getInstance().setReceiver(this);
 
         navigationView = (NavigationView) findViewById(R.id.navigation);
         navigationView.inflateMenu(R.menu.navigation_menu);
@@ -74,6 +75,12 @@ public class ProfileActivity extends AppCompatActivity implements MessageReceive
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        Core.getInstance().setReceiver(this);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
 //        getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -96,8 +103,8 @@ public class ProfileActivity extends AppCompatActivity implements MessageReceive
     }
 
     @Override
-    public void onMessageReceived(String sender, String chatMetadataRecord) {
-        Notifications.pushNotification(this,chatMetadataRecord, sender);
+    public void onMessageReceived(String sender, ChatMetadataRecord chatMetadataRecord) {
+        Notifications.pushNotification(this,chatMetadataRecord.getMessage(), sender);
     }
 
     @Override
@@ -107,6 +114,11 @@ public class ProfileActivity extends AppCompatActivity implements MessageReceive
 
     @Override
     public void onActorRegistered(ActorProfile actorProfile) {
+
+    }
+
+    @Override
+    public void onMessageFail(UUID messageId) {
 
     }
 }

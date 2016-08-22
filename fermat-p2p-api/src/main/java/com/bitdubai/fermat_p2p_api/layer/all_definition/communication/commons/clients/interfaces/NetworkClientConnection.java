@@ -66,13 +66,15 @@ public interface NetworkClientConnection {
      *
      * @param discoveryQueryParameters  parameters for the query
      * @param networkServicePublicKey   network service asking for the list of actors
+     * @param requesterPublicKey        actor public key of the actor which request the discovery
      *
      * @return query id
      *
      * @throws CantRequestProfileListException if something goes wrong.
      */
      UUID discoveryQuery(final DiscoveryQueryParameters discoveryQueryParameters,
-                                     final String                   networkServicePublicKey) throws CantRequestProfileListException;
+                         final String                   networkServicePublicKey ,
+                         final String                   requesterPublicKey      ) throws CantRequestProfileListException;
 
     /**
      * Through the method <code>listRegisteredActorProfiles</code> we can get a list of registered actors

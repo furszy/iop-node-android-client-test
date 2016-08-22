@@ -3,13 +3,12 @@ package com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.n
 import com.bitdubai.fermat_api.layer.all_definition.network_service.enums.NetworkServiceType;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.PackageContent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.util.TimestampAdapter;
-import com.bitdubai.fermat_p2p_api.layer.p2p_communication.commons.enums.FermatMessagesStatus;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.MessageStatus;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -36,7 +35,7 @@ public class NetworkServiceMessage extends PackageContent implements AbstractBas
     private transient Timestamp                deliveryTimestamp      ;
 
     private transient Boolean                  isBetweenActors        ;
-    private transient FermatMessagesStatus     fermatMessagesStatus   ;
+    private transient MessageStatus messageStatus;
 
     private transient           String                   signature              ;
 
@@ -105,12 +104,12 @@ public class NetworkServiceMessage extends PackageContent implements AbstractBas
         this.deliveryTimestamp = deliveryTimestamp;
     }
 
-    public FermatMessagesStatus getFermatMessagesStatus() {
-        return fermatMessagesStatus;
+    public MessageStatus getMessageStatus() {
+        return messageStatus;
     }
 
-    public void setFermatMessagesStatus(FermatMessagesStatus fermatMessagesStatus) {
-        this.fermatMessagesStatus = fermatMessagesStatus;
+    public void setMessageStatus(MessageStatus messageStatus) {
+        this.messageStatus = messageStatus;
     }
 
     public String getSignature() {
@@ -172,7 +171,7 @@ public class NetworkServiceMessage extends PackageContent implements AbstractBas
                 ", shippingTimestamp=" + shippingTimestamp +
                 ", deliveryTimestamp=" + deliveryTimestamp +
                 ", isBetweenActors=" + isBetweenActors +
-                ", fermatMessagesStatus=" + fermatMessagesStatus +
+                ", messageStatus=" + messageStatus +
                 ", contentType=" + getMessageContentType() +
                 ", signature='" + signature + '\'' +
                 ", failCount=" + failCount +

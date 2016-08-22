@@ -1,5 +1,7 @@
 package com.example.mati.chatappjava8.list;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -11,9 +13,11 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -27,10 +31,12 @@ import com.example.mati.chatappjava8.chat.FermatListItemListeners;
 import com.example.mati.chatappjava8.commons.NavigationListener;
 import com.example.mati.chatappjava8.commons.Notifications;
 
+import org.iop.ns.chat.structure.ChatMetadataRecord;
 import org.iop.ns.chat.structure.test.MessageReceiver;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -49,7 +55,8 @@ public class ListActivity extends AppCompatActivity
     private int offset = 0;
     int pastVisiblesItems, visibleItemCount, totalItemCount;
     ExecutorService executorService;
-
+    private SearchView searchView = null;
+    private SearchView.OnQueryTextListener queryTextListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +64,6 @@ public class ListActivity extends AppCompatActivity
         setContentView(R.layout.activity_list_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
         navigationView = (NavigationView) findViewById(R.id.navigation);
 //        navigationView.inflateMenu(R.menu.navigation_menu);
@@ -78,8 +84,6 @@ public class ListActivity extends AppCompatActivity
             }
         });
         init();
-
-        Core.getInstance().setReceiver(this);
 
         this.recyclerView = (RecyclerView) findViewById(R.id.recycler);
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -121,6 +125,7 @@ public class ListActivity extends AppCompatActivity
     }
 
     private void init(){
+        Core.getInstance().setReceiver(this);
         if (executorService==null){
             executorService = Executors.newFixedThreadPool(2);
         }else{
@@ -148,7 +153,7 @@ public class ListActivity extends AppCompatActivity
             executorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList(max, offset);
+                    Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList(max, offset, Core.getInstance().getProfile().getIdentityPublicKey());
                 }
             });
         } catch (Exception e) {
@@ -160,7 +165,36 @@ public class ListActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
 //        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+
+        if (searchItem != null) {
+            searchView = (SearchView) searchItem.getActionView();
+            searchView.setQueryHint("Search...");
+        }
+        if (searchView != null) {
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+            queryTextListener = new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    if (newText.equals(searchView.getQuery().toString())) {
+                        Log.i("onQueryTextChange", newText);
+                        listAdapter.changeDataSet(listActors);
+                        listAdapter.getFilter().filter(newText);
+                    }
+                    return false;
+                }
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    return false;
+                }
+            };
+            searchView.setOnQueryTextListener(queryTextListener);
+        }
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -171,16 +205,23 @@ public class ListActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
+            case R.id.action_search:
+                // Not implemented here
+                return false;
+            default:
+                break;
         }
+        searchView.setOnQueryTextListener(queryTextListener);
 
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public void onMessageReceived(String senderPk,String chatMetadataRecord) {
-        Notifications.pushNotification(this,chatMetadataRecord, senderPk);
+    public void onMessageReceived(String senderPk,ChatMetadataRecord chatMetadataRecord) {
+        Notifications.pushNotification(this,chatMetadataRecord.getMessage(), senderPk);
     }
 
 
@@ -192,6 +233,8 @@ public class ListActivity extends AppCompatActivity
         for (ActorProfile actorProfile : list) {
             Log.i(this.getComponentName().getClassName(),actorProfile.toString());
         }
+
+        Core.getInstance().addRemotesUsers(list);
 
         runOnUiThread(new Runnable() {
             @Override
@@ -228,6 +271,11 @@ public class ListActivity extends AppCompatActivity
 
     @Override
     public void onActorRegistered(ActorProfile actorProfile) {
+
+    }
+
+    @Override
+    public void onMessageFail(UUID messageId) {
 
     }
 

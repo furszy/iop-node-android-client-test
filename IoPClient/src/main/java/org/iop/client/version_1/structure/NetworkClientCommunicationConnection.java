@@ -491,7 +491,8 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
      */
     @Override
     public UUID discoveryQuery(final DiscoveryQueryParameters discoveryQueryParameters,
-                                           final String                   networkServicePublicKey ) throws CantRequestProfileListException {
+                               final String                   networkServicePublicKey ,
+                               final String                   requesterPublicKey      ) throws CantRequestProfileListException {
 
         UUID queryId = UUID.randomUUID();
 
@@ -499,7 +500,8 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
         ActorListMsgRequest actorListMsgRequest = new ActorListMsgRequest(
                 queryId,
                 networkServicePublicKey,
-                discoveryQueryParameters
+                discoveryQueryParameters,
+                requesterPublicKey
         );
 
         actorListMsgRequest.setMessageContentType(MessageContentType.JSON);
