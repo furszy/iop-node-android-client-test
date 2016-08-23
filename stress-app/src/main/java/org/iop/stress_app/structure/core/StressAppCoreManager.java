@@ -15,6 +15,8 @@ public class StressAppCoreManager {
 
     private ExecutorService threadPoolExecutor;
 
+    private boolean networkServiceStart = false;
+
     public StressAppCoreManager() {
         this.stressAppCoreList = new ArrayList<>();
     }
@@ -29,6 +31,7 @@ public class StressAppCoreManager {
         }
         threadPoolExecutor = Executors.newFixedThreadPool(coreCount);
         for (StressAppCore stressAppCore : stressAppCoreList) {
+            stressAppCore.setNetworkServiceStart(networkServiceStart);
             threadPoolExecutor.submit(new CoreTask(stressAppCore));
         }
     }
@@ -64,5 +67,9 @@ public class StressAppCoreManager {
             stressAppCore.shutdown();
         }
         threadPoolExecutor.shutdown();
+    }
+
+    public void setNetworkServiceStart(boolean networkServiceStart) {
+        this.networkServiceStart = networkServiceStart;
     }
 }

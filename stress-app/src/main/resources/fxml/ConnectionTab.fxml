@@ -26,7 +26,7 @@
         <Button fx:id="tabButton" text="Start" prefWidth="60"
                 onAction="#handleStartButtonAction"/>
     </HBox>
-    <Label fx:id="actionTarget" text="Test not started " prefWidth="200" wrapText="true"
+    <Label fx:id="actionTarget" text="Test not started " prefWidth="200" prefHeight="40" wrapText="true"
            GridPane.columnIndex="1"
            GridPane.rowIndex="4"
            GridPane.columnSpan="2"

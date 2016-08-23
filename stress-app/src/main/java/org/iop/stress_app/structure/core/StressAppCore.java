@@ -30,6 +30,8 @@ public class StressAppCore {
     private ActorProfile profile;
     private ActorProfile lastRemoteProfile;
 
+    private boolean networkServiceStart = false;
+
     //private ActorMessengerManager actorMessengerManager;
 
     public StressAppCore() {
@@ -71,14 +73,16 @@ public class StressAppCore {
             ioPClientPluginRoot.start();
 
             //console ns
-            /*chatNetworkServicePluginRoot = new ChatNetworkServicePluginRoot();
-            chatNetworkServicePluginRoot.setP2PLayerManager(p2PLayerPluginRoot);
-            chatNetworkServicePluginRoot.setNetworkClientManager(ioPClientPluginRoot);
-            chatNetworkServicePluginRoot.setEventManager((EventManager) eventManagerPlatformServiceAddonRoot.getManager());
-            chatNetworkServicePluginRoot.setPluginFileSystem((PluginFileSystem) pluginFileSystemLinuxAddonRoot.getManager());
-            chatNetworkServicePluginRoot.setErrorManager((ErrorManager) errorManagerPlatformServiceAddonRoot.getManager());
-            chatNetworkServicePluginRoot.setPluginDatabaseSystem((PluginDatabaseSystem) pluginDatabaseSystemAndroidAddonRoot.getManager());
-            chatNetworkServicePluginRoot.start();*/
+            if(networkServiceStart){
+                chatNetworkServicePluginRoot = new ChatNetworkServicePluginRoot();
+                chatNetworkServicePluginRoot.setP2PLayerManager(p2PLayerPluginRoot);
+                chatNetworkServicePluginRoot.setNetworkClientManager(ioPClientPluginRoot);
+                chatNetworkServicePluginRoot.setEventManager((EventManager) eventManagerPlatformServiceAddonRoot.getManager());
+                chatNetworkServicePluginRoot.setPluginFileSystem((PluginFileSystem) pluginFileSystemLinuxAddonRoot.getManager());
+                chatNetworkServicePluginRoot.setErrorManager((ErrorManager) errorManagerPlatformServiceAddonRoot.getManager());
+                chatNetworkServicePluginRoot.setPluginDatabaseSystem((PluginDatabaseSystem) pluginDatabaseSystemAndroidAddonRoot.getManager());
+                chatNetworkServicePluginRoot.start();
+            }
 
             System.out.println("FERMAT - Network StressAppCore - started satisfactory...");
 
@@ -155,5 +159,9 @@ public class StressAppCore {
 
     public void shutdown() {
         ioPClientPluginRoot.disconnect();
+    }
+
+    public void setNetworkServiceStart(boolean networkServiceStart) {
+        this.networkServiceStart = networkServiceStart;
     }
 }
