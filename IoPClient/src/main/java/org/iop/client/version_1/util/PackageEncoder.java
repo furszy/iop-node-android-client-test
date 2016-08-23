@@ -10,11 +10,7 @@ import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
 
 /**
- * The Class <code>com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.util.PackageEncoder</code>
- * encode the package object to json string format
- * <p/>
- * Created by Roberto Requena - (rart3001@gmail.com) on 30/11/15.
- *
+ * MAtias Furszyfer
  * @version 1.0
  * @since Java JDK 1.7
  */

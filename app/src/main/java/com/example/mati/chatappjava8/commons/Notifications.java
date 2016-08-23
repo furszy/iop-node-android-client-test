@@ -26,7 +26,7 @@ public class Notifications {
                 .getActivity(context, 0, intent,  PendingIntent.FLAG_ONE_SHOT);
         Notification.Builder builder = new Notification.Builder(context).setTicker("ticker")
                 .setContentTitle("New Message arrived")
-                .setSubText(content)
+                .setContentText(content)
                 .setPriority(Notification.PRIORITY_DEFAULT)
                 .setAutoCancel(true)
                 .setSmallIcon(R.drawable.in_message_bg)

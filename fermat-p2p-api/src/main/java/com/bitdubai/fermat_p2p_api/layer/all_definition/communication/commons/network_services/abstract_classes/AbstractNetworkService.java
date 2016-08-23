@@ -34,12 +34,10 @@ import com.bitdubai.fermat_api.layer.osa_android.location_system.Location;
 import com.bitdubai.fermat_api.layer.osa_android.location_system.LocationManager;
 import com.bitdubai.fermat_api.layer.osa_android.location_system.exceptions.CantGetDeviceLocationException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantRegisterProfileException;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantRequestProfileListException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.NetworkClientCall;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.NetworkClientConnection;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.NetworkClientManager;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.P2PLayerManager;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.DiscoveryQueryParameters;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.agents.NetworkServicePendingMessagesSupervisorAgent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.constants.NetworkServiceDatabaseConstants;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.daos.QueriesDao;
@@ -51,8 +49,6 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.ne
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.exceptions.CantUpdateRecordDataBaseException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.exceptions.RecordNotFoundException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.factories.NetworkServiceDatabaseFactory;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.enums.QueryStatus;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.enums.QueryTypes;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.event_handlers.NetworkClientActorFoundEventHandler;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.event_handlers.NetworkClientActorListReceivedEventHandler;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.event_handlers.NetworkClientActorUnreachableEventHandler;
@@ -73,10 +69,9 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.ne
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.NetworkServiceProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.MessageContentType;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.MessageStatus;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.P2pEventType;
 import com.bitdubai.fermat_p2p_api.layer.p2p_communication.CommunicationChannels;
-import com.bitdubai.fermat_p2p_api.layer.p2p_communication.MessagesStatus;
-import com.bitdubai.fermat_p2p_api.layer.p2p_communication.commons.enums.FermatMessagesStatus;
 
 import java.util.HashMap;
 import java.util.List;
@@ -555,14 +550,14 @@ public abstract class AbstractNetworkService extends AbstractPlugin implements N
                  */
                 for (NetworkServiceMessage message : messages) {
 
-                    if (networkClientCall.isConnected() && (message.getFermatMessagesStatus() == FermatMessagesStatus.PENDING_TO_SEND)) {
+                    if (networkClientCall.isConnected() && (message.getMessageStatus() == MessageStatus.PENDING_TO_SEND)) {
 
                         networkClientCall.sendPackageMessage(message);
 
                         /*
                          * Change the message and update in the data base
                          */
-                        message.setFermatMessagesStatus(FermatMessagesStatus.SENT);
+                        message.setMessageStatus(MessageStatus.SENT);
                         getNetworkServiceConnectionManager().getOutgoingMessagesDao().update(message);
 
                     } else {
@@ -650,7 +645,7 @@ public abstract class AbstractNetworkService extends AbstractPlugin implements N
            /*
             * process the new message receive
             */
-            networkServiceMessage.setFermatMessagesStatus(FermatMessagesStatus.NEW_RECEIVED);
+            networkServiceMessage.setMessageStatus(MessageStatus.NEW_RECEIVED);
 
             NetworkServiceMessage networkServiceMessageOld;
 
@@ -823,7 +818,7 @@ public abstract class AbstractNetworkService extends AbstractPlugin implements N
              */
             Map<String, Object> filters = new HashMap<>();
             filters.put(NetworkServiceDatabaseConstants.OUTGOING_MESSAGES_RECEIVER_PUBLIC_KEY_COLUMN_NAME, destinationPublicKey);
-            filters.put(NetworkServiceDatabaseConstants.OUTGOING_MESSAGES_STATUS_COLUMN_NAME, MessagesStatus.PENDING_TO_SEND.getCode());
+            filters.put(NetworkServiceDatabaseConstants.OUTGOING_MESSAGES_STATUS_COLUMN_NAME, MessageStatus.PENDING_TO_SEND.getCode());
 
             List<NetworkServiceMessage> messages = getNetworkServiceConnectionManager().getOutgoingMessagesDao().findAll(filters);
 
