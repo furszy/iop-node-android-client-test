@@ -34,7 +34,7 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:background="#af2"
-            android:text="Send MSG"
+            android:text="Send"
             android:textColor="#000"/>
 
         <android.support.v7.widget.RecyclerView

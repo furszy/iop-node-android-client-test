@@ -2,7 +2,6 @@ package com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.c
 
 import com.bitdubai.fermat_api.layer.all_definition.events.common.AbstractEvent;
 import com.bitdubai.fermat_api.layer.all_definition.network_service.enums.NetworkServiceType;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.P2pEventType;
 
 import java.util.UUID;

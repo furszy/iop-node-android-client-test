@@ -121,6 +121,10 @@ public class ListActivity extends AppCompatActivity
                 onRefreshList();
             }
         });
+        if (listActors.isEmpty()){
+            findViewById(R.id.black_screen).setVisibility(View.VISIBLE);
+        }
+
         onRefreshList();
     }
 
@@ -182,7 +186,7 @@ public class ListActivity extends AppCompatActivity
                 public boolean onQueryTextChange(String newText) {
                     if (newText.equals(searchView.getQuery().toString())) {
                         Log.i("onQueryTextChange", newText);
-                        listAdapter.changeDataSet(listActors);
+//                        listAdapter.changeDataSet(listActors);
                         listAdapter.getFilter().filter(newText);
                     }
                     return false;
@@ -256,6 +260,7 @@ public class ListActivity extends AppCompatActivity
                         }
                     listAdapter.notifyItemRangeInserted(offset, listActors.size() - 1);
                 }
+                findViewById(R.id.black_screen).setVisibility(View.GONE);
             }
         });
         offset = listActors.size();

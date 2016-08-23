@@ -26,6 +26,7 @@ import org.iop.client.version_1.channels.processors.checkin.CheckInNetworkServic
 import org.iop.client.version_1.context.ClientContext;
 import org.iop.client.version_1.context.ClientContextItem;
 import org.iop.client.version_1.structure.NetworkClientCommunicationConnection;
+import org.iop.client.version_1.util.BlockEncoder;
 import org.iop.client.version_1.util.PackageDecoder;
 import org.iop.client.version_1.util.PackageEncoder;
 
@@ -135,11 +136,11 @@ public class NetworkClientCommunicationChannel {
          */
         connection.setServerIdentity((String) session.getUserProperties().get(HeadersAttName.NPKI_ATT_HEADER_NAME));
         connection.startConnectionSuperVisorAgent();
-//        try {
-//            connection.startMessageSenderExecutor();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        try {
+            connection.startMessageSenderExecutor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         //raiseClientConnectedNotificationEvent();
     }
 
@@ -174,7 +175,7 @@ public class NetworkClientCommunicationChannel {
 
         // if it is not an external node i raise the event.
         connection.stopConnectionSuperVisorAgent();
-//        connection.stopMessageSenderExecutor();
+        connection.stopMessageSenderExecutor();
         if (!isExternalNode) {
             isRegistered = Boolean.FALSE;
 

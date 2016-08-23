@@ -33,7 +33,7 @@ public class ListFilter
 
         for (int i = 0; i < count; i++) {
             resource = data.get(i);
-            filterableString = resource.getAlias();
+            filterableString = resource.getName();
             if (filterableString.toLowerCase().contains(filterString)) {
                 nlist.add(data.get(i));
             }
