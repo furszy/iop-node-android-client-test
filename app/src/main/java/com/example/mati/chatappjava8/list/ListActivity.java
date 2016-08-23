@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ListActivity extends AppCompatActivity
         implements MessageReceiver, FermatListItemListeners<ActorProfile>
@@ -58,12 +59,16 @@ public class ListActivity extends AppCompatActivity
     private SearchView searchView = null;
     private SearchView.OnQueryTextListener queryTextListener;
 
+    private AtomicBoolean isRefreshing;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        isRefreshing = new AtomicBoolean(false);
 
         navigationView = (NavigationView) findViewById(R.id.navigation);
 //        navigationView.inflateMenu(R.menu.navigation_menu);
@@ -153,13 +158,16 @@ public class ListActivity extends AppCompatActivity
 
     public void onRefreshList() {
         try {
-            swipeRefresh.setRefreshing(false);
-            executorService.submit(new Runnable() {
-                @Override
-                public void run() {
-                    Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList(max, offset, Core.getInstance().getProfile().getIdentityPublicKey());
-                }
-            });
+            if (!isRefreshing.get()) {
+                swipeRefresh.setRefreshing(false);
+                executorService.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        isRefreshing.set(true);
+                        Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList(max, offset, Core.getInstance().getProfile().getIdentityPublicKey());
+                    }
+                });
+            }
         } catch (Exception e) {
             System.out.println(e.toString());
         }
@@ -225,7 +233,7 @@ public class ListActivity extends AppCompatActivity
 
     @Override
     public void onMessageReceived(String senderPk,ChatMetadataRecord chatMetadataRecord) {
-        Notifications.pushNotification(this,chatMetadataRecord.getMessage(), senderPk);
+        Notifications.pushNotification(this, chatMetadataRecord.getMessage(), senderPk);
     }
 
 
@@ -264,6 +272,7 @@ public class ListActivity extends AppCompatActivity
             }
         });
         offset = listActors.size();
+        isRefreshing.set(true);
     }
 
     private boolean notInList(ActorProfile info) {

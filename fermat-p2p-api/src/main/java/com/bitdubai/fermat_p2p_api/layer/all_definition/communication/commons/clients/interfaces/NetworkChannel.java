@@ -23,9 +23,9 @@ public interface NetworkChannel {
 
     boolean isConnected();
 
-    UUID registerProfile(Profile profile) throws CantRegisterProfileException;
+//    UUID registerProfile(Profile profile) throws CantRegisterProfileException;
 
-    void updateProfile(Profile profile, UpdateTypes types) throws CantUpdateRegisteredProfileException;
+//    void updateProfile(Profile profile, UpdateTypes types) throws CantUpdateRegisteredProfileException;
 
     /**
      *
@@ -46,5 +46,8 @@ public interface NetworkChannel {
      * @throws CantSendMessageException
      */
     UUID sendMessage(PackageContent packageContent, PackageType packageType,NetworkServiceType networkServiceType) throws CantSendMessageException;
+
+    UUID sendMessage(PackageContent packageContent, PackageType packageType) throws CantSendMessageException;
+
 
 }

@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantSendMessageException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.example.mati.app_core.Core;
 import com.example.mati.chatappjava8.IntentConstants;
@@ -33,6 +34,7 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
 
     private EditText messageET;
     private RecyclerView messagesContainer;
+    private LinearLayoutManager layoutManager;
     private Button sendBtn;
     private ChatAdapter2 adapter;
     private ActorProfile remote;
@@ -40,6 +42,7 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
 
     private boolean isSearchingRemote = false;
     private String remotePk;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +69,12 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
             findViewById(R.id.chat_screen).setVisibility(View.GONE);
         }else {
             initControls();
-
+//
+//            try {
+//                Core.getInstance().getChatNetworkServicePluginRoot().subscribeActorOnlineEvent(remote.getIdentityPublicKey());
+//            } catch (CantSendMessageException e) {
+//                e.printStackTrace();
+//            }
         }
 
         Core.getInstance().setReceiver(this);
@@ -75,7 +83,8 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
 
     private void initControls() {
         messagesContainer = (RecyclerView) findViewById(R.id.messagesContainer);
-        messagesContainer.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false));
+        this.layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false);
+        messagesContainer.setLayoutManager(layoutManager);
         messageET = (EditText) findViewById(R.id.messageEdit);
         messageET.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
