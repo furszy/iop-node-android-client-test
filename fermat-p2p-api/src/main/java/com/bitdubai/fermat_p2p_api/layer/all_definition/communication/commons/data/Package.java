@@ -100,10 +100,6 @@ public class Package implements Serializable {
         if (content == null)
             throw new InvalidParameterException("Content can't be null.");
 
-        //esto no es necesario..
-        if (networkServiceTypeSource == null)
-            throw new InvalidParameterException("networkServiceTypeSource can't be null.");
-
         if (packageType == null)
             throw new InvalidParameterException("packageType can't be null. ns type: "+networkServiceTypeSource);
 
