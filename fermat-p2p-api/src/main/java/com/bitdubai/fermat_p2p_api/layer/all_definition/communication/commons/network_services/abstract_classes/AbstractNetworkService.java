@@ -15,6 +15,7 @@ import com.bitdubai.fermat_api.layer.all_definition.enums.ServiceStatus;
 import com.bitdubai.fermat_api.layer.all_definition.events.EventSource;
 import com.bitdubai.fermat_api.layer.all_definition.network_service.enums.NetworkServiceType;
 import com.bitdubai.fermat_api.layer.osa_android.broadcaster.FermatBundle;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.PluginDatabaseSystem;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.FileLifeSpan;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.FilePrivacy;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginFileSystem;
@@ -59,6 +60,9 @@ public abstract class AbstractNetworkService extends AbstractPlugin implements N
 
     @NeededAddonReference(platform = Platforms.OPERATIVE_SYSTEM_API, layer = Layers.SYSTEM          , addon = Addons.PLUGIN_FILE_SYSTEM)
     protected PluginFileSystem pluginFileSystem;
+
+    @NeededAddonReference(platform = Platforms.OPERATIVE_SYSTEM_API, layer = Layers.SYSTEM          , addon = Addons.PLUGIN_DATABASE_SYSTEM)
+    protected PluginDatabaseSystem pluginDatabaseSystem;
 
     //todo: esto va por ahora, más adelante se saca si o si
     @NeededPluginReference(platform = Platforms.COMMUNICATION_PLATFORM, layer = Layers.COMMUNICATION, plugin = Plugins.P2P_LAYER)
@@ -485,6 +489,10 @@ public abstract class AbstractNetworkService extends AbstractPlugin implements N
 
     public void setP2PLayerManager(P2PLayerManager p2PLayerManager) {
         this.p2PLayerManager = p2PLayerManager;
+    }
+
+    public void setPluginDatabaseSystem(PluginDatabaseSystem pluginDatabaseSystem) {
+        this.pluginDatabaseSystem = pluginDatabaseSystem;
     }
 
 }

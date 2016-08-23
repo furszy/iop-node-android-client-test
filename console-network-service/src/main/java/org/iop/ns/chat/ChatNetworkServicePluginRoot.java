@@ -42,8 +42,6 @@ import java.util.UUID;
 @PluginInfo(difficulty = PluginInfo.Dificulty.HIGH, maintainerMail = "acosta_rodrigo@hotmail.com", createdBy = "acostarodrigo", layer = Layers.NETWORK_SERVICE, platform = Platforms.CHAT_PLATFORM, plugin = Plugins.CHAT_NETWORK_SERVICE)
 public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
 
-    @NeededAddonReference(platform = Platforms.OPERATIVE_SYSTEM_API, layer = Layers.SYSTEM          , addon = Addons.PLUGIN_DATABASE_SYSTEM)
-    protected PluginDatabaseSystem pluginDatabaseSystem;
 
     private Database dataBaseCommunication;
     private ChatMetadataRecordDAO chatMetadataRecordDAO;
@@ -284,7 +282,5 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
         subscribeActorOnline(remotePk);
     }
 
-    public void setPluginDatabaseSystem(PluginDatabaseSystem pluginDatabaseSystem) {
-        this.pluginDatabaseSystem = pluginDatabaseSystem;
-    }
+
 }

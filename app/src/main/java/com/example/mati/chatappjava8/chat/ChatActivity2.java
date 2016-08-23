@@ -34,6 +34,7 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
 
     private EditText messageET;
     private RecyclerView messagesContainer;
+    private LinearLayoutManager layoutManager;
     private Button sendBtn;
     private ChatAdapter2 adapter;
     private ActorProfile remote;
@@ -41,6 +42,7 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
 
     private boolean isSearchingRemote = false;
     private String remotePk;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +83,8 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
 
     private void initControls() {
         messagesContainer = (RecyclerView) findViewById(R.id.messagesContainer);
-        messagesContainer.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false));
+        this.layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false);
+        messagesContainer.setLayoutManager(layoutManager);
         messageET = (EditText) findViewById(R.id.messageEdit);
         messageET.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
