@@ -22,6 +22,7 @@
             <option value="$PROJECT_DIR$/fermat-p2p-layer" />
             <option value="$PROJECT_DIR$/fermat-pip-api" />
             <option value="$PROJECT_DIR$/stress" />
+            <option value="$PROJECT_DIR$/stress-app" />
           </set>
         </option>
       </GradleProjectSettings>

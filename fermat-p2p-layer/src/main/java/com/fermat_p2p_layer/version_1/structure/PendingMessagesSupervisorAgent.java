@@ -1,7 +1,7 @@
 package com.fermat_p2p_layer.version_1.structure;
 
 import com.bitdubai.fermat_api.AbstractAgent;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.entities.NetworkServiceMessage;
 import com.fermat_p2p_layer.version_1.P2PLayerPluginRoot;
 import com.fermat_p2p_layer.version_1.structure.database.P2PLayerDao;
 
