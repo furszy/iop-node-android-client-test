@@ -66,4 +66,13 @@ public interface P2PLayerManager {
             IsActorOnlineMsgRequest isActorOnlineMsgRequest,
             NetworkServiceType networkServiceType,
             @Nullable  String nodeDestinationPublicKey) throws CantSendMessageException;
+
+
+    //Subscribers
+
+    /**
+     *
+     * @return
+     */
+    UUID subscribeActorOnlineEvent(NetworkServiceType networkServiceType,String actorToFollowPk) throws CantSendMessageException;
 }

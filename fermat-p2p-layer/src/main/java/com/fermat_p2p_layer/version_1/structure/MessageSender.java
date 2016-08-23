@@ -9,6 +9,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.cl
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.PackageContent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.ActorListMsgRequest;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.IsActorOnlineMsgRequest;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.SubscriberMsgRequest;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.UpdateActorProfileMsgRequest;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.respond.MsgRespond;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
@@ -132,5 +133,17 @@ public class MessageSender {
             messagesSentWaitingForAck.put(packageId,networkServiceType);
         return packageId;
 
+    }
+
+    public UUID subscribeNodeEvent(NetworkServiceType networkServiceType,short eventCode, String actorToFollowPk) throws CantSendMessageException {
+        if (p2PLayerPluginRoot.getNetworkClient().isConnected()) {
+            SubscriberMsgRequest subscriberMsgRequest = new SubscriberMsgRequest(eventCode,actorToFollowPk);
+            UUID packageId = p2PLayerPluginRoot.getNetworkClient().sendMessage(subscriberMsgRequest,PackageType.SUBSCRIBER);
+            if (packageId != null)
+                messagesSentWaitingForAck.put(packageId,networkServiceType);
+            return packageId;
+        }else {
+            throw new CantSendMessageException("SubscribeNodeEvent, The network client is not connected");
+        }
     }
 }

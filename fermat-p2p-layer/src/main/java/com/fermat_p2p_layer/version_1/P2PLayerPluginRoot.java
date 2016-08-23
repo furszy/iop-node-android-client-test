@@ -39,6 +39,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.da
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.respond.MsgRespond;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.ProfileTypes;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.UpdateTypes;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.events_op_codes.EventOp;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.abstract_classes.AbstractNetworkService2;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.exceptions.CantInitializeNetworkServiceDatabaseException;
@@ -579,6 +580,12 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
                 networkServiceType,
                 nodeDestinationPublicKey
         );
+    }
+
+    @Override
+    public UUID subscribeActorOnlineEvent(NetworkServiceType networkServiceType,String actorToFollowPk) throws CantSendMessageException {
+        System.out.println("***P2PLayer Method subscribeActorOnlineEvent...");
+        return messageSender.subscribeNodeEvent(networkServiceType,EventOp.EVENT_OP_IS_PROFILE_ONLINE,actorToFollowPk);
     }
 
     /**

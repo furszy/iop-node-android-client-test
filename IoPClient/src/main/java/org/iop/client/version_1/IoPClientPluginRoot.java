@@ -412,6 +412,15 @@ public class IoPClientPluginRoot extends AbstractPlugin implements NetworkClient
         }
     }
 
+    @Override
+    public UUID sendMessage(PackageContent packageContent, PackageType packageType) throws CantSendMessageException {
+        try {
+            return networkClientCommunicationConnection.sendPackageMessage(packageContent,packageType);
+        } catch (CantSendPackageException e) {
+            throw new CantSendMessageException(e);
+        }
+    }
+
     public void setPluginFileSystem(PluginFileSystem pluginFileSystem) {
         this.pluginFileSystem = pluginFileSystem;
     }
