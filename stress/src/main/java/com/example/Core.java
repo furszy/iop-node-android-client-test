@@ -82,11 +82,9 @@ public class Core {
             //console ns
             chatNetworkServicePluginRoot = new ChatNetworkServicePluginRoot();
             chatNetworkServicePluginRoot.setP2PLayerManager(p2PLayerPluginRoot);
-            chatNetworkServicePluginRoot.setNetworkClientManager(ioPClientPluginRoot);
-            chatNetworkServicePluginRoot.setEventManager((EventManager) eventManagerPlatformServiceAddonRoot.getManager());
+            chatNetworkServicePluginRoot.setPluginDatabaseSystem((PluginDatabaseSystem) pluginDatabaseSystemAndroidAddonRoot.getManager());
             chatNetworkServicePluginRoot.setPluginFileSystem((PluginFileSystem) pluginFileSystemLinuxAddonRoot.getManager());
             chatNetworkServicePluginRoot.setErrorManager((ErrorManager) errorManagerPlatformServiceAddonRoot.getManager());
-            chatNetworkServicePluginRoot.setPluginDatabaseSystem((PluginDatabaseSystem) pluginDatabaseSystemAndroidAddonRoot.getManager());
             chatNetworkServicePluginRoot.start();
 
             System.out.println("FERMAT - Networ Core - started satisfactory...");

@@ -1,8 +1,10 @@
 package org.iop.ns.chat;
 
+import com.bitdubai.fermat_api.layer.all_definition.common.system.annotations.NeededAddonReference;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.error_manager.enums.UnexpectedPluginExceptionSeverity;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.utils.PluginVersionReference;
 import com.bitdubai.fermat_api.layer.all_definition.enums.Actors;
+import com.bitdubai.fermat_api.layer.all_definition.enums.Addons;
 import com.bitdubai.fermat_api.layer.all_definition.enums.Layers;
 import com.bitdubai.fermat_api.layer.all_definition.enums.Platforms;
 import com.bitdubai.fermat_api.layer.all_definition.enums.Plugins;
@@ -11,15 +13,14 @@ import com.bitdubai.fermat_api.layer.all_definition.network_service.enums.Networ
 import com.bitdubai.fermat_api.layer.all_definition.util.Version;
 import com.bitdubai.fermat_api.layer.core.PluginInfo;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.Database;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.PluginDatabaseSystem;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantCreateDatabaseException;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantOpenDatabaseException;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.DatabaseNotFoundException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantSendMessageException;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.NetworkClientManager;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.DiscoveryQueryParameters;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.abstract_classes.AbstractActorNetworkService2;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceMessage;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.database.entities.NetworkServiceQuery;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.abstract_classes.AbstractActorNetworkService;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.entities.NetworkServiceMessage;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.exceptions.ActorAlreadyRegisteredException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.exceptions.CantRegisterActorException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
@@ -39,7 +40,10 @@ import java.util.UUID;
  * Created by Gabriel Araujo 15/02/16.
  */
 @PluginInfo(difficulty = PluginInfo.Dificulty.HIGH, maintainerMail = "acosta_rodrigo@hotmail.com", createdBy = "acostarodrigo", layer = Layers.NETWORK_SERVICE, platform = Platforms.CHAT_PLATFORM, plugin = Plugins.CHAT_NETWORK_SERVICE)
-public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
+public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
+
+    @NeededAddonReference(platform = Platforms.OPERATIVE_SYSTEM_API, layer = Layers.SYSTEM          , addon = Addons.PLUGIN_DATABASE_SYSTEM)
+    protected PluginDatabaseSystem pluginDatabaseSystem;
 
     private Database dataBaseCommunication;
     private ChatMetadataRecordDAO chatMetadataRecordDAO;
@@ -219,11 +223,6 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
         this.messageReceiver = messageReceiver;
     }
 
-    //I need this method for testing
-    public void setNetworkClientManager(NetworkClientManager networkClientManager){
-        this.networkClientManager = networkClientManager;
-    }
-
     public void requestActorProfilesList(int max, int offset, String requesterPublicKey) {
 
         try {
@@ -254,9 +253,9 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
         messageReceiver.onActorRegistered(actorProfile);
     }
 
-
     @Override
-    public void onNetworkServiceActorListReceived(NetworkServiceQuery query, List<ActorProfile> actorProfiles) {
+    public void handleNetworkClientActorListReceivedEvent(UUID queryId, List<ActorProfile> actorProfiles) {
+
         System.out.println("Chat OnNetworkServiceActorListReceived...");
         if (messageReceiver!=null){
             messageReceiver.onActorListReceived(actorProfiles);
@@ -280,6 +279,8 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService2 {
             }
         }
     }
-    
 
+    public void setPluginDatabaseSystem(PluginDatabaseSystem pluginDatabaseSystem) {
+        this.pluginDatabaseSystem = pluginDatabaseSystem;
+    }
 }
