@@ -90,7 +90,7 @@ public class StressAppCore {
             //actorMessengerManager = new ActorMessengerManager(this);
 
             //Register an actor for testing
-            profile = new ActorProfile();
+            /*profile = new ActorProfile();
             profile.setIdentityPublicKey(UUID.randomUUID().toString());
             System.out.println("I will try to register an actor with pk " + profile.getIdentityPublicKey());
             profile.setActorType(Actors.CHAT.getCode());
@@ -107,7 +107,7 @@ public class StressAppCore {
                     0, 73, 69, 78, 68, -82, 66, 96, -126});
             profile.setNsIdentityPublicKey(chatNetworkServicePluginRoot.getNetWorkServicePublicKey());
             profile.setExtraData("Test extra data");
-            chatNetworkServicePluginRoot.registerActor(profile, 0, 0);
+            chatNetworkServicePluginRoot.registerActor(profile, 0, 0);*/
 
         }catch (Exception e){
             System.out.println("StressAppCore Exception "+e);
