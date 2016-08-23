@@ -3,9 +3,11 @@ package org.iop.stress_app.structure.controllers;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import org.iop.stress_app.structure.core.StressAppCoreManager;
+import org.iop.stress_app.structure.views.IntegerSpinner;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -18,7 +20,7 @@ public class ConnectionTapController implements Initializable{
     /**
      * Represents the JavaFx textField containing the connections number.
      */
-    @FXML private TextField connectionsTextField;
+    @FXML private IntegerSpinner connectionsSpinner;
 
     /**
      * Represents the number of tests to test.
@@ -54,7 +56,7 @@ public class ConnectionTapController implements Initializable{
         try{
             int connections;
             try{
-                connections = Integer.parseInt(connectionsTextField.getText());
+                connections = connectionsSpinner.getNumber();
             } catch (Exception e){
                 connections = DEFAULT_CONNECTIONS_TO_SET;
             }
@@ -68,12 +70,15 @@ public class ConnectionTapController implements Initializable{
                 coreManager.setCoreCount(this.connections);
                 coreManager.startStressTest();
                 isStart = true;
+                //Notify the user the test
+                actionTarget.setText("Testing with "+this.connections+" connections");
             }else{
                 int addConnections = connections-this.connections;
                 coreManager.addConnections(addConnections);
+                //Notify the user the test
+                actionTarget.setText("Added "+connections+" connections");
             }
-            //Notify the user the test
-            actionTarget.setText("Testing with "+this.connections+" connections");
+
         } catch (Exception e){
             //Notify the user that we got an error
             actionTarget.setText("The test is failed");
