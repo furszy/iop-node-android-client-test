@@ -31,6 +31,7 @@ public class StressAppCore {
     private ActorProfile lastRemoteProfile;
 
     private boolean networkServiceStart = false;
+    private boolean actorCreation = false;
 
     //private ActorMessengerManager actorMessengerManager;
 
@@ -94,24 +95,26 @@ public class StressAppCore {
             //actorMessengerManager = new ActorMessengerManager(this);
 
             //Register an actor for testing
-            /*profile = new ActorProfile();
-            profile.setIdentityPublicKey(UUID.randomUUID().toString());
-            System.out.println("I will try to register an actor with pk " + profile.getIdentityPublicKey());
-            profile.setActorType(Actors.CHAT.getCode());
-            profile.setName("Juan_" + Thread.currentThread().getId());
-            profile.setAlias("Alias chat");
-            //This represents a valid image
-            profile.setPhoto(new byte[]{-119, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82,
-                    0, 0, 0, 15, 0, 0, 0, 15, 8, 6, 0, 0, 0, 59, -42, -107,
-                    74, 0, 0, 0, 64, 73, 68, 65, 84, 120, -38, 99, 96, -62, 14, -2,
-                    99, -63, 68, 1, 100, -59, -1, -79, -120, 17, -44, -8, 31, -121, 28, 81,
-                    26, -1, -29, 113, 13, 78, -51, 100, -125, -1, -108, 24, 64, 86, -24, -30,
-                    11, 101, -6, -37, 76, -106, -97, 25, 104, 17, 96, -76, 77, 97, 20, -89,
-                    109, -110, 114, 21, 0, -82, -127, 56, -56, 56, 76, -17, -42, 0, 0, 0,
-                    0, 73, 69, 78, 68, -82, 66, 96, -126});
-            profile.setNsIdentityPublicKey(chatNetworkServicePluginRoot.getNetWorkServicePublicKey());
-            profile.setExtraData("Test extra data");
-            chatNetworkServicePluginRoot.registerActor(profile, 0, 0);*/
+            if(actorCreation){
+                profile = new ActorProfile();
+                profile.setIdentityPublicKey(UUID.randomUUID().toString());
+                System.out.println("I will try to register an actor with pk " + profile.getIdentityPublicKey());
+                profile.setActorType(Actors.CHAT.getCode());
+                profile.setName("Juan_" + Thread.currentThread().getId());
+                profile.setAlias("Alias chat");
+                //This represents a valid image
+                profile.setPhoto(new byte[]{-119, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82,
+                        0, 0, 0, 15, 0, 0, 0, 15, 8, 6, 0, 0, 0, 59, -42, -107,
+                        74, 0, 0, 0, 64, 73, 68, 65, 84, 120, -38, 99, 96, -62, 14, -2,
+                        99, -63, 68, 1, 100, -59, -1, -79, -120, 17, -44, -8, 31, -121, 28, 81,
+                        26, -1, -29, 113, 13, 78, -51, 100, -125, -1, -108, 24, 64, 86, -24, -30,
+                        11, 101, -6, -37, 76, -106, -97, 25, 104, 17, 96, -76, 77, 97, 20, -89,
+                        109, -110, 114, 21, 0, -82, -127, 56, -56, 56, 76, -17, -42, 0, 0, 0,
+                        0, 73, 69, 78, 68, -82, 66, 96, -126});
+                profile.setNsIdentityPublicKey(chatNetworkServicePluginRoot.getNetWorkServicePublicKey());
+                profile.setExtraData("Test extra data");
+                chatNetworkServicePluginRoot.registerActor(profile, 0, 0);
+            }
 
         }catch (Exception e){
             System.out.println("StressAppCore Exception "+e);

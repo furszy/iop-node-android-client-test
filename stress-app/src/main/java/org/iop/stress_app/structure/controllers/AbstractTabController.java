@@ -24,8 +24,17 @@ public abstract class AbstractTabController implements Initializable {
     @FXML
     protected IntegerSpinner tabSpinner;
 
+    /**
+     * Represents the button present in the tab
+     */
     @FXML
     protected Button tabButton;
+
+    /**
+     * Represents the label indicating the state of the test
+     */
+    @FXML
+    protected Label actionTarget;
 
     /**
      * Represents the number of tests to test.
@@ -44,7 +53,6 @@ public abstract class AbstractTabController implements Initializable {
 
     protected static int DEFAULT_CONNECTIONS_TO_SET = 5;
 
-    @FXML protected Label actionTarget;
     /**
      * This method handle the click event on <b>Start</b> button
      * @param event
@@ -54,6 +62,9 @@ public abstract class AbstractTabController implements Initializable {
         executeTest();
     }
 
+    /**
+     * This method change the text from the tab button
+     */
     protected void changeButtonText(){
         this.tabButton.setText("Add");
     }
@@ -63,5 +74,8 @@ public abstract class AbstractTabController implements Initializable {
         //Not implemented in this version
     }
 
+    /**
+     * This method must implement the main test
+     */
     protected abstract void executeTest();
 }

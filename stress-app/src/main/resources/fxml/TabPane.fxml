@@ -21,13 +21,20 @@
                     </content>
                 </Tab>
                 <!--end of connection tab-->
-                <!--Connection tab-->
+                <!--Network Service tab-->
                 <Tab  text="Network Services">
                     <content>
                         <fx:include fx:id="networkServiceTab" source="NetworkServiceTab.fxml"/>
                     </content>
                 </Tab>
-                <!--end of connection tab-->
+                <!--end of Network Service tab-->
+                <!--Actor tab-->
+                <Tab  text="Actors">
+                    <content>
+                        <fx:include fx:id="actorTab" source="ActorTab.fxml"/>
+                    </content>
+                </Tab>
+                <!--end of Actor tab-->
             </tabs>
         </TabPane>
 

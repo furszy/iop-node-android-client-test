@@ -16,6 +16,7 @@ public class StressAppCoreManager {
     private ExecutorService threadPoolExecutor;
 
     private boolean networkServiceStart = false;
+    private boolean actorCreation = false;
 
     public StressAppCoreManager() {
         this.stressAppCoreList = new ArrayList<>();
@@ -71,5 +72,9 @@ public class StressAppCoreManager {
 
     public void setNetworkServiceStart(boolean networkServiceStart) {
         this.networkServiceStart = networkServiceStart;
+    }
+
+    public void setActorCreation(boolean actorCreation) {
+        this.actorCreation = actorCreation;
     }
 }
