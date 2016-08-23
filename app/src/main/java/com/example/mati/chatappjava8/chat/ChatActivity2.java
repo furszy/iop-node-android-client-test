@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantSendMessageException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.example.mati.app_core.Core;
 import com.example.mati.chatappjava8.IntentConstants;
@@ -67,6 +68,11 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
         }else {
             initControls();
 
+//            try {
+//                Core.getInstance().getChatNetworkServicePluginRoot().subscribeActorOnlineEvent(remote.getIdentityPublicKey());
+//            } catch (CantSendMessageException e) {
+//                e.printStackTrace();
+//            }
         }
 
         Core.getInstance().setReceiver(this);

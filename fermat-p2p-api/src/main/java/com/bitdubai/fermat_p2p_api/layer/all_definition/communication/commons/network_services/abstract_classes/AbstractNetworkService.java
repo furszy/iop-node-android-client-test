@@ -380,13 +380,15 @@ public abstract class AbstractNetworkService extends AbstractPlugin implements N
          /*
          * Create the query
          */
-        UUID uuid = UUID.randomUUID();
         ActorListMsgRequest actorListMsgRequest = new ActorListMsgRequest(networkServiceType.getCode(),discoveryQueryParameters, requesterPublicKey);
 
-        p2PLayerManager.sendDiscoveryMessage(actorListMsgRequest, networkServiceType, null);
+        return p2PLayerManager.sendDiscoveryMessage(actorListMsgRequest, networkServiceType, null);
 
-        return uuid;
 
+    }
+
+    protected UUID subscribeActorOnline(String remoteActorPk) throws com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantSendMessageException {
+        return p2PLayerManager.subscribeActorOnlineEvent(getNetworkServiceType(), remoteActorPk);
     }
 
     /**

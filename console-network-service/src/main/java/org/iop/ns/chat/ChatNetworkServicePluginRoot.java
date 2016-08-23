@@ -280,6 +280,10 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
         }
     }
 
+    public void subscribeActorOnlineEvent(String remotePk) throws CantSendMessageException {
+        subscribeActorOnline(remotePk);
+    }
+
     public void setPluginDatabaseSystem(PluginDatabaseSystem pluginDatabaseSystem) {
         this.pluginDatabaseSystem = pluginDatabaseSystem;
     }
