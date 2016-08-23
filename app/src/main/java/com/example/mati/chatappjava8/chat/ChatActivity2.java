@@ -67,12 +67,12 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
             findViewById(R.id.chat_screen).setVisibility(View.GONE);
         }else {
             initControls();
-
-            try {
-                Core.getInstance().getChatNetworkServicePluginRoot().subscribeActorOnlineEvent(remote.getIdentityPublicKey());
-            } catch (CantSendMessageException e) {
-                e.printStackTrace();
-            }
+//
+//            try {
+//                Core.getInstance().getChatNetworkServicePluginRoot().subscribeActorOnlineEvent(remote.getIdentityPublicKey());
+//            } catch (CantSendMessageException e) {
+//                e.printStackTrace();
+//            }
         }
 
         Core.getInstance().setReceiver(this);
