@@ -7,11 +7,13 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.cl
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantUpdateRegisteredProfileException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.PackageContent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.ActorListMsgRequest;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.CheckInProfileMsgRequest;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.IsActorOnlineMsgRequest;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.SubscriberMsgRequest;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.UpdateActorProfileMsgRequest;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.entities.NetworkServiceMessage;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ClientProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.NetworkServiceProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.Profile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.MessageContentType;
@@ -42,11 +44,22 @@ public class MessageSender {
         messagesSentWaitingForAck = new ConcurrentHashMap<>();
     }
 
-    public UUID registerNetworkServiceProfile(NetworkServiceProfile profile) throws CantRegisterProfileException {
-        UUID packageId = p2PLayerPluginRoot.getNetworkClient().registerProfile(profile);
-        if (packageId != null)
-            messagesSentWaitingForAck.put(packageId,profile.getNetworkServiceType());
-        return packageId;
+    public UUID registerProfile(Profile profile,NetworkServiceType networkServiceType) throws CantRegisterProfileException, CantSendMessageException {
+        if (p2PLayerPluginRoot.getNetworkClient().isConnected()) {
+            CheckInProfileMsgRequest profileCheckInMsgRequest = new CheckInProfileMsgRequest(profile);
+            profileCheckInMsgRequest.setMessageContentType(MessageContentType.JSON);
+            PackageType packageType = null;
+            if (profile instanceof ActorProfile) {
+                packageType = PackageType.CHECK_IN_ACTOR_REQUEST;
+            } else if (profile instanceof NetworkServiceProfile) {
+                packageType = PackageType.CHECK_IN_NETWORK_SERVICE_REQUEST;
+            }
+            UUID packageId = p2PLayerPluginRoot.getNetworkClient().sendMessage(profileCheckInMsgRequest, packageType, networkServiceType);
+            if (packageId != null)
+                messagesSentWaitingForAck.put(packageId, networkServiceType);
+            return packageId;
+        }
+        throw new CantSendMessageException("Client is not connected");
     }
 
     public UUID sendMessage(NetworkServiceMessage networkServiceMessage, NetworkServiceType networkServiceType, String nodeDestinationPublicKey) throws CantSendMessageException {
@@ -79,29 +92,6 @@ public class MessageSender {
      */
     public NetworkServiceType packageAck(UUID packageId){
         return messagesSentWaitingForAck.remove(packageId);
-    }
-
-    /**
-     * Register a actor profile with the node
-     *
-     * @param profile
-     * @param networkServiceProfileRequester
-     * @return UUID
-     * @throws CantRegisterProfileException
-     */
-    public UUID registerActorProfile(ActorProfile profile, NetworkServiceProfile networkServiceProfileRequester) throws CantRegisterProfileException {
-
-        if (p2PLayerPluginRoot.getNetworkClient().isConnected()) {
-
-            UUID packageId = p2PLayerPluginRoot.getNetworkClient().registerProfile(profile);
-            if (packageId != null)
-                messagesSentWaitingForAck.put(packageId, networkServiceProfileRequester.getNetworkServiceType());
-            return packageId;
-
-        }else {
-            throw new CantRegisterProfileException(CantRegisterProfileException.DEFAULT_MESSAGE, "The network client is not connected");
-        }
-
     }
 
     public UUID sendProfileToUpdate(NetworkServiceType networkServiceType,Profile profile) throws CantUpdateRegisteredProfileException, CantSendMessageException {

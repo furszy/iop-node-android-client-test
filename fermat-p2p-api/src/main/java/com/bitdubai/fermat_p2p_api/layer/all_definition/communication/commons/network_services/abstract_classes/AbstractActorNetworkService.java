@@ -12,6 +12,7 @@ import com.bitdubai.fermat_api.layer.osa_android.location_system.exceptions.Cant
 import com.bitdubai.fermat_api.layer.osa_android.location_system.utils.LocationUtils;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantRegisterProfileException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantRequestActorFullPhotoException;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantSendMessageException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantUpdateRegisteredProfileException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.ProfileTypes;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.UpdateTypes;
@@ -150,7 +151,7 @@ public abstract class AbstractActorNetworkService extends AbstractNetworkService
 
             try {
                 this.getConnection().register(actorToRegister, getProfile());
-            } catch (CantRegisterProfileException e) {
+            } catch (CantRegisterProfileException | CantSendMessageException e) {
                 throw new CantRegisterActorException(e.getCause(), e.getContext(), e.getPossibleReason());
             }
             registeredActors.get(actorToRegister).setLastExecution(System.currentTimeMillis());
@@ -187,7 +188,7 @@ public abstract class AbstractActorNetworkService extends AbstractNetworkService
 
             try {
                 this.getConnection().register(actorToRegister, getProfile());
-            } catch (CantRegisterProfileException e) {
+            } catch (CantRegisterProfileException | CantSendMessageException e) {
                 throw new CantRegisterActorException(e.getCause(), e.getContext(), e.getPossibleReason());
             }
             registeredActors.get(actorToRegister).setLastExecution(System.currentTimeMillis());
@@ -290,7 +291,7 @@ public abstract class AbstractActorNetworkService extends AbstractNetworkService
 
                     this.getConnection().register(actorToRegister.getKey(), getProfile());
 
-                } catch (CantRegisterProfileException e) {
+                } catch (CantRegisterProfileException | CantSendMessageException e) {
                     e.printStackTrace();
                 }
             }

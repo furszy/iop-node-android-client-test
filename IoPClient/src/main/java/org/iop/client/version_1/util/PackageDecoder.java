@@ -40,15 +40,20 @@ public class PackageDecoder implements Decoder.Binary<Package>{
 
     @Override
     public Package decode(ByteBuffer bytes) throws DecodeException {
-        com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.common.Package pack = com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.common.Package.getRootAsPackage(bytes);
+        try {
+            com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.common.Package pack = com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.common.Package.getRootAsPackage(bytes);
 
-        return Package.rebuildInstance(
-                UUID.fromString(pack.id()),
-                pack.content(),
-                NetworkServiceType.getByCode(pack.networkServiceType()),
-                PackageType.buildWithInt(pack.packageType()),
-                pack.destinationPk()
-        );
+            return Package.rebuildInstance(
+                    UUID.fromString(pack.id()),
+                    pack.content(),
+                    (pack.networkServiceType() != null) ? NetworkServiceType.getByCode(pack.networkServiceType()) : null,
+                    PackageType.buildWithInt(pack.packageType()),
+                    pack.destinationPk()
+            );
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override

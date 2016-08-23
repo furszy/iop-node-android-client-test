@@ -199,7 +199,7 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
                         try {
                             System.out.println(abstractNetworkService.getProfile().getNetworkServiceType() + ": se está por registrar..." + abstractNetworkService.isRegistered());
                             if (!abstractNetworkService.isRegistered())
-                                messageSender.registerNetworkServiceProfile(abstractNetworkService.getProfile());
+                                messageSender.registerProfile(abstractNetworkService.getProfile(),abstractNetworkService.getNetworkServiceType());
                             else System.out.println("Ns: "+abstractNetworkService.getNetworkServiceType()+", already registered..");
                         } catch (FermatException e) {
                             e.printStackTrace();
@@ -478,7 +478,7 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
     public synchronized void register(AbstractNetworkService abstractNetworkService) {
         if (client.isConnected()) {
             try {
-                messageSender.registerNetworkServiceProfile(abstractNetworkService.getProfile());
+                messageSender.registerProfile(abstractNetworkService.getProfile(),abstractNetworkService.getNetworkServiceType());
             } catch (FermatException e) {
                 e.printStackTrace();
             }
@@ -494,8 +494,8 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
     }
 
     @Override
-    public void register(ActorProfile profile, NetworkServiceProfile networkServiceProfileRequester) throws CantRegisterProfileException {
-        messageSender.registerActorProfile(profile, networkServiceProfileRequester);
+    public void register(ActorProfile profile, NetworkServiceProfile networkServiceProfileRequester) throws CantRegisterProfileException, CantSendMessageException {
+        messageSender.registerProfile(profile, networkServiceProfileRequester.getNetworkServiceType());
     }
 
 
