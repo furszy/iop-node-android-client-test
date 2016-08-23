@@ -19,3 +19,4 @@ log/
 *.class
 
 gradle/
+/.nb-gradle/
