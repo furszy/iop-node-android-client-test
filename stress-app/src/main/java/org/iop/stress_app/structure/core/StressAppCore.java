@@ -71,16 +71,16 @@ public class StressAppCore {
             ioPClientPluginRoot.start();
 
             //console ns
-            chatNetworkServicePluginRoot = new ChatNetworkServicePluginRoot();
+            /*chatNetworkServicePluginRoot = new ChatNetworkServicePluginRoot();
             chatNetworkServicePluginRoot.setP2PLayerManager(p2PLayerPluginRoot);
             chatNetworkServicePluginRoot.setNetworkClientManager(ioPClientPluginRoot);
             chatNetworkServicePluginRoot.setEventManager((EventManager) eventManagerPlatformServiceAddonRoot.getManager());
             chatNetworkServicePluginRoot.setPluginFileSystem((PluginFileSystem) pluginFileSystemLinuxAddonRoot.getManager());
             chatNetworkServicePluginRoot.setErrorManager((ErrorManager) errorManagerPlatformServiceAddonRoot.getManager());
             chatNetworkServicePluginRoot.setPluginDatabaseSystem((PluginDatabaseSystem) pluginDatabaseSystemAndroidAddonRoot.getManager());
-            chatNetworkServicePluginRoot.start();
+            chatNetworkServicePluginRoot.start();*/
 
-            System.out.println("FERMAT - Networ StressAppCore - started satisfactory...");
+            System.out.println("FERMAT - Network StressAppCore - started satisfactory...");
 
             while (!ioPClientPluginRoot.isConnected()) {
                 System.out.println("Not connected yet");

@@ -1,27 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--Created by Manuel Perez on 22/08/2016-->
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import org.iop.stress_app.structure.views.IntegerSpinner?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.Button?>
 <?import java.net.URL?>
-<?import org.iop.stress_app.structure.views.IntegerSpinner?>
-
-<!--Created by Manuel Perez on 22/08/2016-->
-<GridPane fx:controller="org.iop.stress_app.structure.controllers.ConnectionTapController" xmlns:fx="http://javafx.com/fxml" alignment="center" hgap="10" vgap="10" styleClass="root">
+<GridPane fx:controller="org.iop.stress_app.structure.controllers.NetworkServiceTabController" xmlns:fx="http://javafx.com/fxml" alignment="center" hgap="10" vgap="10" styleClass="root">
     <padding>
         <Insets top="25" right="25" bottom="10" left="25"/>
     </padding>
-    <Label fx:id="label" text="Number of connections to test:" prefWidth="200" wrapText="true"
+    <Label fx:id="label" text="Number of Network Services to start:" prefWidth="200" wrapText="true"
            GridPane.columnIndex="0"
            GridPane.rowIndex="0"
            GridPane.columnSpan="2"/>
     <IntegerSpinner fx:id="tabSpinner" max="1000" min="1" number="5"
-             GridPane.columnIndex="0"
-             GridPane.rowIndex="1"
-             GridPane.columnSpan="2"/>
-    <HBox  alignment="bottom_right"
+                    GridPane.columnIndex="0"
+                    GridPane.rowIndex="1"
+                    GridPane.columnSpan="2"/>
+    <HBox spacing="10" alignment="bottom_right"
           GridPane.columnIndex="1" GridPane.rowIndex="3">
         <Button fx:id="tabButton" text="Start" prefWidth="60"
                 onAction="#handleStartButtonAction"/>
@@ -30,7 +29,7 @@
            GridPane.columnIndex="1"
            GridPane.rowIndex="4"
            GridPane.columnSpan="2"
-           GridPane.rowSpan="2"
+           GridPane.rowSpan="1"
     />
     <stylesheets>
         <URL value="@/css/ConnectionTab.css" />

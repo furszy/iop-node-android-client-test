@@ -37,6 +37,9 @@ public class Main extends Application {
      * @param args
      */
     public static void main(String[] args) {
+        System.out.println("* STRESS FERMAT - Network Client - Version 1.0 (2016) *");
+        System.out.println("* www.fermat.org *");
+        //Launch the app
         launch(args);
     }
 }

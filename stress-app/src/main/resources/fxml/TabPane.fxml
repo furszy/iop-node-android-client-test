@@ -21,6 +21,13 @@
                     </content>
                 </Tab>
                 <!--end of connection tab-->
+                <!--Connection tab-->
+                <Tab  text="Network Services">
+                    <content>
+                        <fx:include fx:id="networkServiceTab" source="NetworkServiceTab.fxml"/>
+                    </content>
+                </Tab>
+                <!--end of connection tab-->
             </tabs>
         </TabPane>
 
