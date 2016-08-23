@@ -81,13 +81,6 @@ public interface ActorNetworkService {
     void unregisterActor(String publicKey) throws ActorNotRegisteredException, CantUnregisterActorException;
 
     /**
-     * Through the method <code>isActorOnline</code> we can check if an actor is online or not.
-     *
-     * @param publicKey of the actor.
-     */
-    boolean isActorOnline(String publicKey);
-
-    /**
      * Through the method <code>getActorFullPhoto</code> we can get Full Photo of an actor specific.
      *
      * @param publicKey of the actor
