@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantSendMessageException;
@@ -38,6 +37,8 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
     private Button sendBtn;
     private ChatAdapter2 adapter;
     private ActorProfile remote;
+
+    private List<ChatMetadataRecord> listMessages;
 
 
     private boolean isSearchingRemote = false;
@@ -70,11 +71,26 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
         }else {
             initControls();
 //
-//            try {
-//                Core.getInstance().getChatNetworkServicePluginRoot().subscribeActorOnlineEvent(remote.getIdentityPublicKey());
-//            } catch (CantSendMessageException e) {
-//                e.printStackTrace();
-//            }
+            /**
+             * subscribe example
+             */
+            try {
+                Core.getInstance().getChatNetworkServicePluginRoot().subscribeActorOnlineEvent(remote.getIdentityPublicKey());
+            } catch (CantSendMessageException e) {
+                e.printStackTrace();
+            }
+
+
+            /**
+             * Save actor as contact if i not have previous talk
+             */
+            if (!listMessages.isEmpty()){
+                try {
+                    Core.getInstance().getChatNetworkServicePluginRoot().saveContact(remote);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         Core.getInstance().setReceiver(this);
@@ -100,7 +116,7 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
 
         TextView companionLabel = (TextView) findViewById(R.id.friendLabel);
         companionLabel.setText(remote.getName());// Hard Coded
-        loadDummyHistory();
+        loadHistory();
 
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -138,7 +154,10 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
                 displayMessage(chatMessage);
             }
         });
+
+
     }
+
 
     public void displayMessage(final ChatMessage message) {
         runOnUiThread(new Runnable() {
@@ -162,7 +181,7 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
         messagesContainer.scrollToPosition(adapter.getItemCount() - 1);
     }
 
-    private void loadDummyHistory(){
+    private void loadHistory(){
 
         adapter = new ChatAdapter2(ChatActivity2.this, new ArrayList<ChatMessage>());
         messagesContainer.setAdapter(adapter);
@@ -170,7 +189,7 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
         try {
 
             String localPK = Core.getInstance().getProfile().getIdentityPublicKey();
-            List<ChatMetadataRecord> listMessages = Core.getInstance().getChatNetworkServicePluginRoot().listMessages(
+            listMessages = Core.getInstance().getChatNetworkServicePluginRoot().listMessages(
                     localPK,
                     remote.getIdentityPublicKey(),
                     null,
@@ -185,6 +204,8 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
                 chatMessage.setMe(localPK.equals(record.getLocalActorPublicKey()));
                 displayMessage(chatMessage);
             }
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -227,6 +248,11 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
     @Override
     public void onMessageFail(UUID messageId) {
         Log.i(this.getClass().getName(),"onMessageFail: acá tengo que mostrar como que el mensaje falló");
+    }
+
+    @Override
+    public void onActorOffline(String remotePkGoOffline) {
+        Log.i(getClass().getName(),"onActorOffline: "+remotePkGoOffline);
     }
 
 }

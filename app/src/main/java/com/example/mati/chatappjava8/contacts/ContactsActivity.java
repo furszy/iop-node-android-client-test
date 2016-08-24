@@ -1,4 +1,4 @@
-package com.example.mati.chatappjava8.list;
+package com.example.mati.chatappjava8.contacts;
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -41,7 +41,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ListActivity extends AppCompatActivity
+public class ContactsActivity extends AppCompatActivity
         implements MessageReceiver, FermatListItemListeners<ActorProfile>
         /*,SwipeRefreshLayout.OnRefreshListener */{
 
@@ -51,24 +51,18 @@ public class ListActivity extends AppCompatActivity
     private DrawerLayout drawerLayout;
     private LinearLayoutManager linearLayoutManager;
     private NavigationView navigationView;
-    private SwipeRefreshLayout swipeRefresh;
-    private int max = 10;
-    private int offset = 0;
-    int pastVisiblesItems, visibleItemCount, totalItemCount;
     ExecutorService executorService;
     private SearchView searchView = null;
     private SearchView.OnQueryTextListener queryTextListener;
 
-    private AtomicBoolean isRefreshing;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list_main);
+        setContentView(R.layout.contact_list_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        isRefreshing = new AtomicBoolean(false);
 
         navigationView = (NavigationView) findViewById(R.id.navigation);
 //        navigationView.inflateMenu(R.menu.navigation_menu);
@@ -97,35 +91,10 @@ public class ListActivity extends AppCompatActivity
         listActors = new ArrayList<>();
         listAdapter = new ListAdapter(getApplicationContext(),listActors);
         listAdapter.setFermatListEventListener(this);
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if (dy > 0) {
-                    visibleItemCount = linearLayoutManager.getChildCount();
-                    totalItemCount = linearLayoutManager.getItemCount();
-                    pastVisiblesItems = linearLayoutManager.findFirstVisibleItemPosition();
-                    offset = totalItemCount;
-                    final int lastItem = pastVisiblesItems + visibleItemCount;
-                    if (lastItem == totalItemCount) {
-                        onRefreshList();
-                    }
-                }
-            }
-        });
         this.recyclerView.setLayoutManager(linearLayoutManager);
         this.recyclerView.setHasFixedSize(true);
         this.recyclerView.setAdapter(listAdapter);
         this.recyclerView.scrollToPosition(0);
-        //Set up swipeRefresher
-        swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe);
-        swipeRefresh.setColorSchemeColors(Color.BLUE, Color.BLUE);
-        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                offset = 0;
-                onRefreshList();
-            }
-        });
         if (listActors.isEmpty()){
             findViewById(R.id.black_screen).setVisibility(View.VISIBLE);
         }
@@ -159,12 +128,22 @@ public class ListActivity extends AppCompatActivity
     public void onRefreshList() {
         try {
 //            if (!isRefreshing.get()) {
-                swipeRefresh.setRefreshing(false);
                 executorService.submit(new Runnable() {
                     @Override
                     public void run() {
 //                        isRefreshing.set(true);
-                        Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList(max, offset, Core.getInstance().getProfile().getIdentityPublicKey());
+                        try {
+                             listActors.addAll(Core.getInstance().getChatNetworkServicePluginRoot().getContacts());
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    listAdapter.changeDataSet(listActors);
+                                    listAdapter.notifyDataSetChanged();
+                                }
+                            });
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
 //            }
@@ -239,40 +218,7 @@ public class ListActivity extends AppCompatActivity
 
     @Override
     public void onActorListReceived(final List<ActorProfile> list) {
-        isRefreshing.set(true);
-        if (list.size()==0){
-            Log.i(this.getComponentName().getClassName(),"ActorList empty");
-        }
-        for (ActorProfile actorProfile : list) {
-            Log.i(this.getComponentName().getClassName(),actorProfile.toString());
-        }
 
-        Core.getInstance().addRemotesUsers(list);
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (offset == 0) {
-                    if (listActors != null) {
-                        listActors.clear();
-                        listActors.addAll(list);
-                    } else {
-                        listActors = list;
-                    }
-                    listAdapter.changeDataSet(listActors);
-                    listAdapter.notifyDataSetChanged();
-                } else {
-                    List<ActorProfile> temp = list;
-                    for (ActorProfile info : temp)
-                        if (notInList(info)) {
-                            listActors.add(info);
-                        }
-                    listAdapter.notifyItemRangeInserted(offset, listActors.size() - 1);
-                }
-                findViewById(R.id.black_screen).setVisibility(View.GONE);
-            }
-        });
-        offset = listActors.size();
 
     }
 

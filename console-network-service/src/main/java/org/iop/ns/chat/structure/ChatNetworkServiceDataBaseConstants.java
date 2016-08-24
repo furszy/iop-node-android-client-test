@@ -12,6 +12,13 @@ public final class ChatNetworkServiceDataBaseConstants {
     public static final String MESSAGES_DATE_COLUMN_NAME = "date";
     public static final String MESSAGES_MESSAGE_COLUMN_NAME = "message";
 
+
+    public static final String CONTACT_TABLE = "contacts";
+
+    public static final String CONTACT_ID_COLUMN_NAME = "pk";
+    public static final String CONTACT_NAME_COLUMN_NAME = "remote_name";
+
+
 }
 
 

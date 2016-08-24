@@ -68,6 +68,28 @@ public class ChatNetworkServiceDatabaseFactory {
             }
 
 
+            /**
+             * Create Chat table.
+             */
+            table = databaseFactory.newTableFactory(ownerId, ChatNetworkServiceDataBaseConstants.CONTACT_TABLE);
+
+            table.addColumn(ChatNetworkServiceDataBaseConstants.CONTACT_ID_COLUMN_NAME, DatabaseDataType.STRING, 50, Boolean.TRUE);
+            table.addColumn(ChatNetworkServiceDataBaseConstants.CONTACT_NAME_COLUMN_NAME, DatabaseDataType.STRING, 255, Boolean.FALSE);
+
+            try {
+                //Create the table
+                databaseFactory.createTable(ownerId, table);
+
+            } catch (CantCreateTableException cantCreateTableException) {
+                CantCreateDatabaseException cantCreateDatabaseException = new CantCreateDatabaseException(CantCreateDatabaseException.DEFAULT_MESSAGE, cantCreateTableException, "", "Exception not handled by the plugin, There is a problem and i cannot create the table.");
+                reportUnexpectedError(cantCreateDatabaseException);
+                throw cantCreateDatabaseException;
+            }catch(Exception e){
+                CantCreateDatabaseException cantCreateDatabaseException = new CantCreateDatabaseException(CantCreateDatabaseException.DEFAULT_MESSAGE, e, "", e.getMessage());
+                reportUnexpectedError(cantCreateDatabaseException);
+                throw cantCreateDatabaseException;
+            }
+
             return database;
         } catch (InvalidOwnerIdException invalidOwnerId) {
             /**

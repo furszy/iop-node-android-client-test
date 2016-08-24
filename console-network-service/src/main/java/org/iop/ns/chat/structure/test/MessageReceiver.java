@@ -18,4 +18,6 @@ public interface MessageReceiver {
     void onActorRegistered(ActorProfile actorProfile);
 
     void onMessageFail(UUID messageId);
+
+    void onActorOffline(String remotePkGoOffline);
 }
