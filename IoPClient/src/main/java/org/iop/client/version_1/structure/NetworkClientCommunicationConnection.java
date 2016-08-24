@@ -190,8 +190,6 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
          */
         ClientManager.ReconnectHandler reconnectHandler = new ClientManager.ReconnectHandler() {
 
-            int i = 0;
-
             @Override
             public boolean onDisconnect(CloseReason closeReason) {
                     System.out.println("##########################################################################");
@@ -204,7 +202,6 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
             public boolean onConnectFailure(Exception exception) {
                     try {
 
-                        //System.out.println("# NetworkClientCommunicationConnection - Reconnect Failure Message: "+exception.getMessage()+" Cause: "+exception.getCause());
                         // To avoid potential DDoS when you don't limit number of reconnects, wait to the next try.
                         Thread.sleep(5000);
 
@@ -212,24 +209,9 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                         e.printStackTrace();
                     }
 
-
                     System.out.println("###############################################################################");
                     System.out.println("#  NetworkClientCommunicationConnection  - Connect Failure -> Reconnecting... #");
                     System.out.println("###############################################################################");
-
-                    try {
-                        /*
-                        if (!connectivityManager.isOnline()) {
-                            System.out.println("###############################################################################");
-                            System.out.println("#  Interrumpiendo hilo de reconctado, no sirve tener algo intentando conectarse si hay un evento que te avisa eso #");
-                            System.out.println("###############################################################################");
-                            tryToReconnect = false;
-
-                        }
-                        */
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
 
                     return tryToReconnect;
             }
@@ -240,6 +222,8 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
          * Register the ReconnectHandler
          */
         container.getProperties().put(ClientProperties.RECONNECT_HANDLER, reconnectHandler);
+        container.setDefaultMaxBinaryMessageBufferSize(65536);
+        container.setDefaultMaxTextMessageBufferSize(65536);
 
         try {
 
@@ -247,7 +231,6 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
 
         } catch (Exception e) {
             e.printStackTrace();
-//            System.out.println(e.getCause());
         }
     }
 
