@@ -27,7 +27,6 @@ import org.iop.client.version_1.channels.processors.checkin.CheckInNetworkServic
 import org.iop.client.version_1.context.ClientContext;
 import org.iop.client.version_1.context.ClientContextItem;
 import org.iop.client.version_1.structure.NetworkClientCommunicationConnection;
-import org.iop.client.version_1.util.BlockEncoder;
 import org.iop.client.version_1.util.PackageDecoder;
 import org.iop.client.version_1.util.PackageEncoder;
 
