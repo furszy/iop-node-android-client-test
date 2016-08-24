@@ -30,6 +30,7 @@ import org.iop.ns.chat.structure.ChatMetadataRecord;
 import org.iop.ns.chat.structure.ChatMetadataRecordDAO;
 import org.iop.ns.chat.structure.ChatNetworkServiceDataBaseConstants;
 import org.iop.ns.chat.structure.ChatNetworkServiceDatabaseFactory;
+import org.iop.ns.chat.structure.ContactsDAO;
 import org.iop.ns.chat.structure.test.MessageReceiver;
 
 import java.sql.Timestamp;
@@ -46,6 +47,7 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
 
     private Database dataBaseCommunication;
     private ChatMetadataRecordDAO chatMetadataRecordDAO;
+    private ContactsDAO contactsDAO;
     private MessageReceiver messageReceiver;
 
 
@@ -73,6 +75,7 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
             initializeDb();
 
             chatMetadataRecordDAO = new ChatMetadataRecordDAO(dataBaseCommunication);
+            contactsDAO = new ContactsDAO(dataBaseCommunication);
 
             actorOnlineEventSubscribed = new HashMap<>();
 
@@ -213,7 +216,6 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
     }
 
     public List<ChatMetadataRecord> listMessages(String localPk, String remotePk, Integer max, Integer offset) throws Exception {
-
         return chatMetadataRecordDAO.listMessages(localPk, remotePk, max, offset);
     }
 
@@ -293,6 +295,14 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
 
     public void subscribeActorOnlineEvent(String remotePk) throws CantSendMessageException {
         actorOnlineEventSubscribed.put(subscribeActorOnline(remotePk),remotePk);
+    }
+
+    public void saveContact(ActorProfile actorProfile) throws Exception {
+        contactsDAO.persistContact(actorProfile);
+    }
+
+    public List<ActorProfile> getContacts() throws Exception {
+        return contactsDAO.listContacts();
     }
 
 
