@@ -70,6 +70,11 @@ import javax.websocket.EncodeException;
  */
 public class NetworkClientCommunicationConnection implements NetworkClientConnection {
 
+    /**
+     * Represent the MAX_MESSAGE_BUFFER_SIZE
+     */
+    public static final int MAX_MESSAGE_BUFFER_SIZE = 65536;
+
     private String                 nodeUrl               ;
     private URI                    uri                   ;
     private EventManager           eventManager          ;
@@ -222,8 +227,8 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
          * Register the ReconnectHandler
          */
         container.getProperties().put(ClientProperties.RECONNECT_HANDLER, reconnectHandler);
-        container.setDefaultMaxBinaryMessageBufferSize(65536);
-        container.setDefaultMaxTextMessageBufferSize(65536);
+        container.setDefaultMaxBinaryMessageBufferSize(MAX_MESSAGE_BUFFER_SIZE);
+        container.setDefaultMaxTextMessageBufferSize(MAX_MESSAGE_BUFFER_SIZE);
 
         try {
 
