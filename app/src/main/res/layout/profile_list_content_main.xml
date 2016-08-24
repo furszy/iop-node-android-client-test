@@ -34,5 +34,12 @@
                 android:id="@+id/recycler"
                 />
         </android.support.v4.widget.SwipeRefreshLayout>
+        <ProgressBar
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/progressBar"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
     </LinearLayout>
 </RelativeLayout>

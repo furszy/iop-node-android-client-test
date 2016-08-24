@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
@@ -46,6 +47,7 @@ public class ListActivity extends AppCompatActivity
 
     RecyclerView recyclerView;
     ListAdapter listAdapter;
+    private ProgressBar progressBar;
     List<ActorProfile> listActors;
     private DrawerLayout drawerLayout;
     private LinearLayoutManager linearLayoutManager;
@@ -87,6 +89,7 @@ public class ListActivity extends AppCompatActivity
 
         this.recyclerView = (RecyclerView) findViewById(R.id.recycler);
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        this.progressBar = (ProgressBar) findViewById(R.id.progressBar);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         this.recyclerView.setLayoutManager(linearLayoutManager);
         listActors = new ArrayList<>();
@@ -149,6 +152,7 @@ public class ListActivity extends AppCompatActivity
 
     public void onRefreshList() {
         try {
+            progressBar.setVisibility(View.VISIBLE);
             swipeRefresh.setRefreshing(false);
             executorService.submit(new Runnable() {
                 @Override
@@ -256,6 +260,7 @@ public class ListActivity extends AppCompatActivity
                         }
                     listAdapter.notifyItemRangeInserted(offset, listActors.size() - 1);
                 }
+                progressBar.setVisibility(View.GONE);
             }
         });
         offset = listActors.size();
