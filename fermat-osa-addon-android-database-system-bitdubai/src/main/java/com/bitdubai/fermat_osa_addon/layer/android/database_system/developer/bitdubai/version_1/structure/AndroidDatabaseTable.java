@@ -33,7 +33,6 @@ import com.bitdubai.fermat_api.layer.osa_android.location_system.Location;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 
@@ -178,7 +177,7 @@ public class AndroidDatabaseTable implements DatabaseTable {
             }
             database = this.database.getWritableDatabase();
             String filter = makeFilter2();
-            Log.i("AndroidDatabase","Database name:"+tableName+" update quantity: "+database.update(tableName, contentValues,filter , null));
+            Log.i("AndroidDatabase","Database name:"+tableName+" update quantity: "+database.update(tableName, contentValues, filter, null));
         } catch (Exception exception) {
             throw new CantUpdateRecordException(CantUpdateRecordException.DEFAULT_MESSAGE, FermatException.wrapException(exception), null, "Check the cause for this error");
         } finally {
@@ -223,7 +222,7 @@ public class AndroidDatabaseTable implements DatabaseTable {
         }
     }
 
-    //@Override
+    @Override
     public void insertRecordIfNotExist(DatabaseTableRecord record,List<DatabaseTableFilter> filters,DatabaseTableFilterGroup databaseTableFilterGroup) throws DatabaseRecordExistException, CantInsertRecordException {
         if (record==null) throw new CantInsertRecordException(CantInsertRecordException.DEFAULT_MESSAGE, new Exception("Record null"), null, "Check the cause for this error");
         SQLiteDatabase database = null;
@@ -248,7 +247,7 @@ public class AndroidDatabaseTable implements DatabaseTable {
         }
     }
 
-    //@Override
+    @Override
     public long numRecords() {
         return numRecords(null,makeFilter2());
     }
@@ -278,7 +277,7 @@ public class AndroidDatabaseTable implements DatabaseTable {
             database = this.database.getWritableDatabase();
 
 //            database.execSQL("DELETE FROM " + tableName);
-            Log.i("AndroidDatabase", "Truncate table: "+tableName+", records quantity: " + database.delete(tableName, null, null));
+            Log.i("AndroidDatabase", "Truncate table: " + tableName + ", records quantity: " + database.delete(tableName, null, null));
         } catch (Exception exception) {
 
             throw new CantTruncateTableException(
@@ -349,7 +348,7 @@ public class AndroidDatabaseTable implements DatabaseTable {
         }
     }
 
-    //@Override
+    @Override
     public List<DatabaseTableRecord> loadRecords(List<DatabaseTableFilter> tableFilters, List<DatabaseTableFilterGroup> databaseTableFilterGroups, String[] columns) throws CantLoadTableToMemoryException{
 
         List<DatabaseTableRecord> records = new ArrayList<>();
@@ -513,7 +512,7 @@ public class AndroidDatabaseTable implements DatabaseTable {
 
         this.tableFilter.add(filter);
     }
-    //@Override
+    @Override
     public DatabaseTableFilter buildFilter(String columnName, String value, DatabaseFilterType type){
         return  new AndroidDatabaseTableFilter(
                 columnName,
@@ -637,6 +636,7 @@ public class AndroidDatabaseTable implements DatabaseTable {
         this.tableFilterGroup = new AndroidDatabaseTableFilterGroup(tableFilters, filterGroups, filterOperator);
     }
 
+
     /**
      * DatabaseTable interface private void.
      */
@@ -664,7 +664,12 @@ public class AndroidDatabaseTable implements DatabaseTable {
         } else {
             //if set group filter
             if (this.tableFilterGroup != null) {
-                return makeGroupFilters(this.tableFilterGroup);
+
+                String groupFilters = makeGroupFilters(this.tableFilterGroup);
+                if (groupFilters.trim().isEmpty())
+                    return "";
+                else
+                    return " WHERE " +groupFilters;
             } else {
                 return filter;
             }
@@ -673,7 +678,7 @@ public class AndroidDatabaseTable implements DatabaseTable {
 
 
     public String makeFilter2() {
-        return makeFilter(this.tableFilter,this.tableFilterGroup);
+        return makeFilter(this.tableFilter, this.tableFilterGroup);
     }
 
     public String makeFilter(List<DatabaseTableFilter> tableFilter,DatabaseTableFilterGroup tableFilterGroup) {
@@ -704,18 +709,19 @@ public class AndroidDatabaseTable implements DatabaseTable {
     public String makeGroupFilters(DatabaseTableFilterGroup databaseTableFilterGroup) {
 
         StringBuilder strFilter = new StringBuilder();
-        String filter;
 
         if (databaseTableFilterGroup != null && (databaseTableFilterGroup.getFilters().size() > 0 || databaseTableFilterGroup.getSubGroups().size() > 0)) {
             strFilter.append("(");
-            strFilter.append(makeInternalConditionGroup(databaseTableFilterGroup.getFilters(), databaseTableFilterGroup.getOperator()));
+
+            if (databaseTableFilterGroup.getFilters() != null && !databaseTableFilterGroup.getFilters().isEmpty())
+                strFilter.append(makeInternalConditionGroup(databaseTableFilterGroup.getFilters(), databaseTableFilterGroup.getOperator()));
 
             int ix = 0;
 
             if (databaseTableFilterGroup.getSubGroups() != null){
 
                 for (DatabaseTableFilterGroup subGroup : databaseTableFilterGroup.getSubGroups()) {
-                    if (subGroup.getFilters().size() > 0 || ix > 0) {
+                    if (subGroup.getFilters().size() > 0 && ix > 0) {
                         switch (databaseTableFilterGroup.getOperator()) {
                             case AND:
                                 strFilter.append(" AND ");
@@ -727,9 +733,13 @@ public class AndroidDatabaseTable implements DatabaseTable {
                                 strFilter.append(" ");
                         }
                     }
-                    strFilter.append("(");
+                    if (databaseTableFilterGroup.getFilters() != null)
+                        strFilter.append("(");
+
                     strFilter.append(makeGroupFilters(subGroup));
-                    strFilter.append(")");
+
+                    if (databaseTableFilterGroup.getFilters() != null)
+                        strFilter.append(")");
                     ix++;
                 }
 
@@ -738,10 +748,7 @@ public class AndroidDatabaseTable implements DatabaseTable {
             strFilter.append(")");
         }
 
-        filter = strFilter.toString();
-        if (strFilter.length() > 0) filter = " WHERE " + filter;
-
-        return filter;
+        return strFilter.toString();
     }
 
     public String makeGroupFilters2(DatabaseTableFilterGroup databaseTableFilterGroup) {
@@ -801,14 +808,13 @@ public class AndroidDatabaseTable implements DatabaseTable {
     }
 
     @Override
-    public void deleteRecord(DatabaseTableRecord record) throws CantDeleteRecordException {
-        if(record==null) throw new CantDeleteRecordException(CantDeleteRecordException.DEFAULT_MESSAGE, new InvalidParameterException("Record null"), null, "Check the cause for this error");;
+    public void deleteRecord() throws CantDeleteRecordException {
         SQLiteDatabase database = null;
         try {
             database = this.database.getWritableDatabase();
             String filter = makeFilter2();
             int rowDeleted =  database.delete(tableName, (!filter.isEmpty()) ? filter : null, null);
-            Log.i("AndroidDatabase", "Database name:" + tableName + " delete id: " +rowDeleted);
+            Log.i("AndroidDatabase", "Database name:" + tableName + " delete id: " + rowDeleted);
 
         } catch (Exception exception) {
             throw new CantDeleteRecordException(CantDeleteRecordException.DEFAULT_MESSAGE, FermatException.wrapException(exception), null, "Check the cause for this error");
@@ -925,17 +931,6 @@ public class AndroidDatabaseTable implements DatabaseTable {
         return tableAggregateFunction;
     }
 
-    //TODO: implemented for compilation
-    @Override
-    public String getSqlQuery() {
-        return null;
-    }
-
-    //TODO: implemented for compilation
-    @Override
-    public void setTableFilterToJoin(Map<String, String> tableFilterToJoin) {
-
-    }
 
 
     @Override

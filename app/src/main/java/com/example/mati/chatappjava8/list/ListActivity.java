@@ -16,7 +16,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -33,6 +32,7 @@ import com.example.mati.chatappjava8.chat.FermatListItemListeners;
 import com.example.mati.chatappjava8.commons.NavigationListener;
 import com.example.mati.chatappjava8.commons.Notifications;
 
+import org.iop.ns.chat.structure.ChatMetadataRecord;
 import org.iop.ns.chat.structure.test.MessageReceiver;
 
 import java.util.ArrayList;
@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ListActivity extends AppCompatActivity
         implements MessageReceiver, FermatListItemListeners<ActorProfile>
@@ -60,12 +61,16 @@ public class ListActivity extends AppCompatActivity
     private SearchView searchView = null;
     private SearchView.OnQueryTextListener queryTextListener;
 
+    private AtomicBoolean isRefreshing;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        isRefreshing = new AtomicBoolean(false);
 
         navigationView = (NavigationView) findViewById(R.id.navigation);
 //        navigationView.inflateMenu(R.menu.navigation_menu);
@@ -124,6 +129,10 @@ public class ListActivity extends AppCompatActivity
                 onRefreshList();
             }
         });
+        if (listActors.isEmpty()){
+            findViewById(R.id.black_screen).setVisibility(View.VISIBLE);
+        }
+
         onRefreshList();
     }
 
@@ -152,14 +161,17 @@ public class ListActivity extends AppCompatActivity
 
     public void onRefreshList() {
         try {
+//            if (!isRefreshing.get()) {
             progressBar.setVisibility(View.VISIBLE);
-            swipeRefresh.setRefreshing(false);
-            executorService.submit(new Runnable() {
-                @Override
-                public void run() {
-                    Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList(max, offset);
-                }
-            });
+                swipeRefresh.setRefreshing(false);
+                executorService.submit(new Runnable() {
+                    @Override
+                    public void run() {
+//                        isRefreshing.set(true);
+                        Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList(max, offset, Core.getInstance().getProfile().getIdentityPublicKey());
+                    }
+                });
+//            }
         } catch (Exception e) {
             System.out.println(e.toString());
         }
@@ -186,7 +198,7 @@ public class ListActivity extends AppCompatActivity
                 public boolean onQueryTextChange(String newText) {
                     if (newText.equals(searchView.getQuery().toString())) {
                         Log.i("onQueryTextChange", newText);
-                        listAdapter.changeDataSet(listActors);
+//                        listAdapter.changeDataSet(listActors);
                         listAdapter.getFilter().filter(newText);
                     }
                     return false;
@@ -224,13 +236,14 @@ public class ListActivity extends AppCompatActivity
     }
 
     @Override
-    public void onMessageReceived(String senderPk,String chatMetadataRecord) {
-        Notifications.pushNotification(this,chatMetadataRecord, senderPk);
+    public void onMessageReceived(String senderPk,ChatMetadataRecord chatMetadataRecord) {
+        Notifications.pushNotification(this, chatMetadataRecord.getMessage(), senderPk);
     }
 
 
     @Override
     public void onActorListReceived(final List<ActorProfile> list) {
+        isRefreshing.set(true);
         if (list.size()==0){
             Log.i(this.getComponentName().getClassName(),"ActorList empty");
         }
@@ -261,6 +274,7 @@ public class ListActivity extends AppCompatActivity
                     listAdapter.notifyItemRangeInserted(offset, listActors.size() - 1);
                 }
                 progressBar.setVisibility(View.GONE);
+                findViewById(R.id.black_screen).setVisibility(View.GONE);
             }
         });
         offset = listActors.size();
@@ -282,6 +296,11 @@ public class ListActivity extends AppCompatActivity
     @Override
     public void onMessageFail(UUID messageId) {
 
+    }
+
+    @Override
+    public void onActorOffline(String remotePkGoOffline) {
+        Log.i(getClass().getName(),"onActorOffline: "+remotePkGoOffline);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request;
 
-import com.bitdubai.fermat_api.layer.all_definition.network_service.enums.NetworkServiceType;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.DiscoveryQueryParameters;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.PackageContent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.util.GsonProvider;
@@ -20,28 +19,21 @@ import java.util.UUID;
  */
 public class ActorListMsgRequest extends PackageContent {
 
-    private UUID                     queryId                ;
-    private String networkServiceType;
-    private DiscoveryQueryParameters parameters             ;
-    //todo: porqué este pk acá?
-//    private String                   clientPublicKey        ;
+    private String                   networkServiceType;
+    private DiscoveryQueryParameters parameters        ;
+    private String                   requesterPublicKey;
 
-    public ActorListMsgRequest(final UUID                     queryId                ,
-                               final String                   networkServiceType,
-                               final DiscoveryQueryParameters parameters             ){
-//                               final String                   clientPublicKey        ) {
+    public ActorListMsgRequest(final String                   networkServiceType,
+                               final DiscoveryQueryParameters parameters        ,
+                               final String                   requesterPublicKey) {
 
         super(MessageContentType.JSON);
 
-        this.queryId                 = queryId                ;
         this.networkServiceType = networkServiceType;
-        this.parameters              = parameters             ;
-//        this.clientPublicKey         = clientPublicKey        ;
+        this.parameters         = parameters        ;
+        this.requesterPublicKey = requesterPublicKey;
     }
 
-    public UUID getQueryId() {
-        return queryId;
-    }
 
     public String getNetworkServiceType() {
         return networkServiceType;
@@ -51,9 +43,9 @@ public class ActorListMsgRequest extends PackageContent {
         return parameters;
     }
 
-//    public String getClientPublicKey() {
-//        return clientPublicKey;
-//    }
+    public String getRequesterPublicKey() {
+        return requesterPublicKey;
+    }
 
     /**
      * Generate the json representation
@@ -78,10 +70,9 @@ public class ActorListMsgRequest extends PackageContent {
     @Override
     public String toString() {
         return "ActorListMsgRequest{" +
-                "queryId=" + queryId +
                 ", networkServiceType='" + networkServiceType + '\'' +
                 ", parameters=" + parameters +
-//                ", clientPublicKey='" + clientPublicKey + '\'' +
+                ", requesterPublicKey='" + requesterPublicKey + '\'' +
                 '}';
     }
 }

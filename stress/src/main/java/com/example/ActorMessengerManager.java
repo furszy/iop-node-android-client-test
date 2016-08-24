@@ -2,6 +2,7 @@ package com.example;
 
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 
+import org.iop.ns.chat.structure.ChatMetadataRecord;
 import org.iop.ns.chat.structure.test.MessageReceiver;
 
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ public class ActorMessengerManager implements MessageReceiver {
 
 
     @Override
-    public void onMessageReceived(String sender, String chatMetadataRecord) {
+    public void onMessageReceived(String sender, ChatMetadataRecord chatMetadataRecord) {
         System.out.println(chatMetadataRecord);
 
 //        try {
@@ -91,6 +92,11 @@ public class ActorMessengerManager implements MessageReceiver {
 
     @Override
     public void onMessageFail(UUID messageId) {
+
+    }
+
+    @Override
+    public void onActorOffline(String remotePkGoOffline) {
 
     }
 }

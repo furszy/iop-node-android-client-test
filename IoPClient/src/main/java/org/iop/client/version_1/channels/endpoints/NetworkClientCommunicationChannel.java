@@ -16,6 +16,7 @@ import com.bitdubai.fermat_p2p_api.layer.p2p_communication.CommunicationChannels
 import org.iop.client.version_1.channels.conf.ClientChannelConfigurator;
 import org.iop.client.version_1.channels.processors.ACKProcessor;
 import org.iop.client.version_1.channels.processors.ActorListRespondProcessor;
+import org.iop.client.version_1.channels.processors.EventPublishProcessor;
 import org.iop.client.version_1.channels.processors.IsActorOnlineRespondProcessor;
 import org.iop.client.version_1.channels.processors.MessageTransmitProcessor;
 import org.iop.client.version_1.channels.processors.PackageProcessor;
@@ -26,6 +27,7 @@ import org.iop.client.version_1.channels.processors.checkin.CheckInNetworkServic
 import org.iop.client.version_1.context.ClientContext;
 import org.iop.client.version_1.context.ClientContextItem;
 import org.iop.client.version_1.structure.NetworkClientCommunicationConnection;
+import org.iop.client.version_1.util.BlockEncoder;
 import org.iop.client.version_1.util.PackageDecoder;
 import org.iop.client.version_1.util.PackageEncoder;
 
@@ -113,6 +115,7 @@ public class NetworkClientCommunicationChannel {
         registerMessageProcessor(new CheckInActorRespondProcessor(this));
         registerMessageProcessor(new CheckInNetworkServiceRespondProcessor(this));
         registerMessageProcessor(new IsActorOnlineRespondProcessor(this));
+        registerMessageProcessor(new EventPublishProcessor(this));
 
 
     }
@@ -135,11 +138,11 @@ public class NetworkClientCommunicationChannel {
          */
         connection.setServerIdentity((String) session.getUserProperties().get(HeadersAttName.NPKI_ATT_HEADER_NAME));
         connection.startConnectionSuperVisorAgent();
-//        try {
-//            connection.startMessageSenderExecutor();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        try {
+            connection.startMessageSenderExecutor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         //raiseClientConnectedNotificationEvent();
     }
 
@@ -174,7 +177,7 @@ public class NetworkClientCommunicationChannel {
 
         // if it is not an external node i raise the event.
         connection.stopConnectionSuperVisorAgent();
-//        connection.stopMessageSenderExecutor();
+        connection.stopMessageSenderExecutor();
         if (!isExternalNode) {
             isRegistered = Boolean.FALSE;
 

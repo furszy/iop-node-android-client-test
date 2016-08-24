@@ -37,18 +37,18 @@ public interface NetworkClientConnection {
      */
     UUID registerProfile(Profile profile) throws CantRegisterProfileException;
 
-    /**
-     * Through the method <code>updateRegisteredProfile</code> we can update registered profile
-     * in the server.
-     * We must to indicate which type of update we're trying to do.
-     *
-     * @param profile  of the component that we're trying to update.
-     * @param type     of the update.
-     *
-     * @throws CantUpdateRegisteredProfileException      if something goes wrong.
-     */
-    void updateRegisteredProfile(Profile     profile,
-                                 UpdateTypes type   ) throws CantUpdateRegisteredProfileException;
+//    /**
+//     * Through the method <code>updateRegisteredProfile</code> we can update registered profile
+//     * in the server.
+//     * We must to indicate which type of update we're trying to do.
+//     *
+//     * @param profile  of the component that we're trying to update.
+//     * @param type     of the update.
+//     *
+//     * @throws CantUpdateRegisteredProfileException      if something goes wrong.
+//     */
+//    void updateRegisteredProfile(Profile     profile,
+//                                 UpdateTypes type   ) throws CantUpdateRegisteredProfileException;
 
     /**
      * Through the method <code>unregisterProfile</code> we can unregister a profile in the server.
@@ -66,13 +66,15 @@ public interface NetworkClientConnection {
      *
      * @param discoveryQueryParameters  parameters for the query
      * @param networkServicePublicKey   network service asking for the list of actors
+     * @param requesterPublicKey        actor public key of the actor which request the discovery
      *
      * @return query id
      *
      * @throws CantRequestProfileListException if something goes wrong.
      */
      UUID discoveryQuery(final DiscoveryQueryParameters discoveryQueryParameters,
-                                     final String                   networkServicePublicKey) throws CantRequestProfileListException;
+                         final String                   networkServicePublicKey ,
+                         final String                   requesterPublicKey      ) throws CantRequestProfileListException;
 
     /**
      * Through the method <code>listRegisteredActorProfiles</code> we can get a list of registered actors

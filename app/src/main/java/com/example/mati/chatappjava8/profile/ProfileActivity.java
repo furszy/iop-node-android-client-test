@@ -8,6 +8,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +19,7 @@ import com.example.mati.chatappjava8.R;
 import com.example.mati.chatappjava8.commons.NavigationListener;
 import com.example.mati.chatappjava8.commons.Notifications;
 
+import org.iop.ns.chat.structure.ChatMetadataRecord;
 import org.iop.ns.chat.structure.test.MessageReceiver;
 
 import java.util.List;
@@ -102,8 +104,8 @@ public class ProfileActivity extends AppCompatActivity implements MessageReceive
     }
 
     @Override
-    public void onMessageReceived(String sender, String chatMetadataRecord) {
-        Notifications.pushNotification(this,chatMetadataRecord, sender);
+    public void onMessageReceived(String sender, ChatMetadataRecord chatMetadataRecord) {
+        Notifications.pushNotification(this,chatMetadataRecord.getMessage(), sender);
     }
 
     @Override
@@ -119,5 +121,10 @@ public class ProfileActivity extends AppCompatActivity implements MessageReceive
     @Override
     public void onMessageFail(UUID messageId) {
 
+    }
+
+    @Override
+    public void onActorOffline(String remotePkGoOffline) {
+        Log.i(getClass().getName(), "onActorOffline: " + remotePkGoOffline);
     }
 }

@@ -177,7 +177,7 @@ public class IoPClientPluginRoot extends AbstractPlugin implements NetworkClient
 
             networkClientCommunicationConnection = new NetworkClientCommunicationConnection(
                     SERVER_IP + ":" + HardcodeConstants.DEFAULT_PORT,
-                    null,//eventManager,
+                    eventManager,//eventManager,
                     null,//locationManager,
                     identity,
                     this,
@@ -185,7 +185,7 @@ public class IoPClientPluginRoot extends AbstractPlugin implements NetworkClient
                     Boolean.FALSE,
                     null,
                     null,//connectivityManager,
-                    null//p2PLayerManager
+                    p2PLayerManager//p2PLayerManager
             );
 
 
@@ -384,15 +384,6 @@ public class IoPClientPluginRoot extends AbstractPlugin implements NetworkClient
         return getConnection().isConnected();
     }
 
-    @Override
-    public UUID registerProfile(Profile profile) throws CantRegisterProfileException {
-        return networkClientCommunicationConnection.registerProfile(profile);
-    }
-
-    @Override
-    public void updateProfile(Profile profile, UpdateTypes types) throws CantUpdateRegisteredProfileException {
-        networkClientCommunicationConnection.updateRegisteredProfile(profile, types);
-    }
 
     @Override
     public UUID sendMessage(PackageContent packageContent, PackageType packageType, NetworkServiceType networkServiceType, String destinationPublicKey) throws CantSendMessageException {
@@ -407,6 +398,15 @@ public class IoPClientPluginRoot extends AbstractPlugin implements NetworkClient
     public UUID sendMessage(PackageContent packageContent, PackageType packageType,NetworkServiceType networkServiceType) throws CantSendMessageException {
         try {
             return networkClientCommunicationConnection.sendPackageMessage(packageContent,packageType,networkServiceType);
+        } catch (CantSendPackageException e) {
+            throw new CantSendMessageException(e);
+        }
+    }
+
+    @Override
+    public UUID sendMessage(PackageContent packageContent, PackageType packageType) throws CantSendMessageException {
+        try {
+            return networkClientCommunicationConnection.sendPackageMessage(packageContent,packageType);
         } catch (CantSendPackageException e) {
             throw new CantSendMessageException(e);
         }

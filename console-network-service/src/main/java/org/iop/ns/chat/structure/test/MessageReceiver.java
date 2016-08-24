@@ -11,11 +11,13 @@ import java.util.UUID;
  */
 public interface MessageReceiver {
 
-    void onMessageReceived(String sender,String chatMetadataRecord);
+    void onMessageReceived(String sender,ChatMetadataRecord chatMetadataRecord);
 
     void onActorListReceived(List<ActorProfile> list);
 
     void onActorRegistered(ActorProfile actorProfile);
 
     void onMessageFail(UUID messageId);
+
+    void onActorOffline(String remotePkGoOffline);
 }

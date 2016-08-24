@@ -2,51 +2,35 @@ package com.example.mati.chatappjava8.profile;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.ContentResolver;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.bitdubai.fermat_api.layer.all_definition.enums.Actors;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.exceptions.ActorAlreadyRegisteredException;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.exceptions.CantRegisterActorException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.example.mati.app_core.Core;
 import com.example.mati.chatappjava8.R;
 import com.example.mati.chatappjava8.commons.Utils;
-import com.example.mati.chatappjava8.list.ListActivity;
 import com.example.mati.chatappjava8.util.BitmapWorkerTask;
-import com.example.mati.chatappjava8.util.CircleTransform;
-import com.squareup.okhttp.internal.Util;
-import com.squareup.picasso.Picasso;
 
 import org.iop.ns.chat.ChatNetworkServicePluginRoot;
 
@@ -63,7 +47,6 @@ import java.util.concurrent.Executors;
  * Updated by Andres Abreu aabreu1 27/06/16
  */
 public class CreateIntraUserIdentityFragment extends Fragment {
-
 
     private static final String TAG = "CreateIdentity";
 
@@ -82,22 +65,11 @@ public class CreateIntraUserIdentityFragment extends Fragment {
     private EditText mBrokerName;
     private ImageView mBrokerImage;
     private ImageView mphoto_header;
-    private RelativeLayout relativeLayout;
-    private Menu menuHelp;
-    Toolbar toolbar;
-//    private IntraUserModuleIdentity identitySelected;
     private boolean isUpdate = false;
-//    private EditText mBrokerPhrase;
-//    IntraUserIdentitySettings intraUserIdentitySettings = null;
-    private boolean updateProfileImage = false;
     private boolean contextMenuInUse = false;
-//    private IntraUserIdentityModuleManager moduleManager;
     private Uri imageToUploadUri;
     private Bitmap imageBitmap;
-//    private Location locationManager;
-    //private Bitmap imageBitmap = null;
 
-    private ImageView mChatImage;
     ExecutorService executorService;
 
     private ChatNetworkServicePluginRoot manager;
@@ -123,17 +95,8 @@ public class CreateIntraUserIdentityFragment extends Fragment {
         View rootLayout = inflater.inflate(R.layout.fragment_main, container, false);
         initViews(rootLayout);
         setUpIdentity();
-        SharedPreferences pref = getActivity().getSharedPreferences("dont show dialog more", Context.MODE_PRIVATE);
-//        if (!pref.getBoolean("isChecked", false)) {
-//            PresentationIntraUserIdentityDialog presentationIntraUserCommunityDialog = new PresentationIntraUserIdentityDialog(getActivity(), null, null);
-//            presentationIntraUserCommunityDialog.show();
-//        }
-
-
-
         return rootLayout;
     }
-
 
     /**
      * Inicializa las vistas de este Fragment
@@ -143,14 +106,8 @@ public class CreateIntraUserIdentityFragment extends Fragment {
     private void initViews(View layout) {
         createButton = (Button) layout.findViewById(R.id.create_crypto_broker_button);
         mBrokerName = (EditText) layout.findViewById(R.id.crypto_broker_name);
-//        mBrokerPhrase = (EditText) layout.findViewById(R.id.crypto_broker_phrase);
         mBrokerImage = (ImageView) layout.findViewById(R.id.img_photo);
-        relativeLayout = (RelativeLayout) layout.findViewById(R.id.user_image);
         mphoto_header = (ImageView) layout.findViewById(R.id.img_photo_header);
-
-
-
-        //createButton.setText((!isUpdate) ? "Create" : "Update");
 
         mBrokerName.requestFocus();
         registerForContextMenu(mBrokerImage);
@@ -158,28 +115,18 @@ public class CreateIntraUserIdentityFragment extends Fragment {
         mBrokerImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                CommonLogger.debug(TAG, "Entrando en mBrokerImage.setOnClickListener");
                 getActivity().openContextMenu(mBrokerImage);
             }
         });
 
         createButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-//                CommonLogger.debug(TAG, "Entrando en createButton.setOnClickListener");
+            public synchronized void onClick(View view) {
 
-                if (identity == null) {
-                    if (CREATE_IDENTITY_SUCCESS == createNewIdentity()) {
-//                        Intent intent = new Intent(getActivity(), ListActivity.class);
-//                        startActivity(intent);
-                        Toast.makeText(getActivity(), "Profile creado!", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    updateIdentity();
-                    new AlertDialog.Builder(getActivity()).setTitle("Identity exist, No podes cambiar de nombre por ahora").show();
-                }
-
-
+                if (Core.getInstance().getProfile() == null)
+                    publishResult(createNewIdentity());
+                else
+                    publishResult(updateIdentity());
             }
         });
     }
@@ -190,7 +137,6 @@ public class CreateIntraUserIdentityFragment extends Fragment {
             public void run() {
                 switch (resultKey) {
                     case CREATE_IDENTITY_SUCCESS:
-//                        changeActivity(Activities.CCP_SUB_APP_INTRA_USER_IDENTITY.getCode(), appSession.getAppPublicKey());
                         if (!isUpdate) {
                             Toast.makeText(getActivity(), "Identity created", Toast.LENGTH_SHORT).show();
                         } else {
@@ -199,7 +145,7 @@ public class CreateIntraUserIdentityFragment extends Fragment {
                         getActivity().onBackPressed();
                         break;
                     case CREATE_IDENTITY_FAIL_MODULE_EXCEPTION:
-                        Toast.makeText(getActivity(), "Error al crear la identidad", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "Error creating identity", Toast.LENGTH_LONG).show();
                         break;
                     case CREATE_IDENTITY_FAIL_NO_VALID_DATA:
                         Toast.makeText(getActivity(), "La data no es valida", Toast.LENGTH_LONG).show();
@@ -242,11 +188,6 @@ public class CreateIntraUserIdentityFragment extends Fragment {
                 BitmapWorkerTask bitmapWorkerTask = new BitmapWorkerTask(mphoto_header,getResources(),0,true);
                 bitmapWorkerTask.execute(identity.getPhoto());
                 mphoto_header.setAlpha(150);
-//                bitmap = Bitmap.createScaledBitmap(bitmap, mBrokerImage.getWidth(), mBrokerImage.getHeight(), true);
-            } else {
-//                bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_profile_male);
-//
-//                Picasso.with(getActivity()).load(R.drawable.ic_profile_male).into(mphoto_header);
             }
             bitmap = Bitmap.createScaledBitmap(bitmap, 100, 100, true);
             brokerImageByteArray = toByteArray(bitmap);
@@ -259,10 +200,8 @@ public class CreateIntraUserIdentityFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-    //    super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             contextMenuInUse = true;
-            ImageView pictureView = mBrokerImage;
 
             switch (requestCode) {
                 case REQUEST_IMAGE_CAPTURE:
@@ -293,50 +232,14 @@ public class CreateIntraUserIdentityFragment extends Fragment {
                     try {
                         if (checkCameraPermission()) {
                             if (checkWriteExternalPermission()) {
-                                if (imageBitmap != null) {
-                                  //  if (imageBitmap.getWidth() >= 192 && imageBitmap.getHeight() >= 192) {
-//                                        final DialogCropImage dialogCropImage = new DialogCropImage(getActivity(), appSession, null, imageBitmap);
-//                                        dialogCropImage.show();
-//                                        dialogCropImage.setOnDismissListener(new DialogInterface.OnDismissListener() {
-//                                            @Override
-//                                            public void onDismiss(DialogInterface dialog) {
-//                                                if (dialogCropImage.getCroppedImage() != null) {
-//                                                    imageBitmap = getResizedBitmap(rotateBitmap(dialogCropImage.getCroppedImage(), ExifInterface.ORIENTATION_NORMAL), dpToPx(), dpToPx());
-//                                                    mBrokerImage.setImageDrawable(ImagesUtils.getRoundedBitmap(getResources(), imageBitmap));
-//                                                    brokerImageByteArray = toByteArray(imageBitmap);
-//                                                    updateProfileImage = true;
-//
-//                                                    BitmapWorkerTask bitmapWorkerTask = new BitmapWorkerTask(mphoto_header,getResources(),false);
-//                                                    bitmapWorkerTask.execute(brokerImageByteArray );
-//                                                    mphoto_header.setAlpha(150);
-//
-//                                                } else {
-//                                                    imageBitmap = null;
-//                                                }
-//                                            }
-//                                        });
-                                   // } else {
-                                  //      Toast.makeText(getActivity(), "The image selected is too small. Please select a photo with height and width of at least 192x192", Toast.LENGTH_LONG).show();
-                                        // cryptoBrokerBitmap = null;
-                                        //Toast.makeText(getActivity(), "", Toast.LENGTH_SHORT).show();
-                                   // }
-                                } else {
+                                if (imageBitmap == null)
                                     Toast.makeText(getActivity(), "Error on upload image", Toast.LENGTH_LONG).show();
-                                    //  cryptoBrokerBitmap = null;
-                                    //Toast.makeText(getActivity(), "", Toast.LENGTH_SHORT).show();
-                                }
-                            } else {
+                            } else
                                 Toast.makeText(getActivity(), "An error occurred", Toast.LENGTH_LONG).show();
-                                // cryptoBrokerBitmap = null;
-                                //Toast.makeText(getActivity(), "", Toast.LENGTH_SHORT).show();
-                            }
-                        } else {
+                        } else
                             Toast.makeText(getActivity(), "An error occurred", Toast.LENGTH_LONG).show();
-                            //  cryptoBrokerBitmap = null;
-                            //Toast.makeText(getActivity(), "", Toast.LENGTH_SHORT).show();
-                        }
                     } catch (Exception e) {
-//                        errorManager.reportUnexpectedUIException(UISource.ACTIVITY, UnexpectedUIExceptionSeverity.UNSTABLE, FermatException.wrapException(e));
+                        e.printStackTrace();
                     }
 
                     break;
@@ -362,8 +265,6 @@ public class CreateIntraUserIdentityFragment extends Fragment {
                             imageBitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImage);
                             imageBitmap = Bitmap.createScaledBitmap(imageBitmap, mBrokerImage.getWidth(), mBrokerImage.getHeight(), true);
                             brokerImageByteArray = toByteArray(imageBitmap);
-                            updateProfileImage = true;
-//                            Picasso.with(getActivity()).load(selectedImage).transform(new CircleTransform()).into(mBrokerImage);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -373,39 +274,10 @@ public class CreateIntraUserIdentityFragment extends Fragment {
 //                    Uri selectedImage = data.getData();
                     try {
                         if (isAdded()) {
-                            ContentResolver contentResolver = getActivity().getContentResolver();
-//                            imageBitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImage);
-                            //cryptoBrokerBitmap = Bitmap.createScaledBitmap(cryptoBrokerBitmap, mBrokerImage.getWidth(), mBrokerImage.getHeight(), true);
-                            if (imageBitmap.getWidth() >= 192 && imageBitmap.getHeight() >= 192) {
-                                // cryptoBrokerBitmap = ImagesUtils.cropImage(cryptoBrokerBitmap);
-//                                final DialogCropImage dialogCropImagee = new DialogCropImage(getActivity(), appSession, null, imageBitmap);
-//                                dialogCropImagee.show();
-//                                dialogCropImagee.setOnDismissListener(new DialogInterface.OnDismissListener() {
-//                                    @Override
-//                                    public void onDismiss(DialogInterface dialog) {
-//                                        if (dialogCropImagee.getCroppedImage() != null) {
-//                                            imageBitmap = getResizedBitmap(rotateBitmap(dialogCropImagee.getCroppedImage(), ExifInterface.ORIENTATION_NORMAL), dpToPx(), dpToPx());
-//                                            mBrokerImage.setImageDrawable(ImagesUtils.getRoundedBitmap(getResources(), imageBitmap));
-//                                            brokerImageByteArray = toByteArray(imageBitmap);
-//
-//                                            BitmapWorkerTask bitmapWorkerTask = new BitmapWorkerTask(mphoto_header,getResources(),false);
-//                                            bitmapWorkerTask.execute(brokerImageByteArray);
-//                                            mphoto_header.setAlpha(150);
-//                                            updateProfileImage = true;
-//                                        } else {
-//                                            imageBitmap = null;
-//                                        }
-//                                    }
-//                                });
-                            } else {
+                            if (imageBitmap.getWidth() < 192 || imageBitmap.getHeight() < 192)
                                 Toast.makeText(getActivity(), "The image selected is too small. Please select a photo with height and width of at least 192x192", Toast.LENGTH_LONG).show();
-                                // cryptoBrokerBitmap = null;
-                                // Toast.makeText(getActivity(), "The image selected is too small", Toast.LENGTH_SHORT).show();
-                            }
-
                         }
                     } catch (Exception e) {
-                       // errorManager.reportUnexpectedUIException(UISource.ACTIVITY, UnexpectedUIExceptionSeverity.UNSTABLE, FermatException.wrapException(e));
                         Toast.makeText(getActivity().getApplicationContext(), "Error loading the image", Toast.LENGTH_SHORT).show();
                     }
 
@@ -416,10 +288,8 @@ public class CreateIntraUserIdentityFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (mBrokerImage != null && finalImageBitmap != null) {
-//                        mBrokerImage.setImageDrawable(new BitmapDrawable(getResources(), finalImageBitmap));
+                    if (mBrokerImage != null && finalImageBitmap != null)
                         mBrokerImage.setImageDrawable(ImagesUtils.getRoundedBitmap(getResources(), finalImageBitmap));
-                    }
                 }
             });
 
@@ -430,8 +300,6 @@ public class CreateIntraUserIdentityFragment extends Fragment {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
         menu.setHeaderTitle("Choose mode");
-//        menu.setHeaderIcon(getActivity().getResources().getDrawable(R.drawable.ic_camera_green));
-//        menu.add(Menu.NONE, CONTEXT_MENU_CAMERA, Menu.NONE, "Camera");
         menu.add(Menu.NONE, CONTEXT_MENU_GALLERY, Menu.NONE, "Gallery");
 
         super.onCreateContextMenu(menu, view, menuInfo);
@@ -466,15 +334,8 @@ public class CreateIntraUserIdentityFragment extends Fragment {
     private int createNewIdentity() {
 
         final String brokerNameText = mBrokerName.getText().toString();
-        String brokerPhraseText = "";
 
-//        if (!mBrokerPhrase.getText().toString().isEmpty()){
-//             brokerPhraseText = mBrokerPhrase.getText().toString();
-//        }else{
-//            brokerPhraseText = "Available";
-//        }
-
-        boolean dataIsValid = validateIdentityData(brokerNameText, brokerPhraseText, brokerImageByteArray);
+        boolean dataIsValid = validateIdentityData(brokerNameText, brokerImageByteArray);
 
         if (dataIsValid) {
             final ActorProfile profile = new ActorProfile();
@@ -499,65 +360,11 @@ public class CreateIntraUserIdentityFragment extends Fragment {
                             createButton.setText("Save changes");
                         }
                     });
-//                        manager.registerActor(profile, 0, 0);
                 }
             });
 
             return CREATE_IDENTITY_SUCCESS;
-            //            if (moduleManager != null) {
-//                try {
-//                    if (!isUpdate) {
-//                        final String finalBrokerPhraseText = brokerPhraseText;
-//                        executorService.submit(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                try {
-//
-//                                    moduleManager.createNewIntraWalletUser(brokerNameText, finalBrokerPhraseText, (brokerImageByteArray == null) ? convertImage(R.drawable.ic_profile_male) : brokerImageByteArray, (long)100, Frequency.NORMAL, moduleManager.getLocationManager());
-//
-//                                    publishResult(CREATE_IDENTITY_SUCCESS);
-//                                } catch (CantCreateNewIntraUserIdentityException e) {
-//                                    e.printStackTrace();
-//                                }
-//                                catch (Exception e) {
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//                        });
-//                    }
-//                    else {
-//                        final String finalBrokerPhraseText1 = brokerPhraseText;
-//                        executorService.submit(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                try {
-////                                    if (!exist){
-////                                        moduleManager.createIdentity("Mati","aaa",null);
-////                                        exist = true;
-////                                    }
-//                                    if (updateProfileImage)
-//
-//                                        moduleManager.updateIntraUserIdentity(identitySelected.getPublicKey(), brokerNameText, finalBrokerPhraseText1, brokerImageByteArray, (long)100, Frequency.NORMAL, moduleManager.getLocationManager());
-//
-//                                    else
-//                                        moduleManager.updateIntraUserIdentity(identitySelected.getPublicKey(), brokerNameText, finalBrokerPhraseText1, identitySelected.getImage(), (long)100, Frequency.NORMAL,moduleManager.getLocationManager());
-//                                    publishResult(CREATE_IDENTITY_SUCCESS);
-//                                }catch (Exception e){
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//                        });
-//                        //todo: sacar
-////                        return CREATE_IDENTITY_FAIL_NO_VALID_DATA;
-//                    }
-//
-//                 } catch (Exception e) {
-//                    errorManager.reportUnexpectedUIException(UISource.VIEW, UnexpectedUIExceptionSeverity.UNSTABLE, e);
-//
-//                }
-//                return CREATE_IDENTITY_SUCCESS;
-//            }
-//            return CREATE_IDENTITY_FAIL_MODULE_IS_NULL;
+
         }
         return CREATE_IDENTITY_FAIL_NO_VALID_DATA;
 
@@ -565,21 +372,12 @@ public class CreateIntraUserIdentityFragment extends Fragment {
 
     public int updateIdentity(){
         final String brokerNameText = mBrokerName.getText().toString();
-        String brokerPhraseText = "";
 
-//        if (!mBrokerPhrase.getText().toString().isEmpty()){
-//             brokerPhraseText = mBrokerPhrase.getText().toString();
-//        }else{
-//            brokerPhraseText = "Available";
-//        }
-
-        boolean dataIsValid = validateIdentityData(brokerNameText, brokerPhraseText, brokerImageByteArray);
+        boolean dataIsValid = validateIdentityData(brokerNameText, brokerImageByteArray);
 
         if (dataIsValid) {
-            final ActorProfile profile = new ActorProfile();
-            profile.setIdentityPublicKey(UUID.randomUUID().toString());
-            System.out.println("I will try to register an actor with pk " + profile.getIdentityPublicKey());
-            profile.setActorType(Actors.CHAT.getCode());
+            final ActorProfile profile = Core.getInstance().getProfile();
+            System.out.println("I will try to update an actor with pk " + profile.getIdentityPublicKey());
             profile.setName(mBrokerName.getText().toString());
             profile.setAlias("Alias chat");
             //This represents a valid image
@@ -590,29 +388,18 @@ public class CreateIntraUserIdentityFragment extends Fragment {
                 @Override
                 public void run() {
                     Utils.saveActorProfileSettings(getActivity(), profile);
-                    Core.getInstance().updaterofile(profile);
+                    Core.getInstance().updateProfile(profile);
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             Toast.makeText(getActivity(), "Registering profile...", Toast.LENGTH_SHORT).show();
                         }
                     });
-//                        manager.registerActor(profile, 0, 0);
                 }
             });
 
             return CREATE_IDENTITY_SUCCESS;
-        }else return 0;
-    }
-
-    boolean exist = false;
-
-    private byte[] convertImage(int resImage){
-        Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), resImage);
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG,50,stream);
-        //bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        return stream.toByteArray();
+        }else return CREATE_IDENTITY_FAIL_NO_VALID_DATA;
     }
 
     private void dispatchTakePictureIntent() {
@@ -631,11 +418,9 @@ public class CreateIntraUserIdentityFragment extends Fragment {
         startActivityForResult(loadImageIntent, REQUEST_LOAD_IMAGE);
     }
 
-    private boolean validateIdentityData(String brokerNameText, String brokerPhraseText, byte[] brokerImageBytes) {
+    private boolean validateIdentityData(String brokerNameText, byte[] brokerImageBytes) {
         if (brokerNameText.isEmpty())
             return false;
-//        if (brokerPhraseText.isEmpty())
-//            return false;
         if (brokerImageBytes == null)
             return true;
         if (brokerImageBytes.length > 0)
@@ -655,67 +440,6 @@ public class CreateIntraUserIdentityFragment extends Fragment {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream);
         return stream.toByteArray();
     }
-
-
-    public void showDialog(){
-        if(getActivity()!=null) {
-//            PresentationIntraUserIdentityDialog presentationIntraUserCommunityDialog = new PresentationIntraUserIdentityDialog(getActivity(), appSession, null, appSession.getModuleManager());
-//            presentationIntraUserCommunityDialog.show();
-        }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        //inflater.inflate(R.menu.menu_main, menu);
-
-      /*  try {
-            menu.add(1, 99, 1, "help").setIcon(R.drawable.help_icon)
-                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-
-
-            final MenuItem action_help = menu.findItem(R.id.action_help);
-            menu.findItem(R.id.action_help).setVisible(true);
-            action_help.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    menu.findItem(R.id.action_help).setVisible(false);
-                    return false;
-                }
-            });
-
-        } catch (Exception e) {
-
-        }*/
-
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-//        try {
-//            int id = item.getItemId();
-//
-//            if (id == 1)
-//                showDialog();
-//
-//            if (id == 2)
-//                if(identitySelected!=null)
-//                    changeActivity(Activities.CCP_SUB_APP_INTRA_IDENTITY_GEOLOCATION_IDENTITY, appSession.getAppPublicKey());
-//                else
-//                    showDialog();
-//
-//
-//
-//        } catch (Exception e) {
-//            errorManager.reportUnexpectedUIException(UISource.ACTIVITY, UnexpectedUIExceptionSeverity.UNSTABLE, FermatException.wrapException(e));
-//            makeText(getActivity(), "Oooops! recovering from system error",
-//                    LENGTH_LONG).show();
-//        }
-        return super.onOptionsItemSelected(item);
-    }
-
 
     private Bitmap getBitmap(String path) {
         Uri uri = Uri.fromFile(new File(path));
@@ -788,71 +512,6 @@ public class CreateIntraUserIdentityFragment extends Fragment {
         int res = getActivity().checkCallingOrSelfPermission(permission);
         return (res == PackageManager.PERMISSION_GRANTED);
     }
-
-    public static Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-        Matrix matrix = new Matrix();
-        // RESIZE THE BIT MAP
-        matrix.postScale(scaleWidth, scaleHeight);
-        // RECREATE THE NEW BITMAP
-        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height,
-                matrix, false);
-        return resizedBitmap;
-    }
-
-    public int dpToPx() {
-        int dp = 150;
-        DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-        int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
-        return px;
-    }
-
-    public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
-
-        Matrix matrix = new Matrix();
-        switch (orientation) {
-            case ExifInterface.ORIENTATION_NORMAL:
-                return bitmap;
-            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
-                matrix.setScale(-1, 1);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_180:
-                matrix.setRotate(180);
-                break;
-            case ExifInterface.ORIENTATION_FLIP_VERTICAL:
-                matrix.setRotate(180);
-                matrix.postScale(-1, 1);
-                break;
-            case ExifInterface.ORIENTATION_TRANSPOSE:
-                matrix.setRotate(90);
-                matrix.postScale(-1, 1);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_90:
-                matrix.setRotate(90);
-                break;
-            case ExifInterface.ORIENTATION_TRANSVERSE:
-                matrix.setRotate(-90);
-                matrix.postScale(-1, 1);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_270:
-                matrix.setRotate(-90);
-                break;
-            default:
-                return bitmap;
-        }
-        try {
-            Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-            bitmap.recycle();
-            return bmRotated;
-        } catch (OutOfMemoryError e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
 
     public void setManager(ChatNetworkServicePluginRoot manager) {
         this.manager = manager;

@@ -4,10 +4,7 @@ import android.content.Context;
 
 import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.ErrorManager;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.EventManager;
-import com.bitdubai.fermat_api.layer.all_definition.enums.Actors;
-import com.bitdubai.fermat_api.layer.osa_android.database_system.Database;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.PluginDatabaseSystem;
-import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.DatabaseNotFoundException;
 import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginFileSystem;
 import com.bitdubai.fermat_osa_addon.layer.android.database_system.developer.bitdubai.version_1.PluginDatabaseSystemAndroidAddonRoot;
 import com.bitdubai.fermat_osa_addon.layer.android.file_system.developer.bitdubai.version_1.PluginFileSystemAndroidAddonRoot;
@@ -23,11 +20,9 @@ import org.iop.client.version_1.IoPClientPluginRoot;
 import org.iop.ns.chat.ChatNetworkServicePluginRoot;
 import org.iop.ns.chat.structure.test.MessageReceiver;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Created by mati on 16/08/16.
@@ -104,11 +99,9 @@ public class Core {
             //console ns
             chatNetworkServicePluginRoot = new ChatNetworkServicePluginRoot();
             chatNetworkServicePluginRoot.setP2PLayerManager(p2PLayerPluginRoot);
-            chatNetworkServicePluginRoot.setNetworkClientManager(ioPClientPluginRoot);
-            chatNetworkServicePluginRoot.setEventManager((EventManager) eventManagerPlatformServiceAddonRoot.getManager());
             chatNetworkServicePluginRoot.setPluginFileSystem((PluginFileSystem) pluginFileSystemLinuxAddonRoot.getManager());
-            chatNetworkServicePluginRoot.setErrorManager((ErrorManager) errorManagerPlatformServiceAddonRoot.getManager());
             chatNetworkServicePluginRoot.setPluginDatabaseSystem((PluginDatabaseSystem) pluginDatabaseSystemAndroidAddonRoot.getManager());
+            chatNetworkServicePluginRoot.setErrorManager((ErrorManager) errorManagerPlatformServiceAddonRoot.getManager());
             chatNetworkServicePluginRoot.start();
 
             System.out.println("FERMAT - Network Client - started satisfactory...");
@@ -162,12 +155,16 @@ public class Core {
         }
     }
 
-    public void setProfile(ActorProfile profile) {
-        this.profile = profile;
-        chatNetworkServicePluginRoot.registerProfile(profile);
+    public synchronized void setProfile(ActorProfile profile) {
+        if (this.profile != null) {
+            updateProfile(profile);
+        } else {
+            this.profile = profile;
+            chatNetworkServicePluginRoot.registerProfile(profile);
+        }
     }
 
-    public void updaterofile(ActorProfile profile){
+    public synchronized void updateProfile(ActorProfile profile){
         try {
             this.profile = profile;
             chatNetworkServicePluginRoot.updateRegisteredActor(profile, UpdateTypes.FULL);

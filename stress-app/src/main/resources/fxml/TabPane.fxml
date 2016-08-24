@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.Tab?>
+<?import java.net.URL?>
+
+<!--Created by Manuel Perez on 22/08/2016-->
+<BorderPane fx:controller="org.iop.stress_app.structure.controllers.TabPaneController" xmlns:fx="http://javafx.com/fxml" styleClass="root">
+    <center>
+        <!--
+        This file FXML must include all the tabs that you want to include in the main app, please,
+        be careful to set an unique Id to each tab. Thank you.
+        -->
+        <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
+            <tabs>
+                <!--Connection tab-->
+                <Tab  text="Connections">
+                    <content>
+                        <fx:include fx:id="connectionTab" source="ConnectionTab.fxml"/>
+                    </content>
+                </Tab>
+                <!--end of connection tab-->
+                <!--Network Service tab-->
+                <Tab  text="Network Services">
+                    <content>
+                        <fx:include fx:id="networkServiceTab" source="NetworkServiceTab.fxml"/>
+                    </content>
+                </Tab>
+                <!--end of Network Service tab-->
+                <!--Actor tab-->
+                <Tab  text="Actors">
+                    <content>
+                        <fx:include fx:id="actorTab" source="ActorTab.fxml"/>
+                    </content>
+                </Tab>
+                <!--end of Actor tab-->
+            </tabs>
+        </TabPane>
+
+    </center>
+    <stylesheets>
+        <URL value="@/css/TabPane.css" />
+    </stylesheets>
+</BorderPane>
