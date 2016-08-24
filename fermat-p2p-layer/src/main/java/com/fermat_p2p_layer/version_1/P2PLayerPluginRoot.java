@@ -593,6 +593,11 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
         return messageSender.subscribeNodeEvent(networkServiceType, EventOp.EVENT_OP_IS_PROFILE_ONLINE, actorToFollowPk);
     }
 
+    @Override
+    public UUID unSubscribeActorOnlineEvent(NetworkServiceType networkServiceType,UUID eventSubscribedId) throws CantSendMessageException {
+        return messageSender.unSubscribeNodeEvent(networkServiceType,eventSubscribedId);
+    }
+
     public Collection<AbstractNetworkService> getNetworkServices() {
         return networkServices.values();
     }

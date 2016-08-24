@@ -36,6 +36,7 @@ import org.iop.ns.chat.structure.test.MessageReceiver;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -284,6 +285,17 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
 
     public void subscribeActorOnlineEvent(String remotePk) throws CantSendMessageException {
         actorOnlineEventSubscribed.put(subscribeActorOnline(remotePk), remotePk);
+    }
+
+    public void unSubscribeOnlineEvent(String remotePk) throws CantSendMessageException{
+        UUID prevSubscribePackageSent = null;
+        for (Map.Entry<UUID, String> entry : actorOnlineEventSubscribed.entrySet()) {
+            if (entry.getValue().equals(remotePk)){
+                prevSubscribePackageSent = entry.getKey();
+                break;
+            }
+        }
+        unSubscribeActorOnline(prevSubscribePackageSent);
     }
 
     public void registerProfile(ActorProfile actorProfile){

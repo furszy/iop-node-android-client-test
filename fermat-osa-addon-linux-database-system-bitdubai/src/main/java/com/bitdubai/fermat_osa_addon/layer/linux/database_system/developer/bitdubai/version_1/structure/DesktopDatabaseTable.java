@@ -17,6 +17,7 @@ import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.Cant
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantLoadTableToMemoryException;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantTruncateTableException;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.CantUpdateRecordException;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.exceptions.DatabaseRecordExistException;
 import com.bitdubai.fermat_api.layer.osa_android.location_system.Location;
 import com.bitdubai.fermat_osa_addon.layer.linux.database_system.developer.bitdubai.version_1.desktop.database.bridge.DesktopDatabaseBridge;
 
@@ -344,6 +345,11 @@ public class DesktopDatabaseTable implements DatabaseTable {
         }
     }
 
+    @Override
+    public List<DatabaseTableRecord> loadRecords(List<DatabaseTableFilter> tableFilters, List<DatabaseTableFilterGroup> databaseTableFilterGroups, String[] columns) throws CantLoadTableToMemoryException {
+        return null;
+    }
+
     /**
      * <p>Check if the set will table in tableName variable exists
      *
@@ -544,6 +550,10 @@ public class DesktopDatabaseTable implements DatabaseTable {
     }
 
     @Override
+    public void deleteRecord() throws CantDeleteRecordException {
+
+    }
+
     public void deleteRecord(DatabaseTableRecord record) throws CantDeleteRecordException {
 
         try {
@@ -628,11 +638,24 @@ public class DesktopDatabaseTable implements DatabaseTable {
     }
 
     @Override
+    public void insertRecordIfNotExist(DatabaseTableRecord record, List<DatabaseTableFilter> filters, DatabaseTableFilterGroup databaseTableFilterGroup) throws DatabaseRecordExistException, CantInsertRecordException {
+
+    }
+
+    @Override
+    public long numRecords() {
+        return 0;
+    }
+
+    @Override
+    public DatabaseTableFilter buildFilter(String columnName, String value, DatabaseFilterType type) {
+        return null;
+    }
+
     public String getSqlQuery() {
         return null;
     }
 
-    @Override
     public void setTableFilterToJoin(Map<String, String> tableFilterToJoin) {
 
     }
