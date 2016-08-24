@@ -35,6 +35,9 @@
         <activity android:name=".list.ListActivity"
             android:launchMode= "singleInstance"
             android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".contacts.ContactsActivity"
+            android:launchMode= "singleInstance"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>
