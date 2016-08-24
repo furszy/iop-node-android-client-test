@@ -5,9 +5,12 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import org.iop.stress_app.structure.controllers.AbstractMainController;
+import org.iop.stress_app.structure.interfaces.StressTest;
+import org.iop.stress_app.structure.tests.DevicesTest;
 import org.iop.stress_app.structure.views.InfoTextArea;
 import org.iop.stress_app.structure.views.IntegerSpinner;
 
@@ -38,11 +41,18 @@ public class MainBottomController extends AbstractMainController {
      */
     @FXML
     HBox mainBottom;
+
     /**
      * Represents the status label showed in the bottom
      */
     @FXML
     Label statusLabel;
+
+    /**
+     * Represents the mainBotton button
+     */
+    @FXML
+    Button mainButton;
 
     /**
      * External objects
@@ -148,22 +158,31 @@ public class MainBottomController extends AbstractMainController {
      */
     private void executeAction(){
 
+        //Get the infoTextArea
+        if(coreInfoArea==null){
+            coreInfoArea = getInfoTextArea();
+        }
         //Get the Core Tab Spinner
         if(devicesIntegerSpinner==null){
             devicesIntegerSpinner = getDeviceIntegerSpinner();
         }
         //We only execute the test if the view is available
         if(devicesIntegerSpinner!=null){
-            int devicesToStart = devicesIntegerSpinner.getNumber();
-            appendDevicesText("Devices to start: "+devicesToStart);
+            //int devicesToStart = devicesIntegerSpinner.getNumber();
+            //statusLabel.setText("Devices to start: "+devicesToStart);
+            //Todo: create a logic to choose the test type
+            //Todo: put some checks in the view to select the test, by default I launch a devices test.
+            DevicesTest devicesTest = new DevicesTest(devicesIntegerSpinner, coreInfoArea, mainButton);
+            devicesTest.executeTest();
         }
 
     }
 
-    private void appendDevicesText(String text){
-        if(coreInfoArea==null){
-            coreInfoArea = getInfoTextArea();
-        }
-        coreInfoArea.append(text);
+    /**
+     * This method set the test conditions and execute it
+     */
+    protected void executeTest(){
+
+
     }
 }
