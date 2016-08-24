@@ -5,9 +5,29 @@
 <!--Created by Manuel Perez on 22/08/2016-->
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import org.iop.stress_app.structure.views.IntegerSpinner?>
+<?import java.net.URL?>
+<?import javafx.scene.control.Button?>
+<?import org.iop.stress_app.structure.views.InfoTextArea?>
 <GridPane fx:controller="org.iop.stress_app.structure.controllers.tab.CoreTabController" xmlns:fx="http://javafx.com/fxml" styleClass="root">
     <padding>
-        <Insets top="25" right="25" bottom="10" left="25"/>
+        <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
+    <Label fx:id="label" text="Please, set the number of:" prefWidth="200" wrapText="true"
+       GridPane.columnIndex="0"
+       GridPane.rowIndex="0"
+       GridPane.columnSpan="2" />
+    <IntegerSpinner fx:id="tabSpinner" max="1000" min="1" number="5"
+        GridPane.columnIndex="0"
+        GridPane.rowIndex="1"
+        GridPane.columnSpan="2" />
+    <InfoTextArea fx:id="coreInfoArea"
+        GridPane.columnIndex="0"
+        GridPane.rowIndex="2"
+        GridPane.columnSpan="2"/>
+    <stylesheets>
+        <URL value="@/css/ConnectionTab.css" />
+    </stylesheets>
 
 </GridPane>

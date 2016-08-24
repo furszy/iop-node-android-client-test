@@ -10,12 +10,17 @@
     <center>
         <!--
         This file FXML must include all the tabs that you want to include in the main app, please,
-        be careful to set an unique Id to each tab. Thank you.
+        be careful to set an unique Id to each tab. All the tab settings must be done in the proper fxml file.
+        Thank you.
         -->
         <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
             <tabs>
                 <!--Advanced Tests Tabs-->
-
+                <Tab  text="Devices">
+                    <content>
+                        <fx:include fx:id="devicesTab" source="CoreTab.fxml"/>
+                    </content>
+                </Tab>
                 <!--Connection tab-->
                 <!--<Tab  text="Connections">
                     <content>
