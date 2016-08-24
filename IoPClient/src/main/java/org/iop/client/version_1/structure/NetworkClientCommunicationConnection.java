@@ -31,6 +31,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.pr
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.NetworkServiceProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.NodeProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.Profile;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.util.ObjectSizeCalculator;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.MessageContentType;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.P2pEventType;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.PackageType;
@@ -44,8 +45,10 @@ import org.iop.client.version_1.exceptions.CantSendPackageException;
 import org.iop.client.version_1.network_calls.NetworkClientCommunicationCall;
 import org.iop.client.version_1.structure.Sync.WaiterObjectsBuffer;
 import org.iop.client.version_1.util.HardcodeConstants;
+import org.iop.client.version_1.util.PackageEncoder;
 
 import java.io.IOException;
+import java.lang.instrument.Instrumentation;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Iterator;
@@ -510,7 +513,9 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                                    final PackageType        packageType,
                                    final NetworkServiceType networkServiceType          ,
                                    final String             destinationIdentityPublicKey) throws CantSendMessageException, CantSendPackageException {
+
         System.out.println("******* IS CONNECTED: " + isConnected() + " - TRYING NO SEND");
+
         if (isConnected()){
             try {
                 //todo: esto hay que mejorarlo
@@ -521,9 +526,18 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                         clientIdentity.getPrivateKey(),
                         destinationIdentityPublicKey
                 );
+
+                long packSize = ObjectSizeCalculator.getObjectSize(pack);
+                System.out.println("******* packSize " + packSize);
+
+                if (packSize > MAX_MESSAGE_BUFFER_SIZE){
+                    throw new  RuntimeException("Message size is too big, The max size configure is "+MAX_MESSAGE_BUFFER_SIZE);
+                }
+
                 packagesWaitingToSend.add(pack);
                 return pack.getPackageId();
-            } catch (Exception exception) {
+
+            }catch (Exception exception) {
                 throw new CantSendMessageException(
                         exception,
                         "packageContent:"+packageContent,
@@ -706,9 +720,6 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                                 }
                             }
                         }
-
-
-
                     } else {
                         System.err.println("MessageSenderExecutor, connection is close and the executor is on, this is very bad");
                     }
