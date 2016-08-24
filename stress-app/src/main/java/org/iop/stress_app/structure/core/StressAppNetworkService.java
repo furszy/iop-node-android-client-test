@@ -42,6 +42,8 @@ public class StressAppNetworkService {
         if (networkServicePluginRootClassName.equals("ChatNetworkServicePluginRoot")){
             ChatNetworkServicePluginRoot chatNetworkServicePluginRoot = new ChatNetworkServicePluginRoot();
             abstractNetworkServiceList.put(chatNetworkServicePluginRoot.getNetworkServiceType(),chatNetworkServicePluginRoot);
+        }else{
+//            AbstractNetworkService abstractNetworkService = loadNetworkService(networkServicePluginRootClassName);
         }
     }
 
@@ -58,6 +60,11 @@ public class StressAppNetworkService {
                 e.printStackTrace();
             }
         }
+    }
+
+
+    private void loadAllNetworkServicesInExtDirectory(){
+
     }
 
 }
