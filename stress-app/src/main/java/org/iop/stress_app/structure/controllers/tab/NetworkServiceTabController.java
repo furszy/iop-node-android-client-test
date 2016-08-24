@@ -1,5 +1,7 @@
-package org.iop.stress_app.structure.controllers;
+package org.iop.stress_app.structure.controllers.tab;
 
+
+import org.iop.stress_app.structure.controllers.AbstractTabController;
 
 /**
  * This class implements the controller for NetworkServiceTab.fxml

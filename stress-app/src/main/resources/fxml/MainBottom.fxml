@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import java.net.URL?>
+<?import javafx.scene.control.Button?>
+
+<!--Created by Manuel Perez on 22/08/2016-->
+
+<HBox fx:controller="org.iop.stress_app.structure.controllers.main.MainBottomController" xmlns:fx="http://javafx.com/fxml" prefHeight="28" prefWidth="350">
+    <Label fx:id="statusLabel" text="IoP Stress App" prefHeight="28" prefWidth="296" wrapText="true" alignment="CENTER_LEFT"/>
+    <Button fx:id="mainButton" text="Start" prefWidth="54" alignment="bottom_right"/>
+    <stylesheets>
+        <URL value="@/css/Main.css" />
+    </stylesheets>
+</HBox>

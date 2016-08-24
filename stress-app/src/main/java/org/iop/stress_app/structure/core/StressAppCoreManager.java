@@ -32,7 +32,7 @@ public class StressAppCoreManager {
         }
         threadPoolExecutor = Executors.newFixedThreadPool(coreCount);
         for (StressAppCore stressAppCore : stressAppCoreList) {
-            stressAppCore.setNetworkServiceStart(networkServiceStart);
+            //stressAppCore.setNetworkServiceStart(networkServiceStart);
             threadPoolExecutor.submit(new CoreTask(stressAppCore));
         }
     }

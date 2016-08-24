@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.Button?>
 <?import java.net.URL?>
-<GridPane fx:controller="org.iop.stress_app.structure.controllers.NetworkServiceTabController" xmlns:fx="http://javafx.com/fxml" alignment="center" hgap="10" vgap="10" styleClass="root">
+<GridPane fx:controller="org.iop.stress_app.structure.controllers.tab.NetworkServiceTabController" xmlns:fx="http://javafx.com/fxml" alignment="center" hgap="10" vgap="10" styleClass="root">
     <padding>
         <Insets top="25" right="25" bottom="10" left="25"/>
     </padding>

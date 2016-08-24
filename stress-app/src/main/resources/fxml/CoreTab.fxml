@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.GridPane?>
+
+<!--Created by Manuel Perez on 22/08/2016-->
+
+<?import javafx.geometry.Insets?>
+<GridPane fx:controller="org.iop.stress_app.structure.controllers.tab.CoreTabController" xmlns:fx="http://javafx.com/fxml" styleClass="root">
+    <padding>
+        <Insets top="25" right="25" bottom="10" left="25"/>
+    </padding>
+
+</GridPane>

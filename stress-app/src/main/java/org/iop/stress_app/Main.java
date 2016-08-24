@@ -20,9 +20,9 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         //Set the FXML file
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/TabPane.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/Main.fxml"));
 
-        Scene scene = new Scene(root, 320, 260);
+        Scene scene = new Scene(root, 400, 260);
 
         stage.setTitle("IoP Stress App");
         stage.setScene(scene);
