@@ -35,6 +35,7 @@ public class MainBottomController extends AbstractMainController {
     HashMap<String, Node> parentNodes;
     HashMap<String, Node> borderPaneNodes;
     HashMap<String, Node> tabPaneNodes;
+    HashMap<String, Node> nsTabPaneNodes;
 
     /**
      * Represents the main container present in this controller
@@ -117,9 +118,10 @@ public class MainBottomController extends AbstractMainController {
             Node tabPane = borderPaneNodes.get(TAB_PANE_ID);
             //System.out.println(tabPane);
             ObservableList<Node> children = ((Parent) tabPane).getChildrenUnmodifiable();
+            //children.forEach(n-> System.out.println(((Parent)n).getId()));
             //Todo: to improve
-            //for some reason the TabPane that I need is in index 1
-            Node node = children.get(1);
+            //for some reason the TabPane that I need is in index 2
+            Node node = children.get(2);
             //System.out.println(node);
             ObservableList<Node> innerNodes=((Parent)node).getChildrenUnmodifiable();
             Node innerNode = innerNodes.get(0);
@@ -127,6 +129,22 @@ public class MainBottomController extends AbstractMainController {
             tabPaneNodes = mapChildren((Parent) innerNode);
         }
         //System.out.println(tabPaneNodes);
+        if(nsTabPaneNodes==null){
+            //Now, we need the BorderPane
+            Node tabPane = borderPaneNodes.get(TAB_PANE_ID);
+            //System.out.println(tabPane);
+            ObservableList<Node> children = ((Parent) tabPane).getChildrenUnmodifiable();
+            //children.forEach(n-> System.out.println(((Parent)n).getId()));
+            //Todo: to improve
+            //for some reason the TabPane that I need is in index 1
+            Node node = children.get(1);
+            //System.out.println(node);
+            ObservableList<Node> innerNodes=((Parent)node).getChildrenUnmodifiable();
+            Node innerNode = innerNodes.get(0);
+            //System.out.println(innerNodes);
+            nsTabPaneNodes = mapChildren((Parent) innerNode);
+        }
+        System.out.println(nsTabPaneNodes);
     }
 
     /**

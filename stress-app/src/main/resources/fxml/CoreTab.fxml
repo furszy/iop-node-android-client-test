@@ -13,7 +13,7 @@
     <padding>
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
-    <Label fx:id="label" text="Please, set the number of devices to start:" prefWidth="200" wrapText="true"
+    <Label fx:id="label" text="Please, set the number of devices to start:" prefWidth="450" wrapText="true" prefHeight="40"
        GridPane.columnIndex="0"
        GridPane.rowIndex="0"
        GridPane.columnSpan="2" />
@@ -25,6 +25,10 @@
         GridPane.columnIndex="0"
         GridPane.rowIndex="2"
         GridPane.columnSpan="2"/>
+    <Label text="" prefHeight="30"
+       GridPane.columnIndex="0"
+       GridPane.rowIndex="3"
+    />
     <stylesheets>
         <URL value="@/css/ConnectionTab.css" />
     </stylesheets>

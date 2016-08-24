@@ -2,7 +2,7 @@
     Created on : 22-ago-2016, 10:37:02
     Author     : Manuel Perez
 */
-#label {
+.label {
     -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-text-fill: #333333;
@@ -30,4 +30,9 @@
 #coreInfoArea{
     -fx-font-family: "Inconsolata";
     -fx-font-size: 11px;
+}
+.check-box{
+    -fx-border-color: lightblue;
+    -fx-font-size: 12;
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );
 }

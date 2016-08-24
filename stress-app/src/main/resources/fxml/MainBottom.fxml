@@ -7,8 +7,8 @@
 
 <!--Created by Manuel Perez on 22/08/2016-->
 
-<HBox fx:id="mainBottom" fx:controller="org.iop.stress_app.structure.controllers.main.MainBottomController" xmlns:fx="http://javafx.com/fxml" prefHeight="28" prefWidth="370">
-    <Label fx:id="statusLabel" text="IoP Stress App" prefHeight="28" prefWidth="316" wrapText="true" alignment="CENTER_LEFT"/>
+<HBox fx:id="mainBottom" fx:controller="org.iop.stress_app.structure.controllers.main.MainBottomController" xmlns:fx="http://javafx.com/fxml" prefHeight="28" prefWidth="470">
+    <Label fx:id="statusLabel" text="IoP Stress App" prefHeight="28" prefWidth="416" wrapText="true" alignment="CENTER_LEFT"/>
     <Button fx:id="mainButton" text="Start" prefWidth="46" alignment="bottom_right" onAction="#handleStartButtonAction"/>
     <stylesheets>
         <URL value="@/css/Main.css" />

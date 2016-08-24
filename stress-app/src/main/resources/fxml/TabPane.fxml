@@ -13,12 +13,17 @@
         be careful to set an unique Id to each tab. All the tab settings must be done in the proper fxml file.
         Thank you.
         -->
-        <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
+        <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" tabMaxWidth="450">
             <tabs>
                 <!--Devices Tabs-->
                 <Tab  text="Devices">
                     <content>
                         <fx:include fx:id="devicesTab" source="CoreTab.fxml"/>
+                    </content>
+                </Tab>
+                <Tab  text="Network Services">
+                    <content>
+                        <fx:include fx:id="nsTab" source="NetworkServiceAdvancedTab.fxml"/>
                     </content>
                 </Tab>
                 <!--Information tab-->

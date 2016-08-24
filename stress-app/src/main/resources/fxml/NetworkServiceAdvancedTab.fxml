@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import org.iop.stress_app.structure.views.IntegerSpinner?>
+<?import java.net.URL?>
+<?import org.iop.stress_app.structure.views.InfoTextArea?>
+
+<!--Created by Manuel Perez on 22/08/2016-->
+
+<?import javafx.scene.control.CheckBox?>
+<GridPane fx:id="nsTab" fx:controller="org.iop.stress_app.structure.controllers.tab.NetworkServiceAdvanceTabController" xmlns:fx="http://javafx.com/fxml" styleClass="root">
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+    <Label fx:id="nsLabel" text="Please, set the number of Network Service to start in every device:" prefWidth="450" wrapText="true" prefHeight="40"
+           GridPane.columnIndex="0"
+           GridPane.rowIndex="0"
+           GridPane.columnSpan="2" />
+    <IntegerSpinner fx:id="nsSpinner" max="1000" min="1" number="5"
+                    GridPane.columnIndex="0"
+                    GridPane.rowIndex="1"
+                    GridPane.columnSpan="2" />
+    <InfoTextArea fx:id="nsInfoArea"
+                  GridPane.columnIndex="0"
+                  GridPane.rowIndex="2"
+                  GridPane.columnSpan="2"/>
+    <CheckBox fx:id="nsCheckBox" text="Activate this test" prefHeight="30"
+              GridPane.columnIndex="0"
+              GridPane.rowIndex="3"
+              GridPane.halignment="LEFT"
+    />
+    <stylesheets>
+        <URL value="@/css/ConnectionTab.css" />
+    </stylesheets>
+
+</GridPane>

@@ -20,7 +20,7 @@ public class Main extends Application {
     public void start(Stage stage) throws Exception {
         //Set the FXML file
         StressAppManager stressAppManager = new StressAppManager();
-        Scene scene = new Scene(stressAppManager.getParent(), 400, 260);
+        Scene scene = new Scene(stressAppManager.getParent(), 500, 320);
 
         stage.setTitle("IoP Stress App");
         stage.setScene(scene);

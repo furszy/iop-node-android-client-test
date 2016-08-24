@@ -38,7 +38,7 @@ public class InfoTextArea extends BorderPane {
      */
     private void setDefaultValues(){
         //TextArea default values
-        textArea.setPrefWidth(316);
+        textArea.setPrefWidth(416);
         textArea.setPrefHeight(100);
         textArea.setPrefRowCount(10);
         textArea.setPrefColumnCount(100);

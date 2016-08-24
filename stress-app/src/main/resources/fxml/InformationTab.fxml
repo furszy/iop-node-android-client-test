@@ -9,7 +9,7 @@
 <BorderPane fx:controller="org.iop.stress_app.structure.controllers.tab.InformationTabController" xmlns:fx="http://javafx.com/fxml">
     <center>
         <ScrollPane>
-            <Label fx:id="informationLabel" text="Summary:" BorderPane.alignment="TOP_LEFT" wrapText="true" prefWidth="350"/>
+            <Label fx:id="informationLabel" text="Summary:" BorderPane.alignment="TOP_LEFT" wrapText="true" prefWidth="450"/>
         </ScrollPane>
     </center>
 </BorderPane>
