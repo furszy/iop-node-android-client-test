@@ -8,6 +8,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -120,5 +121,10 @@ public class ProfileActivity extends AppCompatActivity implements MessageReceive
     @Override
     public void onMessageFail(UUID messageId) {
 
+    }
+
+    @Override
+    public void onActorOffline(String remotePkGoOffline) {
+        Log.i(getClass().getName(), "onActorOffline: " + remotePkGoOffline);
     }
 }

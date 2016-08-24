@@ -70,11 +70,11 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
         }else {
             initControls();
 //
-//            try {
-//                Core.getInstance().getChatNetworkServicePluginRoot().subscribeActorOnlineEvent(remote.getIdentityPublicKey());
-//            } catch (CantSendMessageException e) {
-//                e.printStackTrace();
-//            }
+            try {
+                Core.getInstance().getChatNetworkServicePluginRoot().subscribeActorOnlineEvent(remote.getIdentityPublicKey());
+            } catch (CantSendMessageException e) {
+                e.printStackTrace();
+            }
         }
 
         Core.getInstance().setReceiver(this);
@@ -227,6 +227,11 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
     @Override
     public void onMessageFail(UUID messageId) {
         Log.i(this.getClass().getName(),"onMessageFail: acá tengo que mostrar como que el mensaje falló");
+    }
+
+    @Override
+    public void onActorOffline(String remotePkGoOffline) {
+        Log.i(getClass().getName(),"onActorOffline: "+remotePkGoOffline);
     }
 
 }

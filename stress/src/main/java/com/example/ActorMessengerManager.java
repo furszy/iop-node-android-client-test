@@ -94,4 +94,9 @@ public class ActorMessengerManager implements MessageReceiver {
     public void onMessageFail(UUID messageId) {
 
     }
+
+    @Override
+    public void onActorOffline(String remotePkGoOffline) {
+
+    }
 }
