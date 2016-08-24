@@ -9,7 +9,7 @@
 
 <!--Created by Manuel Perez on 22/08/2016-->
 
-<GridPane fx:controller="org.iop.stress_app.structure.controllers.tab.CoreTabController" xmlns:fx="http://javafx.com/fxml" styleClass="root">
+<GridPane fx:id="core" fx:controller="org.iop.stress_app.structure.controllers.tab.CoreTabController" xmlns:fx="http://javafx.com/fxml" styleClass="root">
     <padding>
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>

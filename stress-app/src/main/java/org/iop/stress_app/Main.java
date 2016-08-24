@@ -1,11 +1,10 @@
 package org.iop.stress_app;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.iop.stress_app.structure.StressAppManager;
 
 /**
  * Created by Manuel Perez P. (darkpriestrelative@gmail.com) on 22/08/16.
@@ -20,9 +19,8 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         //Set the FXML file
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/Main.fxml"));
-
-        Scene scene = new Scene(root, 400, 260);
+        StressAppManager stressAppManager = new StressAppManager();
+        Scene scene = new Scene(stressAppManager.getParent(), 400, 260);
 
         stage.setTitle("IoP Stress App");
         stage.setScene(scene);

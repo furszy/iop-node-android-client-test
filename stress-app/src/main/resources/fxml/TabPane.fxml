@@ -6,7 +6,7 @@
 <?import java.net.URL?>
 
 <!--Created by Manuel Perez on 22/08/2016-->
-<BorderPane fx:controller="org.iop.stress_app.structure.controllers.main.TabPaneController" xmlns:fx="http://javafx.com/fxml" styleClass="root">
+<BorderPane fx:id="tabBorderPane" fx:controller="org.iop.stress_app.structure.controllers.main.TabPaneController" xmlns:fx="http://javafx.com/fxml" styleClass="root">
     <center>
         <!--
         This file FXML must include all the tabs that you want to include in the main app, please,

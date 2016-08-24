@@ -5,7 +5,7 @@
 
 <!--Created by Manuel Perez on 22/08/2016-->
 
-<BorderPane fx:controller="org.iop.stress_app.structure.controllers.main.MainController" xmlns:fx="http://javafx.com/fxml" >
+<BorderPane fx:controller="org.iop.stress_app.structure.controllers.main.MainController" fx:id="mainView" xmlns:fx="http://javafx.com/fxml" >
     <padding>
         <Insets top="15" right="10" bottom="10" left="15"/>
     </padding>
@@ -14,14 +14,14 @@
     -->
     <!--Main Top-->
     <top>
-        <fx:include source="MainTop.fxml"/>
+        <fx:include fx:id="mainTop" source="MainTop.fxml"/>
     </top>
     <!--Main Tab Pane-->
     <center>
-        <fx:include source="TabPane.fxml"/>
+        <fx:include fx:id="tabBorderPane" source="TabPane.fxml"/>
     </center>
     <!--Main Bottom-->
     <bottom>
-        <fx:include source="MainBottom.fxml"/>
+        <fx:include fx:id="mainBottom" source="MainBottom.fxml" />
     </bottom>
 </BorderPane>
