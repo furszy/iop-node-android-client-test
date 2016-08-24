@@ -74,6 +74,8 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
 
             chatMetadataRecordDAO = new ChatMetadataRecordDAO(dataBaseCommunication);
 
+            actorOnlineEventSubscribed = new HashMap<>();
+
             //declare a schedule to process waiting request message
 //            this.startTimer();
 
