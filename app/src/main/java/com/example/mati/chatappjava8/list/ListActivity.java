@@ -158,16 +158,16 @@ public class ListActivity extends AppCompatActivity
 
     public void onRefreshList() {
         try {
-            if (!isRefreshing.get()) {
+//            if (!isRefreshing.get()) {
                 swipeRefresh.setRefreshing(false);
                 executorService.submit(new Runnable() {
                     @Override
                     public void run() {
-                        isRefreshing.set(true);
+//                        isRefreshing.set(true);
                         Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList(max, offset, Core.getInstance().getProfile().getIdentityPublicKey());
                     }
                 });
-            }
+//            }
         } catch (Exception e) {
             System.out.println(e.toString());
         }
@@ -239,6 +239,7 @@ public class ListActivity extends AppCompatActivity
 
     @Override
     public void onActorListReceived(final List<ActorProfile> list) {
+        isRefreshing.set(true);
         if (list.size()==0){
             Log.i(this.getComponentName().getClassName(),"ActorList empty");
         }
@@ -272,7 +273,7 @@ public class ListActivity extends AppCompatActivity
             }
         });
         offset = listActors.size();
-        isRefreshing.set(true);
+
     }
 
     private boolean notInList(ActorProfile info) {
@@ -291,6 +292,11 @@ public class ListActivity extends AppCompatActivity
     @Override
     public void onMessageFail(UUID messageId) {
 
+    }
+
+    @Override
+    public void onActorOffline(String remotePkGoOffline) {
+        Log.i(getClass().getName(),"onActorOffline: "+remotePkGoOffline);
     }
 
     @Override

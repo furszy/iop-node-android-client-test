@@ -33,6 +33,7 @@ import org.iop.ns.chat.structure.ChatNetworkServiceDatabaseFactory;
 import org.iop.ns.chat.structure.test.MessageReceiver;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,6 +47,10 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
     private Database dataBaseCommunication;
     private ChatMetadataRecordDAO chatMetadataRecordDAO;
     private MessageReceiver messageReceiver;
+
+
+    //esto se que va en db pero bueno, cero ganas de hacer una db despues de 10 horas laburando
+    private HashMap<UUID,String> actorOnlineEventSubscribed;
 
     /**
      * Constructor with parameters
@@ -266,6 +271,12 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
         messageReceiver.onMessageFail(messageId);
     }
 
+    @Override
+    public void onNodeEventArrive(UUID eventPackageId) {
+        super.onNodeEventArrive(eventPackageId);
+        messageReceiver.onActorOffline(actorOnlineEventSubscribed.get(eventPackageId));
+    }
+
     public void registerProfile(ActorProfile actorProfile){
         if (actorProfile!=null) {
             try {
@@ -279,7 +290,7 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
     }
 
     public void subscribeActorOnlineEvent(String remotePk) throws CantSendMessageException {
-        subscribeActorOnline(remotePk);
+        actorOnlineEventSubscribed.put(subscribeActorOnline(remotePk),remotePk);
     }
 
 

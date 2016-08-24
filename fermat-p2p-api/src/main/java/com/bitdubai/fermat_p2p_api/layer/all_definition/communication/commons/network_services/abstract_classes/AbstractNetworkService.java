@@ -435,6 +435,18 @@ public abstract class AbstractNetworkService extends AbstractPlugin implements N
 
     }
 
+    public final void handleOnNodeEventArrive(UUID packageId) {
+        onNodeEventArrive(packageId);
+    }
+
+    /**
+     * Method to override if you want to subscribe and listen for event from node
+     * @param eventPackageId
+     */
+    public void onNodeEventArrive(UUID eventPackageId){
+
+    }
+
     public synchronized void onSentMessage(UUID messageId) {
 
     }
@@ -494,5 +506,6 @@ public abstract class AbstractNetworkService extends AbstractPlugin implements N
     public void setPluginDatabaseSystem(PluginDatabaseSystem pluginDatabaseSystem) {
         this.pluginDatabaseSystem = pluginDatabaseSystem;
     }
+
 
 }
