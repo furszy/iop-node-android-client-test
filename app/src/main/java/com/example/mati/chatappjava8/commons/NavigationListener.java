@@ -6,6 +6,7 @@ import android.support.design.widget.NavigationView;
 import android.view.MenuItem;
 
 import com.example.mati.chatappjava8.chat.ChatActivity2;
+import com.example.mati.chatappjava8.contacts.ContactsActivity;
 import com.example.mati.chatappjava8.list.ListActivity;
 import com.example.mati.chatappjava8.profile.ProfileActivity;
 
@@ -35,6 +36,9 @@ public class NavigationListener implements NavigationView.OnNavigationItemSelect
                 break;
             case "Chat":
                 clazz = ChatActivity2.class;
+                break;
+            case "Contacts":
+                clazz = ContactsActivity.class;
                 break;
         }
 //        menuItem.setChecked(true);

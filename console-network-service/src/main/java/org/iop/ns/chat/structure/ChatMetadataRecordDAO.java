@@ -79,13 +79,14 @@ public class ChatMetadataRecordDAO {
      */
     private ChatMetadataRecord buildNetworkServiceMessage(DatabaseTableRecord databaseTableRecord){
 
-        return new ChatMetadataRecord(
-                databaseTableRecord.getUUIDValue(MESSAGES_ID_COLUMN_NAME),
+        ChatMetadataRecord chatMetadataRecord = new ChatMetadataRecord(
                 databaseTableRecord.getStringValue(MESSAGES_LOCAL_PM_COLUMN_NAME),
                 databaseTableRecord.getStringValue(MESSAGES_REMOTE_PK_COLUMN_NAME),
                 getTimestampFromLongValue(databaseTableRecord.getLongValue(MESSAGES_DATE_COLUMN_NAME)),
                 databaseTableRecord.getStringValue(MESSAGES_MESSAGE_COLUMN_NAME)
         );
+        chatMetadataRecord.setId(databaseTableRecord.getUUIDValue(MESSAGES_ID_COLUMN_NAME));
+        return chatMetadataRecord;
     }
 
     public List<ChatMetadataRecord> listMessages(String sender, String receiver, final Integer max, final Integer offset) throws Exception {

@@ -15,8 +15,7 @@ public class ChatMetadataRecord {
 
     private String message;
 
-    public ChatMetadataRecord(UUID id, String localActorPublicKey, String remoteActorPublicKey, Timestamp date, String message) {
-        this.id = id;
+    public ChatMetadataRecord(String localActorPublicKey, String remoteActorPublicKey, Timestamp date, String message) {
         this.localActorPublicKey = localActorPublicKey;
         this.remoteActorPublicKey = remoteActorPublicKey;
         this.date = date;
@@ -41,6 +40,10 @@ public class ChatMetadataRecord {
 
     public String getMessage() {
         return message;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     @Override

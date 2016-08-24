@@ -8,11 +8,19 @@ import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseTable;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseTableFilter;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseTableFilterGroup;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseTableRecord;
+import com.bitdubai.fermat_api.layer.osa_android.file_system.FileLifeSpan;
+import com.bitdubai.fermat_api.layer.osa_android.file_system.FilePrivacy;
+import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginBinaryFile;
+import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginFileSystem;
+import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.CantCreateFileException;
+import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.CantLoadFileException;
+import com.bitdubai.fermat_api.layer.osa_android.file_system.exceptions.FileNotFoundException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.iop.ns.chat.structure.ChatNetworkServiceDataBaseConstants.CONTACT_ID_COLUMN_NAME;
 import static org.iop.ns.chat.structure.ChatNetworkServiceDataBaseConstants.CONTACT_NAME_COLUMN_NAME;
@@ -26,11 +34,17 @@ import static org.iop.ns.chat.structure.ChatNetworkServiceDataBaseConstants.MESS
 
 public class ContactsDAO {
 
-    private final Database database;
+    private final String CONTACT_IMAGES_DIR = "images";
 
-    public ContactsDAO(final Database database) {
+    private final Database database;
+    private final PluginFileSystem pluginFileSystem;
+    private final UUID pluginId;
+
+    public ContactsDAO(final Database database,PluginFileSystem pluginFileSystem,UUID pluginID) {
 
         this.database = database;
+        this.pluginFileSystem = pluginFileSystem;
+        this.pluginId = pluginID;
     }
 
     private DatabaseTable getDatabaseTable() {
@@ -51,6 +65,11 @@ public class ContactsDAO {
         buildDatabaseRecord(actorProfile, databaseTableRecord);
 
         databaseTable.insertRecord(databaseTableRecord);
+
+        PluginBinaryFile pluginBinaryFile = pluginFileSystem.getBinaryFile(pluginId, CONTACT_IMAGES_DIR, actorProfile.getIdentityPublicKey(), FilePrivacy.PUBLIC, FileLifeSpan.PERMANENT);
+        pluginBinaryFile.setContent(actorProfile.getPhoto());
+        pluginBinaryFile.persistToMedia();
+
     }
 
     /**
@@ -77,10 +96,21 @@ public class ContactsDAO {
      * @return a ActorProfile instance.
      */
     private ActorProfile buildNetworkServiceMessage(DatabaseTableRecord databaseTableRecord){
-
         ActorProfile actorProfile = new ActorProfile();
         actorProfile.setIdentityPublicKey(databaseTableRecord.getStringValue(CONTACT_ID_COLUMN_NAME));
         actorProfile.setName(databaseTableRecord.getStringValue(CONTACT_NAME_COLUMN_NAME));
+        PluginBinaryFile pluginBinaryFile = null;
+        try {
+            pluginBinaryFile = pluginFileSystem.getBinaryFile(pluginId, CONTACT_IMAGES_DIR, actorProfile.getIdentityPublicKey(), FilePrivacy.PUBLIC, FileLifeSpan.PERMANENT);
+            pluginBinaryFile.loadFromMedia();
+            actorProfile.setPhoto(pluginBinaryFile.getContent());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (CantCreateFileException e) {
+            e.printStackTrace();
+        } catch (CantLoadFileException e) {
+            e.printStackTrace();
+        }
         return actorProfile;
     }
 

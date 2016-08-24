@@ -75,7 +75,7 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
             initializeDb();
 
             chatMetadataRecordDAO = new ChatMetadataRecordDAO(dataBaseCommunication);
-            contactsDAO = new ContactsDAO(dataBaseCommunication);
+            contactsDAO = new ContactsDAO(dataBaseCommunication,pluginFileSystem,pluginId);
 
             actorOnlineEventSubscribed = new HashMap<>();
 
@@ -188,24 +188,25 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
 
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
-            UUID messageId = UUID.randomUUID();
+//            UUID messageId = UUID.randomUUID();
 
             ChatMetadataRecord messageToSave = new ChatMetadataRecord(
-                    messageId,
                     identityPublicKey,
                     actorPublicKey,
                     timestamp,
                     jsonMessage
             );
-            chatMetadataRecordDAO.persistMessage(messageToSave);
 
-            sendNewMessage(
+            UUID messageId = sendNewMessage(
                     sender,
                     receiver,
                     GsonProvider.getGson().toJson(messageToSave),
                     //I'll set true for testing
                     true
             );
+
+            messageToSave.setId(messageId);
+            chatMetadataRecordDAO.persistMessage(messageToSave);
 
             return messageId;
         } catch (Exception e) {
@@ -233,7 +234,7 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
     public void requestActorProfilesList(int max, int offset, String requesterPublicKey) {
 
         try {
-            discoveryActorProfiles(new DiscoveryQueryParameters(
+            UUID packageId = discoveryActorProfiles(new DiscoveryQueryParameters(
                     null,
                     NetworkServiceType.ACTOR_CHAT,
                     Actors.CHAT.getCode(),
@@ -261,7 +262,7 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
     }
 
     @Override
-    public void handleNetworkClientActorListReceivedEvent(UUID queryId, List<ActorProfile> actorProfiles) {
+    public void handleNetworkClientActorListReceivedEvent(UUID packageId, List<ActorProfile> actorProfiles) {
 
         System.out.println("Chat OnNetworkServiceActorListReceived...");
         if (messageReceiver!=null){
@@ -281,6 +282,10 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
         messageReceiver.onActorOffline(actorOnlineEventSubscribed.get(eventPackageId));
     }
 
+    public void subscribeActorOnlineEvent(String remotePk) throws CantSendMessageException {
+        actorOnlineEventSubscribed.put(subscribeActorOnline(remotePk), remotePk);
+    }
+
     public void registerProfile(ActorProfile actorProfile){
         if (actorProfile!=null) {
             try {
@@ -293,9 +298,7 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
         }
     }
 
-    public void subscribeActorOnlineEvent(String remotePk) throws CantSendMessageException {
-        actorOnlineEventSubscribed.put(subscribeActorOnline(remotePk),remotePk);
-    }
+
 
     public void saveContact(ActorProfile actorProfile) throws Exception {
         contactsDAO.persistContact(actorProfile);

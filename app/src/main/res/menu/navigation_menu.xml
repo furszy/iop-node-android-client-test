@@ -6,5 +6,6 @@
         <item android:id="@+id/id_profile" android:title="Profile"/>
         <item android:id="@+id/id_actors" android:title="Actors"/>
         <item android:id="@+id/id_chat" android:title="Chat"/>
+        <item android:id="@+id/id_contact" android:title="Contacts"/>
     </group>
 </menu>
