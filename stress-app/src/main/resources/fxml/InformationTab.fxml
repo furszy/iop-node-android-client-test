@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+
+<!--Created by Manuel Perez on 24/08/2016-->
+
+<BorderPane fx:controller="org.iop.stress_app.structure.controllers.tab.InformationTabController" xmlns:fx="http://javafx.com/fxml">
+    <center>
+        <ScrollPane>
+            <Label fx:id="informationLabel" text="Summary:" BorderPane.alignment="TOP_LEFT" wrapText="true" prefWidth="350"/>
+        </ScrollPane>
+    </center>
+</BorderPane>

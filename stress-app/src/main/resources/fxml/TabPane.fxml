@@ -15,10 +15,16 @@
         -->
         <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
             <tabs>
-                <!--Advanced Tests Tabs-->
+                <!--Devices Tabs-->
                 <Tab  text="Devices">
                     <content>
                         <fx:include fx:id="devicesTab" source="CoreTab.fxml"/>
+                    </content>
+                </Tab>
+                <!--Information tab-->
+                <Tab  text="Information">
+                    <content>
+                        <fx:include fx:id="informationTab" source="InformationTab.fxml"/>
                     </content>
                 </Tab>
                 <!--Connection tab-->
