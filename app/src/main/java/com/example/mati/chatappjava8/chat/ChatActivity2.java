@@ -255,4 +255,14 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
         Log.i(getClass().getName(),"onActorOffline: "+remotePkGoOffline);
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try{
+            Core.getInstance().getChatNetworkServicePluginRoot().unSubscribeOnlineEvent(remote.getIdentityPublicKey());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }

@@ -391,9 +391,14 @@ public abstract class AbstractNetworkService extends AbstractPlugin implements N
 
     }
 
-    protected UUID subscribeActorOnline(String remoteActorPk) throws com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantSendMessageException {
+    protected final UUID subscribeActorOnline(String remoteActorPk) throws com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantSendMessageException {
         return p2PLayerManager.subscribeActorOnlineEvent(getNetworkServiceType(), remoteActorPk);
     }
+
+    protected final UUID unSubscribeActorOnline(UUID previousSubscribePackageId) throws com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantSendMessageException {
+        return p2PLayerManager.unSubscribeActorOnlineEvent(getNetworkServiceType(), previousSubscribePackageId);
+    }
+
 
     /**
      * This method is automatically called when the network service receive
