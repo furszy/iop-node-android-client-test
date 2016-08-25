@@ -16,6 +16,7 @@ public class StressAppCoreManager {
     private ExecutorService threadPoolExecutor;
 
     private boolean networkServiceStart = false;
+    private int nsToStart = 0;
     private boolean actorCreation = false;
 
     public StressAppCoreManager() {
@@ -60,6 +61,13 @@ public class StressAppCoreManager {
         @Override
         public void run() {
             stressAppCore.start();
+            if(networkServiceStart){
+                StressAppNetworkService stressAppNetworkService = new StressAppNetworkService(stressAppCore);
+                for(int i=0; i<nsToStart; i++){
+                    stressAppNetworkService.addNetworkService("ChatNetworkServicePluginRoot");
+                }
+                stressAppNetworkService.startNetworkServices();
+            }
         }
     }
 
@@ -68,6 +76,10 @@ public class StressAppCoreManager {
             stressAppCore.shutdown();
         }
         threadPoolExecutor.shutdown();
+    }
+
+    public void setNsToStart(int nsToStart){
+        this.nsToStart = nsToStart;
     }
 
     public void setNetworkServiceStart(boolean networkServiceStart) {

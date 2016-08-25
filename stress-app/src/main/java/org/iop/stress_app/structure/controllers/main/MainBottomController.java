@@ -6,11 +6,13 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import org.iop.stress_app.structure.controllers.AbstractMainController;
 import org.iop.stress_app.structure.interfaces.StressTest;
 import org.iop.stress_app.structure.tests.DevicesTest;
+import org.iop.stress_app.structure.tests.NetworkServiceTest;
 import org.iop.stress_app.structure.views.InfoTextArea;
 import org.iop.stress_app.structure.views.IntegerSpinner;
 
@@ -28,6 +30,9 @@ public class MainBottomController extends AbstractMainController {
     private final static String INTEGER_SPINNER_ID = "tabSpinner";
     private final static String DEVICES_TAB_ID = "devicesTab";
     private final static String INFO_TEXT_AREA_ID = "coreInfoArea";
+    private final static String NS_CHECK_BOX = "nsCheckBox";
+    private final static String NS_TEXT_AREA_ID = "nsInfoArea";
+    private final static String NS_SPINNER_ID = "nsSpinner";
 
     /**
      * Devices Children Maps
@@ -67,6 +72,17 @@ public class MainBottomController extends AbstractMainController {
      * Represents the spinner with the number of devices to start
      */
     IntegerSpinner devicesIntegerSpinner;
+
+    CheckBox nsTabCheckBox;
+
+    InfoTextArea nsInfoArea;
+
+    IntegerSpinner nsIntegerSpinner;
+
+    /**
+     * Tests
+     */
+    StressTest test;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -161,12 +177,46 @@ public class MainBottomController extends AbstractMainController {
         return null;
     }
 
+    /**
+     * This method gets the
+     * @return
+     */
+    private InfoTextArea getNsInfoTextArea(){
+        mapAllDeviceChildren();
+        Node infoTextAreaNode = nsTabPaneNodes.get(NS_TEXT_AREA_ID);
+        if(infoTextAreaNode instanceof InfoTextArea){
+            InfoTextArea infoTextArea = (InfoTextArea) infoTextAreaNode;
+            return infoTextArea;
+        }
+        return null;
+    }
+
     private IntegerSpinner getDeviceIntegerSpinner(){
         mapAllDeviceChildren();
         Node integerSpinnerNode = tabPaneNodes.get(INTEGER_SPINNER_ID);
         if(integerSpinnerNode instanceof IntegerSpinner){
             IntegerSpinner integerSpinner = (IntegerSpinner) integerSpinnerNode;
             return integerSpinner;
+        }
+        return null;
+    }
+
+    private IntegerSpinner getNsIntegerSpinner(){
+        mapAllDeviceChildren();
+        Node integerSpinnerNode = nsTabPaneNodes.get(NS_SPINNER_ID);
+        if(integerSpinnerNode instanceof IntegerSpinner){
+            IntegerSpinner integerSpinner = (IntegerSpinner) integerSpinnerNode;
+            return integerSpinner;
+        }
+        return null;
+    }
+
+    private CheckBox getNsTabCheckBox(){
+        mapAllDeviceChildren();
+        Node checkBoxNode = nsTabPaneNodes.get(NS_CHECK_BOX);
+        if(checkBoxNode instanceof CheckBox){
+            CheckBox nsCheckBox = (CheckBox) checkBoxNode;
+            return nsCheckBox;
         }
         return null;
     }
@@ -190,17 +240,28 @@ public class MainBottomController extends AbstractMainController {
             //statusLabel.setText("Devices to start: "+devicesToStart);
             //Todo: create a logic to choose the test type
             //Todo: put some checks in the view to select the test, by default I launch a devices test.
-            DevicesTest devicesTest = new DevicesTest(devicesIntegerSpinner, coreInfoArea, mainButton);
-            devicesTest.executeTest();
+            //Case NS enabled
+            if(nsTabCheckBox==null){
+                nsTabCheckBox = getNsTabCheckBox();
+            }
+            if(nsInfoArea==null){
+                nsInfoArea = getNsInfoTextArea();
+            }
+            if(nsIntegerSpinner==null){
+                nsIntegerSpinner = getNsIntegerSpinner();
+            }
+
+            if(nsTabCheckBox.isSelected()){
+                if(test==null)
+                    test = new NetworkServiceTest(mainButton, nsInfoArea, devicesIntegerSpinner, nsIntegerSpinner);
+            } else{
+                if(test==null)
+                    test = new DevicesTest(devicesIntegerSpinner, coreInfoArea, mainButton);
+            }
+
+            test.executeTest();
+
         }
-
-    }
-
-    /**
-     * This method set the test conditions and execute it
-     */
-    protected void executeTest(){
-
 
     }
 }
