@@ -3,13 +3,10 @@ package org.iop.client.version_1.structure;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.EventManager;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.error_manager.enums.UnexpectedPluginExceptionSeverity;
 import com.bitdubai.fermat_api.layer.all_definition.crypto.asymmetric.ECCKeyPair;
-import com.bitdubai.fermat_api.layer.all_definition.events.EventSource;
-import com.bitdubai.fermat_api.layer.all_definition.events.interfaces.FermatEvent;
 import com.bitdubai.fermat_api.layer.all_definition.network_service.enums.NetworkServiceType;
 import com.bitdubai.fermat_api.layer.osa_android.ConnectivityManager;
 import com.bitdubai.fermat_api.layer.osa_android.location_system.LocationManager;
 import com.bitdubai.fermat_api.layer.osa_android.location_system.exceptions.CantGetDeviceLocationException;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.events.NetworkClientConnectionLostEvent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantRegisterProfileException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantRequestActorFullPhotoException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.exceptions.CantRequestProfileListException;
@@ -18,21 +15,19 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.cl
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.NetworkClientCall;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.NetworkClientConnection;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.clients.interfaces.P2PLayerManager;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.BlockPackages;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.DiscoveryQueryParameters;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.Package;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.PackageContent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.ActorListMsgRequest;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.CheckInProfileMsgRequest;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.UpdateActorProfileMsgRequest;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.UpdateTypes;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ClientProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.NetworkServiceProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.NodeProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.Profile;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.util.ObjectSizeCalculator;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.MessageContentType;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.P2pEventType;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.PackageType;
 import com.bitdubai.fermat_p2p_api.layer.p2p_communication.CommunicationChannels;
 
@@ -48,7 +43,6 @@ import org.iop.client.version_1.util.HardcodeConstants;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Iterator;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -69,6 +63,11 @@ import javax.websocket.EncodeException;
  * @since   Java JDK 1.7
  */
 public class NetworkClientCommunicationConnection implements NetworkClientConnection {
+
+    /**
+     * Represent the MAX_MESSAGE_BUFFER_SIZE
+     */
+    public static final int MAX_MESSAGE_BUFFER_SIZE = 65536;
 
     private String                 nodeUrl               ;
     private URI                    uri                   ;
@@ -190,8 +189,6 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
          */
         ClientManager.ReconnectHandler reconnectHandler = new ClientManager.ReconnectHandler() {
 
-            int i = 0;
-
             @Override
             public boolean onDisconnect(CloseReason closeReason) {
                     System.out.println("##########################################################################");
@@ -204,7 +201,6 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
             public boolean onConnectFailure(Exception exception) {
                     try {
 
-                        //System.out.println("# NetworkClientCommunicationConnection - Reconnect Failure Message: "+exception.getMessage()+" Cause: "+exception.getCause());
                         // To avoid potential DDoS when you don't limit number of reconnects, wait to the next try.
                         Thread.sleep(5000);
 
@@ -212,24 +208,9 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                         e.printStackTrace();
                     }
 
-
                     System.out.println("###############################################################################");
                     System.out.println("#  NetworkClientCommunicationConnection  - Connect Failure -> Reconnecting... #");
                     System.out.println("###############################################################################");
-
-                    try {
-                        /*
-                        if (!connectivityManager.isOnline()) {
-                            System.out.println("###############################################################################");
-                            System.out.println("#  Interrumpiendo hilo de reconctado, no sirve tener algo intentando conectarse si hay un evento que te avisa eso #");
-                            System.out.println("###############################################################################");
-                            tryToReconnect = false;
-
-                        }
-                        */
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
 
                     return tryToReconnect;
             }
@@ -240,6 +221,8 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
          * Register the ReconnectHandler
          */
         container.getProperties().put(ClientProperties.RECONNECT_HANDLER, reconnectHandler);
+        container.setDefaultMaxBinaryMessageBufferSize(MAX_MESSAGE_BUFFER_SIZE);
+        container.setDefaultMaxTextMessageBufferSize(MAX_MESSAGE_BUFFER_SIZE);
 
         try {
 
@@ -247,7 +230,6 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
 
         } catch (Exception e) {
             e.printStackTrace();
-//            System.out.println(e.getCause());
         }
     }
 
@@ -522,7 +504,9 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                                    final PackageType        packageType,
                                    final NetworkServiceType networkServiceType          ,
                                    final String             destinationIdentityPublicKey) throws CantSendMessageException, CantSendPackageException {
+
         System.out.println("******* IS CONNECTED: " + isConnected() + " - TRYING NO SEND");
+
         if (isConnected()){
             try {
                 //todo: esto hay que mejorarlo
@@ -533,9 +517,18 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                         clientIdentity.getPrivateKey(),
                         destinationIdentityPublicKey
                 );
+
+                long packSize = ObjectSizeCalculator.getObjectSize(pack);
+                System.out.println("******* packSize " + packSize);
+
+                if (packSize > MAX_MESSAGE_BUFFER_SIZE){
+                    throw new  RuntimeException("Message size is too big, The max size configure is "+MAX_MESSAGE_BUFFER_SIZE);
+                }
+
                 packagesWaitingToSend.add(pack);
                 return pack.getPackageId();
-            } catch (Exception exception) {
+
+            }catch (Exception exception) {
                 throw new CantSendMessageException(
                         exception,
                         "packageContent:"+packageContent,
@@ -718,9 +711,6 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                                 }
                             }
                         }
-
-
-
                     } else {
                         System.err.println("MessageSenderExecutor, connection is close and the executor is on, this is very bad");
                     }
