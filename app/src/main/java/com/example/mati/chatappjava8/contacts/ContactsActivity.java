@@ -139,6 +139,9 @@ public class ContactsActivity extends AppCompatActivity
                                 public void run() {
                                     listAdapter.changeDataSet(listActors);
                                     listAdapter.notifyDataSetChanged();
+                                    if (!listActors.isEmpty()){
+                                        findViewById(R.id.black_screen).setVisibility(View.VISIBLE);
+                                    }
                                 }
                             });
                         } catch (Exception e) {

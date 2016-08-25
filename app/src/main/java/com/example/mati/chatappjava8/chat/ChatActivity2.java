@@ -73,11 +73,11 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
             /**
              * subscribe example
              */
-            try {
-                Core.getInstance().getChatNetworkServicePluginRoot().subscribeActorOnlineEvent(remote.getIdentityPublicKey());
-            } catch (CantSendMessageException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                Core.getInstance().getChatNetworkServicePluginRoot().subscribeActorOnlineEvent(remote.getIdentityPublicKey());
+//            } catch (CantSendMessageException e) {
+//                e.printStackTrace();
+//            }
 
 
             /**

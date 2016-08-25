@@ -40,10 +40,12 @@ import org.iop.client.version_1.exceptions.CantSendPackageException;
 import org.iop.client.version_1.network_calls.NetworkClientCommunicationCall;
 import org.iop.client.version_1.structure.Sync.WaiterObjectsBuffer;
 import org.iop.client.version_1.util.HardcodeConstants;
+import org.iop.client.version_1.util.PackageEncoder;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -519,12 +521,12 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                         destinationIdentityPublicKey
                 );
 
-                long packSize = ObjectSizeCalculator.getObjectSize(pack);
-                System.out.println("******* packSize " + packSize);
-
-                if (packSize > MAX_MESSAGE_BUFFER_SIZE){
-                    throw new MessageTooBigException("Message size is too big, The max size configure is "+MAX_MESSAGE_BUFFER_SIZE);
-                }
+//                long packSize = ObjectSizeCalculator.getObjectSize(pack);
+//                System.out.println("******* packSize " + packSize);
+//
+//                if (packSize > MAX_MESSAGE_BUFFER_SIZE){
+//                    throw new MessageTooBigException("Message size is too big, The max size configure is "+MAX_MESSAGE_BUFFER_SIZE);
+//                }
 
                 packagesWaitingToSend.add(pack);
                 return pack.getPackageId();

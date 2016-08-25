@@ -40,6 +40,7 @@ import java.util.Map;
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
+import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.PongMessage;
@@ -87,6 +88,7 @@ public class NetworkClientCommunicationChannel {
 
     private EventManager eventManager  ;
 
+
     public NetworkClientCommunicationChannel(final NetworkClientCommunicationConnection connection,
                                              final Boolean isExternalNode) {
 
@@ -96,6 +98,8 @@ public class NetworkClientCommunicationChannel {
         this.isExternalNode    = isExternalNode ;
         this.isRegistered      = Boolean.FALSE  ;
         this.packageProcessors = new HashMap<>();
+
+
 
         initPackageProcessorsRegistration();
     }
@@ -209,6 +213,11 @@ public class NetworkClientCommunicationChannel {
 //                networkClientConnectionsManager.getActiveConnectionsToExternalNodes().remove(this.connection.getNodeUrl());
             System.out.println("Error: onClose");
         }
+    }
+
+    @OnError
+    public void onError(Session session,Throwable t){
+
     }
 
     public void sendPing() throws IOException {

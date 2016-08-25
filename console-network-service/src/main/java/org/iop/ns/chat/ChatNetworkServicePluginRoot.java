@@ -244,7 +244,7 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
                     null,
                     null,
                     null,
-                    false,
+                    true,
                     null,
                     max,
                     offset,

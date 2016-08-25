@@ -71,6 +71,7 @@ public class ListActivity extends AppCompatActivity
         setContentView(R.layout.activity_list_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setTitle("World");
 
         isRefreshing = new AtomicBoolean(false);
 
@@ -131,9 +132,6 @@ public class ListActivity extends AppCompatActivity
                 onRefreshList();
             }
         });
-        if (listActors.isEmpty()){
-            findViewById(R.id.black_screen).setVisibility(View.VISIBLE);
-        }
 
         onRefreshList();
     }
@@ -276,7 +274,6 @@ public class ListActivity extends AppCompatActivity
                 }
                 progressBar.setVisibility(View.GONE);
                 isRefreshing.set(false);
-                findViewById(R.id.black_screen).setVisibility(View.GONE);
             }
         });
         offset = listActors.size();

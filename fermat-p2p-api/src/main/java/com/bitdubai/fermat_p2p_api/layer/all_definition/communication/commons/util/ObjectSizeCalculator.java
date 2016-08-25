@@ -19,7 +19,7 @@ public class ObjectSizeCalculator {
     /**
      * Represent the instrumentation intance
      */
-    private static Instrumentation instrumentation;
+    private static Instrumentation instrumentation ;
 
     /**
      * Configure the instance
