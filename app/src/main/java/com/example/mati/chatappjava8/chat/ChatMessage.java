@@ -8,6 +8,7 @@ public class ChatMessage {
     private String message;
     private Long userId;
     private String dateTime;
+    private boolean isFail;
 
     public UUID getId() {
         return id;
@@ -41,5 +42,13 @@ public class ChatMessage {
 
     public void setDate(String dateTime) {
         this.dateTime = dateTime;
+    }
+
+    public boolean getIsFail() {
+        return isFail;
+    }
+
+    public void setIsFail(boolean isFail) {
+        this.isFail = isFail;
     }
 }
