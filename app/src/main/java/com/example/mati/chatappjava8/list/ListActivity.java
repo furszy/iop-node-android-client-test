@@ -23,11 +23,13 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.ProfileStatus;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.example.mati.app_core.Core;
 import com.example.mati.chatappjava8.IntentConstants;
 import com.example.mati.chatappjava8.R;
 import com.example.mati.chatappjava8.chat.ChatActivity2;
+import com.example.mati.chatappjava8.chat.ChatMessage;
 import com.example.mati.chatappjava8.chat.FermatListItemListeners;
 import com.example.mati.chatappjava8.commons.NavigationListener;
 import com.example.mati.chatappjava8.commons.Notifications;
@@ -161,17 +163,17 @@ public class ListActivity extends AppCompatActivity
 
     public void onRefreshList() {
         try {
-//            if (!isRefreshing.get()) {
+            if (!isRefreshing.get()) {
             progressBar.setVisibility(View.VISIBLE);
                 swipeRefresh.setRefreshing(false);
                 executorService.submit(new Runnable() {
                     @Override
                     public void run() {
-//                        isRefreshing.set(true);
+                        isRefreshing.set(true);
                         Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList(max, offset, Core.getInstance().getProfile().getIdentityPublicKey());
                     }
                 });
-//            }
+            }
         } catch (Exception e) {
             System.out.println(e.toString());
         }
@@ -243,7 +245,6 @@ public class ListActivity extends AppCompatActivity
 
     @Override
     public void onActorListReceived(final List<ActorProfile> list) {
-        isRefreshing.set(true);
         if (list.size()==0){
             Log.i(this.getComponentName().getClassName(),"ActorList empty");
         }
@@ -274,10 +275,12 @@ public class ListActivity extends AppCompatActivity
                     listAdapter.notifyItemRangeInserted(offset, listActors.size() - 1);
                 }
                 progressBar.setVisibility(View.GONE);
+                isRefreshing.set(false);
                 findViewById(R.id.black_screen).setVisibility(View.GONE);
             }
         });
         offset = listActors.size();
+
     }
 
     private boolean notInList(ActorProfile info) {
@@ -301,7 +304,28 @@ public class ListActivity extends AppCompatActivity
     @Override
     public void onActorOffline(String remotePkGoOffline) {
         Log.i(getClass().getName(),"onActorOffline: "+remotePkGoOffline);
+        ActorProfile actor = new ActorProfile();
+        for(int n = 0; n < listActors.size()-1; n++){
+            if(actor.getIdentityPublicKey().equals(remotePkGoOffline)) {
+                actor = listActors.get(n);
+                actor.setStatus(ProfileStatus.OFFLINE);
+                listActors.set(n, actor);
+            }
+        }
+        changeStatus(listActors);
     }
+
+    public void changeStatus(final List<ActorProfile> actorlist) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                listAdapter.changeDataSet(actorlist);
+                listAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+
 
     @Override
     public void onItemClickListener(ActorProfile data, int position) {

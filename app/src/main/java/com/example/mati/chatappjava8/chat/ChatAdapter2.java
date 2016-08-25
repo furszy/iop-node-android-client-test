@@ -43,6 +43,13 @@ public class ChatAdapter2 extends FermatAdapter<ChatMessage,chatHolder> {
         setAlignment(holder, myMsg);
         holder.txtMessage.setText(data.getMessage());
         holder.txtInfo.setText(data.getDate());
+        if (data.getIsFail() == true) {
+            holder.imageTick.setImageResource(R.drawable.cht_close);
+            holder.imageTick.setVisibility(View.VISIBLE);
+        } else {
+            holder.imageTick.setImageResource(0);
+            holder.imageTick.setVisibility(View.GONE);
+        }
     }
 
 

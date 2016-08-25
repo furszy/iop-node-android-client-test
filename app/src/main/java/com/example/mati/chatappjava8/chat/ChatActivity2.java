@@ -39,11 +39,10 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
     private ActorProfile remote;
 
     private List<ChatMetadataRecord> listMessages;
-
+    private List<ChatMessage> listChatMessages = new ArrayList<>();
 
     private boolean isSearchingRemote = false;
     private String remotePk;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,6 +127,7 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
 
                 final ChatMessage chatMessage = new ChatMessage();
                 chatMessage.setMessage(messageText);
+                chatMessage.setIsFail(false);
                 chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
                 chatMessage.setMe(true);
 
@@ -152,12 +152,22 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
                 }).start();
 
                 displayMessage(chatMessage);
+                listChatMessages.add(chatMessage);
             }
         });
-
-
     }
 
+
+    public void displayMessagesStatus(final List<ChatMessage> messages) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                adapter.changeDataSet(messages);
+                adapter.notifyDataSetChanged();
+                scroll();
+            }
+        });
+    }
 
     public void displayMessage(final ChatMessage message) {
         runOnUiThread(new Runnable() {
@@ -168,7 +178,6 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
                 scroll();
             }
         });
-
     }
 
     @Override
@@ -200,12 +209,12 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
                 ChatMessage chatMessage = new ChatMessage();
                 chatMessage.setId(record.getId());
                 chatMessage.setMessage(record.getMessage());
+                chatMessage.setIsFail(false);
                 chatMessage.setDate(DateFormat.getDateTimeInstance().format(record.getDate()));
                 chatMessage.setMe(localPK.equals(record.getLocalActorPublicKey()));
                 displayMessage(chatMessage);
+                listChatMessages.add(chatMessage);
             }
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -220,6 +229,7 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
             chatMessage.setId(content.getId());
             chatMessage.setMessage(content.getMessage());
             chatMessage.setDate(DateFormat.getDateTimeInstance().format(content.getDate()));
+            chatMessage.setIsFail(false);
             chatMessage.setMe(false);
             displayMessage(chatMessage);
         }else {
@@ -247,7 +257,16 @@ public class ChatActivity2 extends AppCompatActivity implements MessageReceiver 
 
     @Override
     public void onMessageFail(UUID messageId) {
-        Log.i(this.getClass().getName(),"onMessageFail: acá tengo que mostrar como que el mensaje falló");
+        Log.i(getClass().getName(),"onMessageFail: "+messageId);
+        ChatMessage message = new ChatMessage();
+        for(int n = 0; n < listChatMessages.size()-1; n++){
+            if(message.getId().equals(messageId)) {
+                message = listChatMessages.get(n);
+                message.setIsFail(true);
+                listChatMessages.set(n, message);
+                displayMessagesStatus(listChatMessages);
+            }
+        }
     }
 
     @Override

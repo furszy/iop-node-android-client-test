@@ -46,6 +46,10 @@ public class ListAdapter
     @Override
     protected void bindHolder(ActorHolder holder, ActorProfile data, int position) {
         holder.textView_name.setText(data.getName());
+        if(data.getStatus() != null && data.getStatus().getCode().equalsIgnoreCase("ON"))
+            holder.textView_name.setTextColor(Color.parseColor("#47BF73"));
+        else
+            holder.textView_name.setTextColor(Color.RED);
         if (data.getPhoto()!=null){
             if (data.getPhoto().length>0){
                 holder.img_photo.setImageDrawable(ImagesUtils.getRoundedBitmap(context.getResources(), BitmapFactory.decodeByteArray(data.getPhoto(),0,data.getPhoto().length)));
