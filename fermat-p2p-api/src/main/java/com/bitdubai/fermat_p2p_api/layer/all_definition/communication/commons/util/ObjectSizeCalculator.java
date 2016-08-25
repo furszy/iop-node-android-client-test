@@ -16,27 +16,27 @@ import java.lang.instrument.Instrumentation;
  */
 public class ObjectSizeCalculator {
 
-    /**
-     * Represent the instrumentation intance
-     */
-    private static Instrumentation instrumentation ;
+//    /**
+//     * Represent the instrumentation intance
+//     */
+//    private static Instrumentation instrumentation ;
 
-    /**
-     * Configure the instance
-     *
-     * @param args
-     * @param inst
-     */
-    public static void premain(String args, Instrumentation inst) {
-        instrumentation = inst;
-    }
+//    /**
+//     * Configure the instance
+//     *
+//     * @param args
+//     * @param inst
+//     */
+//    public static void premain(String args, Instrumentation inst) {
+//        instrumentation = inst;
+//    }
 
     /**
      * Calculate the object size
      * @param o
      * @return long
      */
-    public static long getObjectSize(Object o) {
-        return instrumentation.getObjectSize(o);
-    }
+//    public static long getObjectSize(Object o) {
+//        return instrumentation.getObjectSize(o);
+//    }
 }

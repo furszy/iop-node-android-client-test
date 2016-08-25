@@ -27,7 +27,6 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.pr
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.NetworkServiceProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.NodeProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.Profile;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.util.ObjectSizeCalculator;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.MessageContentType;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.PackageType;
 import com.bitdubai.fermat_p2p_api.layer.p2p_communication.CommunicationChannels;
@@ -109,7 +108,7 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
     /**
      * Message waiting to send
      */
-    private ConcurrentLinkedQueue<Package> packagesWaitingToSend;
+    private ConcurrentLinkedQueue<ByteBuffer> packagesWaitingToSend;
 
     private ScheduledExecutorService messageSenderExecutor;
 
@@ -134,6 +133,8 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
      * Represents the P2P layer manager
      */
     private P2PLayerManager p2PLayerManager;
+
+    private PackageEncoder packageEncoder;
 
     /*
      * Constructor
@@ -176,6 +177,8 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
         this.waiterObjectsBuffer = new WaiterObjectsBuffer();
 
         packagesWaitingToSend = new ConcurrentLinkedQueue<>();
+
+        packageEncoder = new PackageEncoder();
     }
 
     /*
@@ -521,14 +524,15 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                         destinationIdentityPublicKey
                 );
 
-//                long packSize = ObjectSizeCalculator.getObjectSize(pack);
-//                System.out.println("******* packSize " + packSize);
-//
-//                if (packSize > MAX_MESSAGE_BUFFER_SIZE){
-//                    throw new MessageTooBigException("Message size is too big, The max size configure is "+MAX_MESSAGE_BUFFER_SIZE);
-//                }
+                ByteBuffer encodedPackage = packageEncoder.encode(pack);;
+                int packSize = encodedPackage.position();
+                System.out.println("******* packSize " + packSize);
 
-                packagesWaitingToSend.add(pack);
+                if (packSize > MAX_MESSAGE_BUFFER_SIZE){
+                    throw new MessageTooBigException("Message size is too big, The max size configure is "+MAX_MESSAGE_BUFFER_SIZE);
+                }
+
+                packagesWaitingToSend.add(encodedPackage);
                 return pack.getPackageId();
 
             }catch (Exception exception) {
@@ -702,12 +706,12 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                     if (isConnected()) {
                         boolean flag = false;
                         while (!flag){
-                            Package pack = packagesWaitingToSend.poll();
+                            ByteBuffer pack = packagesWaitingToSend.poll();
                             if (pack==null){
                                 flag = true;
                             }else{
                                 try {
-                                    networkClientCommunicationChannel.getClientConnection().getBasicRemote().sendObject(pack);
+                                    networkClientCommunicationChannel.getClientConnection().getBasicRemote().sendBinary(pack);
                                 } catch (Exception exception) {
                                     System.err.println("CantSendPackage: block package: " + pack);
                                     exception.printStackTrace();

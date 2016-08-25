@@ -59,7 +59,7 @@ import javax.websocket.Session;
 
 @ClientEndpoint(
         configurator = ClientChannelConfigurator.class,
-        encoders = {PackageEncoder.class},
+//        encoders = {PackageEncoder.class},
         decoders = {PackageDecoder.class}
 )
 public class NetworkClientCommunicationChannel {
