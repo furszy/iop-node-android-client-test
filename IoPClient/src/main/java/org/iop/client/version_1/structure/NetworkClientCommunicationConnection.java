@@ -527,8 +527,8 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                 ByteBuffer encodedPackage = packageEncoder.encode(pack);;
                 int packSize = encodedPackage.position();
                 System.out.println("******* packSize " + packSize);
-
-                if (packSize > MAX_MESSAGE_BUFFER_SIZE){
+                //le puse eso porque vi que el websocket le agrega datos, hay que chequear mejor cuantos..
+                if (packSize > MAX_MESSAGE_BUFFER_SIZE-7648){
                     throw new MessageTooBigException("Message size is too big, The max size configure is "+MAX_MESSAGE_BUFFER_SIZE);
                 }
 
