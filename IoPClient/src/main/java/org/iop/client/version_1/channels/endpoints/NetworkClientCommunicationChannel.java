@@ -27,7 +27,6 @@ import org.iop.client.version_1.channels.processors.checkin.CheckInNetworkServic
 import org.iop.client.version_1.context.ClientContext;
 import org.iop.client.version_1.context.ClientContextItem;
 import org.iop.client.version_1.structure.NetworkClientCommunicationConnection;
-import org.iop.client.version_1.util.BlockEncoder;
 import org.iop.client.version_1.util.PackageDecoder;
 import org.iop.client.version_1.util.PackageEncoder;
 
@@ -41,6 +40,7 @@ import java.util.Map;
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
+import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.PongMessage;
@@ -59,7 +59,7 @@ import javax.websocket.Session;
 
 @ClientEndpoint(
         configurator = ClientChannelConfigurator.class,
-        encoders = {PackageEncoder.class},
+//        encoders = {PackageEncoder.class},
         decoders = {PackageDecoder.class}
 )
 public class NetworkClientCommunicationChannel {
@@ -88,6 +88,7 @@ public class NetworkClientCommunicationChannel {
 
     private EventManager eventManager  ;
 
+
     public NetworkClientCommunicationChannel(final NetworkClientCommunicationConnection connection,
                                              final Boolean isExternalNode) {
 
@@ -97,6 +98,8 @@ public class NetworkClientCommunicationChannel {
         this.isExternalNode    = isExternalNode ;
         this.isRegistered      = Boolean.FALSE  ;
         this.packageProcessors = new HashMap<>();
+
+
 
         initPackageProcessorsRegistration();
     }
@@ -210,6 +213,11 @@ public class NetworkClientCommunicationChannel {
 //                networkClientConnectionsManager.getActiveConnectionsToExternalNodes().remove(this.connection.getNodeUrl());
             System.out.println("Error: onClose");
         }
+    }
+
+    @OnError
+    public void onError(Session session,Throwable t){
+
     }
 
     public void sendPing() throws IOException {

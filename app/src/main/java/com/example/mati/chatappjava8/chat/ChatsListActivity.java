@@ -1,4 +1,4 @@
-package com.example.mati.chatappjava8.contacts;
+package com.example.mati.chatappjava8.chat;
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -20,16 +20,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.example.mati.app_core.Core;
 import com.example.mati.chatappjava8.IntentConstants;
 import com.example.mati.chatappjava8.R;
-import com.example.mati.chatappjava8.chat.ChatActivity2;
-import com.example.mati.chatappjava8.chat.FermatListItemListeners;
 import com.example.mati.chatappjava8.commons.NavigationListener;
 import com.example.mati.chatappjava8.commons.Notifications;
+import com.example.mati.chatappjava8.list.ListAdapter;
 
 import org.iop.ns.chat.structure.ChatMetadataRecord;
 import org.iop.ns.chat.structure.test.MessageReceiver;
@@ -41,28 +41,38 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ContactsActivity extends AppCompatActivity
-        implements MessageReceiver, FermatListItemListeners<ActorProfile>
+/**
+ * Created by josej on 8/24/2016.
+ */
+public class ChatsListActivity extends AppCompatActivity
+        implements MessageReceiver, FermatListItemListeners<ChatsList>
         /*,SwipeRefreshLayout.OnRefreshListener */{
 
     RecyclerView recyclerView;
-    ListAdapter listAdapter;
-    List<ActorProfile> listActors;
+    ChatsListAdapter listAdapter;
+    private ProgressBar progressBar;
+    List<ChatsList> listChats;
     private DrawerLayout drawerLayout;
     private LinearLayoutManager linearLayoutManager;
     private NavigationView navigationView;
+    private SwipeRefreshLayout swipeRefresh;
+    private int max = 10;
+    private int offset = 0;
+    int pastVisiblesItems, visibleItemCount, totalItemCount;
     ExecutorService executorService;
     private SearchView searchView = null;
     private SearchView.OnQueryTextListener queryTextListener;
 
+    private AtomicBoolean isRefreshing;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.contact_list_main);
+        setContentView(R.layout.activity_list_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        isRefreshing = new AtomicBoolean(false);
 
         navigationView = (NavigationView) findViewById(R.id.navigation);
 //        navigationView.inflateMenu(R.menu.navigation_menu);
@@ -84,18 +94,34 @@ public class ContactsActivity extends AppCompatActivity
         });
         init();
 
-        this.recyclerView = (RecyclerView) findViewById(R.id.recycler);
+        this.recyclerView = (RecyclerView) findViewById(R.id.recycler_chats);
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         this.recyclerView.setLayoutManager(linearLayoutManager);
-        listActors = new ArrayList<>();
-        listAdapter = new ListAdapter(getApplicationContext(),listActors);
+        listChats = new ArrayList<>();
+        listAdapter = new ChatsListAdapter(getApplicationContext(),listChats);
         listAdapter.setFermatListEventListener(this);
+//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+//                if (dy > 0) {
+//                    visibleItemCount = linearLayoutManager.getChildCount();
+//                    totalItemCount = linearLayoutManager.getItemCount();
+//                    pastVisiblesItems = linearLayoutManager.findFirstVisibleItemPosition();
+//                    offset = totalItemCount;
+//                    final int lastItem = pastVisiblesItems + visibleItemCount;
+//                    if (lastItem == totalItemCount) {
+//                        onRefreshList();
+//                    }
+//                }
+//            }
+//        });
         this.recyclerView.setLayoutManager(linearLayoutManager);
         this.recyclerView.setHasFixedSize(true);
         this.recyclerView.setAdapter(listAdapter);
         this.recyclerView.scrollToPosition(0);
-        if (listActors.isEmpty()){
+
+        if (listChats.isEmpty()){
             findViewById(R.id.black_screen).setVisibility(View.VISIBLE);
         }
 
@@ -126,33 +152,7 @@ public class ContactsActivity extends AppCompatActivity
     }
 
     public void onRefreshList() {
-        try {
-//            if (!isRefreshing.get()) {
-                executorService.submit(new Runnable() {
-                    @Override
-                    public void run() {
-//                        isRefreshing.set(true);
-                        try {
-                             listActors.addAll(Core.getInstance().getChatNetworkServicePluginRoot().getContacts());
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    listAdapter.changeDataSet(listActors);
-                                    listAdapter.notifyDataSetChanged();
-                                    if (!listActors.isEmpty()){
-                                        findViewById(R.id.black_screen).setVisibility(View.VISIBLE);
-                                    }
-                                }
-                            });
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-//            }
-        } catch (Exception e) {
-            System.out.println(e.toString());
-        }
+
     }
 
     @Override
@@ -218,29 +218,18 @@ public class ContactsActivity extends AppCompatActivity
         Notifications.pushNotification(this, chatMetadataRecord.getMessage(), senderPk);
     }
 
-
-    @Override
-    public void onActorListReceived(final List<ActorProfile> list) {
-
-
-    }
-
-    private boolean notInList(ActorProfile info) {
-        for (ActorProfile contact : listActors) {
-            if (contact.getIdentityPublicKey().equals(info.getIdentityPublicKey()))
-                return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void onActorRegistered(ActorProfile actorProfile) {
-
-    }
-
     @Override
     public void onMessageFail(UUID messageId) {
 
+    }
+
+    @Override
+    public void onActorListReceived(final List<ActorProfile> list) {
+    }
+
+
+    @Override
+    public void onActorRegistered(ActorProfile actorProfile) {
     }
 
     @Override
@@ -249,16 +238,16 @@ public class ContactsActivity extends AppCompatActivity
     }
 
     @Override
-    public void onItemClickListener(ActorProfile data, int position) {
+    public void onItemClickListener(ChatsList data, int position) {
         if (Core.getInstance().getProfile()!=null) {
-            Intent intent = new Intent(getApplicationContext(), ChatActivity2.class);
-            intent.putExtra(IntentConstants.PROFILE_RECEIVER, data);
-            startActivity(intent);
+//            Intent intent = new Intent(getApplicationContext(), ChatActivity2.class);
+//            intent.putExtra(IntentConstants.PROFILE_RECEIVER, data);
+//            startActivity(intent);
         }else Toast.makeText(this,"No profile created,\nplease go to the profile screen and create one",Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onLongItemClickListener(ActorProfile data, int position) {
+    public void onLongItemClickListener(ChatsList data, int position) {
 
     }
 }

@@ -20,13 +20,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.ProfileStatus;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.example.mati.app_core.Core;
 import com.example.mati.chatappjava8.IntentConstants;
 import com.example.mati.chatappjava8.R;
 import com.example.mati.chatappjava8.chat.ChatActivity2;
+import com.example.mati.chatappjava8.chat.ChatMessage;
 import com.example.mati.chatappjava8.chat.FermatListItemListeners;
 import com.example.mati.chatappjava8.commons.NavigationListener;
 import com.example.mati.chatappjava8.commons.Notifications;
@@ -47,6 +50,7 @@ public class ListActivity extends AppCompatActivity
 
     RecyclerView recyclerView;
     ListAdapter listAdapter;
+    private ProgressBar progressBar;
     List<ActorProfile> listActors;
     private DrawerLayout drawerLayout;
     private LinearLayoutManager linearLayoutManager;
@@ -67,6 +71,7 @@ public class ListActivity extends AppCompatActivity
         setContentView(R.layout.activity_list_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setTitle("World");
 
         isRefreshing = new AtomicBoolean(false);
 
@@ -92,6 +97,7 @@ public class ListActivity extends AppCompatActivity
 
         this.recyclerView = (RecyclerView) findViewById(R.id.recycler);
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        this.progressBar = (ProgressBar) findViewById(R.id.progressBar);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         this.recyclerView.setLayoutManager(linearLayoutManager);
         listActors = new ArrayList<>();
@@ -126,9 +132,6 @@ public class ListActivity extends AppCompatActivity
                 onRefreshList();
             }
         });
-        if (listActors.isEmpty()){
-            findViewById(R.id.black_screen).setVisibility(View.VISIBLE);
-        }
 
         onRefreshList();
     }
@@ -158,16 +161,17 @@ public class ListActivity extends AppCompatActivity
 
     public void onRefreshList() {
         try {
-//            if (!isRefreshing.get()) {
+            if (!isRefreshing.get()) {
+            progressBar.setVisibility(View.VISIBLE);
                 swipeRefresh.setRefreshing(false);
                 executorService.submit(new Runnable() {
                     @Override
                     public void run() {
-//                        isRefreshing.set(true);
+                        isRefreshing.set(true);
                         Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfilesList(max, offset, Core.getInstance().getProfile().getIdentityPublicKey());
                     }
                 });
-//            }
+            }
         } catch (Exception e) {
             System.out.println(e.toString());
         }
@@ -239,7 +243,6 @@ public class ListActivity extends AppCompatActivity
 
     @Override
     public void onActorListReceived(final List<ActorProfile> list) {
-        isRefreshing.set(true);
         if (list.size()==0){
             Log.i(this.getComponentName().getClassName(),"ActorList empty");
         }
@@ -269,7 +272,8 @@ public class ListActivity extends AppCompatActivity
                         }
                     listAdapter.notifyItemRangeInserted(offset, listActors.size() - 1);
                 }
-                findViewById(R.id.black_screen).setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
+                isRefreshing.set(false);
             }
         });
         offset = listActors.size();
@@ -297,7 +301,28 @@ public class ListActivity extends AppCompatActivity
     @Override
     public void onActorOffline(String remotePkGoOffline) {
         Log.i(getClass().getName(),"onActorOffline: "+remotePkGoOffline);
+        ActorProfile actor = new ActorProfile();
+        for(int n = 0; n < listActors.size()-1; n++){
+            if(actor.getIdentityPublicKey().equals(remotePkGoOffline)) {
+                actor = listActors.get(n);
+                actor.setStatus(ProfileStatus.OFFLINE);
+                listActors.set(n, actor);
+            }
+        }
+        changeStatus(listActors);
     }
+
+    public void changeStatus(final List<ActorProfile> actorlist) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                listAdapter.changeDataSet(actorlist);
+                listAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+
 
     @Override
     public void onItemClickListener(ActorProfile data, int position) {
