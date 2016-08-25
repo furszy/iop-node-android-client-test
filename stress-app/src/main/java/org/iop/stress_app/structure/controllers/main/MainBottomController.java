@@ -11,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import org.iop.stress_app.structure.controllers.AbstractMainController;
 import org.iop.stress_app.structure.interfaces.StressTest;
+import org.iop.stress_app.structure.tests.ActorTest;
 import org.iop.stress_app.structure.tests.DevicesTest;
 import org.iop.stress_app.structure.tests.NetworkServiceTest;
 import org.iop.stress_app.structure.views.InfoTextArea;
@@ -33,6 +34,9 @@ public class MainBottomController extends AbstractMainController {
     private final static String NS_CHECK_BOX = "nsCheckBox";
     private final static String NS_TEXT_AREA_ID = "nsInfoArea";
     private final static String NS_SPINNER_ID = "nsSpinner";
+    private final static String ACTOR_CHECK_BOX = "actorCheckBox";
+    private final static String ACTOR_TEXT_AREA_ID = "actorInfoArea";
+    private final static String ACTOR_SPINNER_ID = "actorSpinner";
 
     /**
      * Devices Children Maps
@@ -41,6 +45,7 @@ public class MainBottomController extends AbstractMainController {
     HashMap<String, Node> borderPaneNodes;
     HashMap<String, Node> tabPaneNodes;
     HashMap<String, Node> nsTabPaneNodes;
+    HashMap<String, Node> actorTabPaneNodes;
 
     /**
      * Represents the main container present in this controller
@@ -55,7 +60,7 @@ public class MainBottomController extends AbstractMainController {
     Label statusLabel;
 
     /**
-     * Represents the mainBotton button
+     * Represents the mainBottom button
      */
     @FXML
     Button mainButton;
@@ -73,11 +78,35 @@ public class MainBottomController extends AbstractMainController {
      */
     IntegerSpinner devicesIntegerSpinner;
 
+    /**
+     * Represents the NS Tab checkbox
+     */
     CheckBox nsTabCheckBox;
 
+    /**
+     * Represents the NS Tab InfoTextArea
+     */
     InfoTextArea nsInfoArea;
 
+    /**
+     * Represents the NS Tab IntegerSpinner
+     */
     IntegerSpinner nsIntegerSpinner;
+
+    /**
+     * Represents the Actors Tab checkbox
+     */
+    CheckBox actorTabCheckBox;
+
+    /**
+     * Represents the Actors Tab InfoTextArea
+     */
+    InfoTextArea actorInfoArea;
+
+    /**
+     * Represents the Actors Tab IntegerSpinner
+     */
+    IntegerSpinner actorIntegerSpinner;
 
     /**
      * Tests
@@ -136,8 +165,8 @@ public class MainBottomController extends AbstractMainController {
             ObservableList<Node> children = ((Parent) tabPane).getChildrenUnmodifiable();
             //children.forEach(n-> System.out.println(((Parent)n).getId()));
             //Todo: to improve
-            //for some reason the TabPane that I need is in index 2
-            Node node = children.get(2);
+            //for some reason the TabPane that I need is in index 3
+            Node node = children.get(3);
             //System.out.println(node);
             ObservableList<Node> innerNodes=((Parent)node).getChildrenUnmodifiable();
             Node innerNode = innerNodes.get(0);
@@ -152,19 +181,35 @@ public class MainBottomController extends AbstractMainController {
             ObservableList<Node> children = ((Parent) tabPane).getChildrenUnmodifiable();
             //children.forEach(n-> System.out.println(((Parent)n).getId()));
             //Todo: to improve
-            //for some reason the TabPane that I need is in index 1
-            Node node = children.get(1);
+            //for some reason the TabPane that I need is in index 2
+            Node node = children.get(2);
             //System.out.println(node);
             ObservableList<Node> innerNodes=((Parent)node).getChildrenUnmodifiable();
             Node innerNode = innerNodes.get(0);
             //System.out.println(innerNodes);
             nsTabPaneNodes = mapChildren((Parent) innerNode);
         }
-        System.out.println(nsTabPaneNodes);
+        //System.out.println(nsTabPaneNodes);
+        if(actorTabPaneNodes==null){
+            //Now, we need the BorderPane
+            Node tabPane = borderPaneNodes.get(TAB_PANE_ID);
+            //System.out.println(tabPane);
+            ObservableList<Node> children = ((Parent) tabPane).getChildrenUnmodifiable();
+            //children.forEach(n-> System.out.println(((Parent)n).getId()));
+            //Todo: to improve
+            //for some reason the TabPane that I need is in index 1
+            Node node = children.get(1);
+            //System.out.println(node);
+            ObservableList<Node> innerNodes=((Parent)node).getChildrenUnmodifiable();
+            Node innerNode = innerNodes.get(0);
+            //System.out.println(innerNodes);
+            actorTabPaneNodes = mapChildren((Parent) innerNode);
+        }
+        //System.out.println(actorTabPaneNodes);
     }
 
     /**
-     * This method gets the
+     * This method gets the devices info text area
      * @return
      */
     private InfoTextArea getInfoTextArea(){
@@ -178,12 +223,26 @@ public class MainBottomController extends AbstractMainController {
     }
 
     /**
-     * This method gets the
+     * This method gets the Ns info text area
      * @return
      */
     private InfoTextArea getNsInfoTextArea(){
         mapAllDeviceChildren();
         Node infoTextAreaNode = nsTabPaneNodes.get(NS_TEXT_AREA_ID);
+        if(infoTextAreaNode instanceof InfoTextArea){
+            InfoTextArea infoTextArea = (InfoTextArea) infoTextAreaNode;
+            return infoTextArea;
+        }
+        return null;
+    }
+
+    /**
+     * This method gets the Ns info text area
+     * @return
+     */
+    private InfoTextArea getActorInfoTextArea(){
+        mapAllDeviceChildren();
+        Node infoTextAreaNode = actorTabPaneNodes.get(ACTOR_TEXT_AREA_ID);
         if(infoTextAreaNode instanceof InfoTextArea){
             InfoTextArea infoTextArea = (InfoTextArea) infoTextAreaNode;
             return infoTextArea;
@@ -211,9 +270,29 @@ public class MainBottomController extends AbstractMainController {
         return null;
     }
 
+    private IntegerSpinner getActorIntegerSpinner(){
+        mapAllDeviceChildren();
+        Node integerSpinnerNode = actorTabPaneNodes.get(ACTOR_SPINNER_ID);
+        if(integerSpinnerNode instanceof IntegerSpinner){
+            IntegerSpinner integerSpinner = (IntegerSpinner) integerSpinnerNode;
+            return integerSpinner;
+        }
+        return null;
+    }
+
     private CheckBox getNsTabCheckBox(){
         mapAllDeviceChildren();
         Node checkBoxNode = nsTabPaneNodes.get(NS_CHECK_BOX);
+        if(checkBoxNode instanceof CheckBox){
+            CheckBox nsCheckBox = (CheckBox) checkBoxNode;
+            return nsCheckBox;
+        }
+        return null;
+    }
+
+    private CheckBox getActorTabCheckBox(){
+        mapAllDeviceChildren();
+        Node checkBoxNode = actorTabPaneNodes.get(ACTOR_CHECK_BOX);
         if(checkBoxNode instanceof CheckBox){
             CheckBox nsCheckBox = (CheckBox) checkBoxNode;
             return nsCheckBox;
@@ -238,8 +317,6 @@ public class MainBottomController extends AbstractMainController {
         if(devicesIntegerSpinner!=null){
             //int devicesToStart = devicesIntegerSpinner.getNumber();
             //statusLabel.setText("Devices to start: "+devicesToStart);
-            //Todo: create a logic to choose the test type
-            //Todo: put some checks in the view to select the test, by default I launch a devices test.
             //Case NS enabled
             if(nsTabCheckBox==null){
                 nsTabCheckBox = getNsTabCheckBox();
@@ -250,8 +327,21 @@ public class MainBottomController extends AbstractMainController {
             if(nsIntegerSpinner==null){
                 nsIntegerSpinner = getNsIntegerSpinner();
             }
-
-            if(nsTabCheckBox.isSelected()){
+            //Verify if Actor test is enabled
+            if(actorTabCheckBox==null){
+                actorTabCheckBox = getActorTabCheckBox();
+            }
+            if(actorInfoArea==null){
+                actorInfoArea = getActorInfoTextArea();
+            }
+            if(actorIntegerSpinner==null){
+                actorIntegerSpinner = getActorIntegerSpinner();
+            }
+            if(actorTabCheckBox.isSelected()){
+                if(test==null){
+                    test = new ActorTest(mainButton, actorInfoArea, devicesIntegerSpinner, nsIntegerSpinner, actorIntegerSpinner);
+                }
+            } else if(nsTabCheckBox.isSelected()&&!actorTabCheckBox.isSelected()){
                 if(test==null)
                     test = new NetworkServiceTest(mainButton, nsInfoArea, devicesIntegerSpinner, nsIntegerSpinner);
             } else{
