@@ -9,7 +9,7 @@
 <?import org.iop.stress_app.structure.views.IntegerSpinner?>
 
 <!--Created by Manuel Perez on 22/08/2016-->
-<GridPane fx:controller="org.iop.stress_app.structure.controllers.ActorTabController" xmlns:fx="http://javafx.com/fxml" alignment="center" hgap="10" vgap="10" styleClass="root">
+<GridPane fx:controller="org.iop.stress_app.structure.controllers.tab.ActorTabController" xmlns:fx="http://javafx.com/fxml" alignment="center" hgap="10" vgap="10" styleClass="root">
     <padding>
         <Insets top="25" right="25" bottom="10" left="25"/>
     </padding>

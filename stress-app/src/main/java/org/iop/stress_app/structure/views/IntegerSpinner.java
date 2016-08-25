@@ -31,7 +31,7 @@ public class IntegerSpinner extends HBox {
 
     public static final String ARROW = "NumberSpinnerArrow";
     public static final String NUMBER_FIELD = "NumberField";
-    public static final String NUMBER_SPINNER = "NumberSpinner";
+    //public static final String NUMBER_SPINNER = "NumberSpinner";
     public static final String SPINNER_BUTTON_UP = "SpinnerButtonUp";
     public static final String SPINNER_BUTTON_DOWN = "SpinnerButtonDown";
     private final String BUTTONS_BOX = "ButtonsBox";
@@ -88,7 +88,7 @@ public class IntegerSpinner extends HBox {
             NumberFormat nf){
 
         super();
-        this.setId(NUMBER_SPINNER);
+        //this.setId(NUMBER_SPINNER);
         this.stepWidthProperty.set(stepWidth);
 
         //Set max and min
@@ -223,6 +223,10 @@ public class IntegerSpinner extends HBox {
         return numberProperty;
     }
 
+    /**
+     * This method returns the Integer set in the view
+     * @return
+     */
     public final Integer getNumber() {
         if(checkBorders()){
             return numberField.getInteger();

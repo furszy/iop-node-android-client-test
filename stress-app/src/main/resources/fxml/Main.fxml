@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.BorderPane?>
+
+<!--Created by Manuel Perez on 22/08/2016-->
+
+<BorderPane fx:controller="org.iop.stress_app.structure.controllers.main.MainController" fx:id="mainView" xmlns:fx="http://javafx.com/fxml" >
+    <padding>
+        <Insets top="15" right="10" bottom="10" left="15"/>
+    </padding>
+    <!--In this fxml we build the main layout, please, use this file only to call another containers built in different
+    fxml files. Please, not include your containers here. Thank you.
+    -->
+    <!--Main Top-->
+    <top>
+        <fx:include fx:id="mainTop" source="MainTop.fxml"/>
+    </top>
+    <!--Main Tab Pane-->
+    <center>
+        <fx:include fx:id="tabBorderPane" source="TabPane.fxml"/>
+    </center>
+    <!--Main Bottom-->
+    <bottom>
+        <fx:include fx:id="mainBottom" source="MainBottom.fxml" />
+    </bottom>
+</BorderPane>

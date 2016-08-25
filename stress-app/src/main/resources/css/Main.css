@@ -1,0 +1,29 @@
+/*
+    Created on : 23-ago-2016, 10:37:02
+    Author     : Manuel Perez
+*/
+#statusLabel {
+    -fx-text-fill: navy;
+    -fx-font-size: 11px;
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );
+}
+#mainLabel {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );
+}
+#labelInfo {
+    -fx-font-size: 10px;
+}
+.button {
+    -fx-text-fill: rgba(0,0,0,0.9);
+    -fx-font-family: "Arial Narrow";
+    -fx-font-weight: bold;
+    -fx-font-size: 10px;
+    -fx-background-color: linear-gradient(rgba(255,255,255,0.5), rgba(100,100,100,0.5));
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+.button:hover {
+    -fx-background-color: linear-gradient(rgba(100,100,100,0.5), rgba(255,255,255,0.5));
+}

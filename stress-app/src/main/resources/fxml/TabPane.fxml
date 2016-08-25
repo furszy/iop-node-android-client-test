@@ -6,34 +6,52 @@
 <?import java.net.URL?>
 
 <!--Created by Manuel Perez on 22/08/2016-->
-<BorderPane fx:controller="org.iop.stress_app.structure.controllers.TabPaneController" xmlns:fx="http://javafx.com/fxml" styleClass="root">
+<BorderPane fx:id="tabBorderPane" fx:controller="org.iop.stress_app.structure.controllers.main.TabPaneController" xmlns:fx="http://javafx.com/fxml" styleClass="root">
     <center>
         <!--
         This file FXML must include all the tabs that you want to include in the main app, please,
-        be careful to set an unique Id to each tab. Thank you.
+        be careful to set an unique Id to each tab. All the tab settings must be done in the proper fxml file.
+        Thank you.
         -->
-        <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
+        <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" tabMaxWidth="450">
             <tabs>
+                <!--Devices Tabs-->
+                <Tab  text="Devices">
+                    <content>
+                        <fx:include fx:id="devicesTab" source="CoreTab.fxml"/>
+                    </content>
+                </Tab>
+                <Tab  text="Network Services">
+                    <content>
+                        <fx:include fx:id="nsTab" source="NetworkServiceAdvancedTab.fxml"/>
+                    </content>
+                </Tab>
+                <!--Information tab-->
+                <Tab  text="Information">
+                    <content>
+                        <fx:include fx:id="informationTab" source="InformationTab.fxml"/>
+                    </content>
+                </Tab>
                 <!--Connection tab-->
-                <Tab  text="Connections">
+                <!--<Tab  text="Connections">
                     <content>
                         <fx:include fx:id="connectionTab" source="ConnectionTab.fxml"/>
                     </content>
-                </Tab>
+                </Tab>-->
                 <!--end of connection tab-->
                 <!--Network Service tab-->
-                <Tab  text="Network Services">
+                <!--<Tab  text="Network Services">
                     <content>
                         <fx:include fx:id="networkServiceTab" source="NetworkServiceTab.fxml"/>
                     </content>
-                </Tab>
+                </Tab>-->
                 <!--end of Network Service tab-->
                 <!--Actor tab-->
-                <Tab  text="Actors">
+                <!--<Tab  text="Actors">
                     <content>
                         <fx:include fx:id="actorTab" source="ActorTab.fxml"/>
                     </content>
-                </Tab>
+                </Tab>-->
                 <!--end of Actor tab-->
             </tabs>
         </TabPane>

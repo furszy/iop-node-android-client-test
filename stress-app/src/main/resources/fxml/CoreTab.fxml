@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import org.iop.stress_app.structure.views.IntegerSpinner?>
+<?import java.net.URL?>
+<?import org.iop.stress_app.structure.views.InfoTextArea?>
+
+<!--Created by Manuel Perez on 22/08/2016-->
+
+<GridPane fx:id="core" fx:controller="org.iop.stress_app.structure.controllers.tab.CoreTabController" xmlns:fx="http://javafx.com/fxml" styleClass="root">
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+    <Label fx:id="label" text="Please, set the number of devices to start:" prefWidth="450" wrapText="true" prefHeight="40"
+       GridPane.columnIndex="0"
+       GridPane.rowIndex="0"
+       GridPane.columnSpan="2" />
+    <IntegerSpinner fx:id="tabSpinner" max="1000" min="1" number="5"
+        GridPane.columnIndex="0"
+        GridPane.rowIndex="1"
+        GridPane.columnSpan="2" />
+    <InfoTextArea fx:id="coreInfoArea"
+        GridPane.columnIndex="0"
+        GridPane.rowIndex="2"
+        GridPane.columnSpan="2"/>
+    <Label text="" prefHeight="30"
+       GridPane.columnIndex="0"
+       GridPane.rowIndex="3"
+    />
+    <stylesheets>
+        <URL value="@/css/ConnectionTab.css" />
+    </stylesheets>
+
+</GridPane>
