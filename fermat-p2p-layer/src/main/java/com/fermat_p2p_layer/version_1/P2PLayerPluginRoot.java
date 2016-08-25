@@ -588,14 +588,32 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
         );
     }
 
+    /**
+     *  Bloqueada por ahora
+     *
+     * @param networkServiceType
+     * @param actorToFollowPk
+     * @return
+     * @throws CantSendMessageException
+     */
     @Override
     public UUID subscribeActorOnlineEvent(NetworkServiceType networkServiceType, String actorToFollowPk) throws CantSendMessageException {
-        return messageSender.subscribeNodeEvent(networkServiceType, EventOp.EVENT_OP_IS_PROFILE_ONLINE, actorToFollowPk);
+        throw new UnsupportedOperationException("Method not available");
+//        return messageSender.subscribeNodeEvent(networkServiceType, EventOp.EVENT_OP_IS_PROFILE_ONLINE, actorToFollowPk);
     }
 
+    /**
+     * Bloqueado por ahora
+     *
+     * @param networkServiceType
+     * @param eventSubscribedId
+     * @return
+     * @throws CantSendMessageException
+     */
     @Override
     public UUID unSubscribeActorOnlineEvent(NetworkServiceType networkServiceType,UUID eventSubscribedId) throws CantSendMessageException {
-        return messageSender.unSubscribeNodeEvent(networkServiceType,eventSubscribedId);
+        throw new UnsupportedOperationException("Method not available");
+//        return messageSender.unSubscribeNodeEvent(networkServiceType,eventSubscribedId);
     }
 
     public Collection<AbstractNetworkService> getNetworkServices() {
