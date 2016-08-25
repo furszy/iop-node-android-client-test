@@ -198,6 +198,10 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
                     jsonMessage
             );
 
+            UUID uuid = UUID.randomUUID();
+
+            messageToSave.setId(uuid);
+
             UUID messageId = sendNewMessage(
                     sender,
                     receiver,
@@ -206,7 +210,7 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
                     true
             );
 
-            messageToSave.setId(messageId);
+
             chatMetadataRecordDAO.persistMessage(messageToSave);
 
             return messageId;

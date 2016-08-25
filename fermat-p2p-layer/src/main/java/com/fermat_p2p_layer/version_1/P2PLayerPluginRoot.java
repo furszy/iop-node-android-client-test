@@ -557,13 +557,13 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
         if (packageContent.getSenderPublicKey().equals(packageContent.getReceiverPublicKey())) throw new CantSendMessageException("Sender and Receiver are the same");
         //If the NS wants that the layer monitoring the resend process I'll persist this message in p2p layer database
         if(layerMonitoring){
-            try {
-                p2PLayerDao.persistMessage(packageContent);
-            } catch (CantPersistsMessageException e) {
-                //I will report this error, but, the message process will continue.
-                e.printStackTrace();
-                reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,e);
-            }
+//            try {
+//                p2PLayerDao.persistMessage(packageContent);
+//            } catch (CantPersistsMessageException e) {
+//                //I will report this error, but, the message process will continue.
+//                e.printStackTrace();
+//                reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN,e);
+//            }
         }
         return messageSender.sendMessage(packageContent,networkServiceType,nodeDestinationPublicKey);
     }

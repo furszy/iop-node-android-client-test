@@ -66,9 +66,11 @@ public class ContactsDAO {
 
         databaseTable.insertRecord(databaseTableRecord);
 
-        PluginBinaryFile pluginBinaryFile = pluginFileSystem.getBinaryFile(pluginId, CONTACT_IMAGES_DIR, actorProfile.getIdentityPublicKey(), FilePrivacy.PUBLIC, FileLifeSpan.PERMANENT);
-        pluginBinaryFile.setContent(actorProfile.getPhoto());
-        pluginBinaryFile.persistToMedia();
+        if (actorProfile.getPhoto()!=null) {
+            PluginBinaryFile pluginBinaryFile = pluginFileSystem.getBinaryFile(pluginId, CONTACT_IMAGES_DIR, actorProfile.getIdentityPublicKey(), FilePrivacy.PUBLIC, FileLifeSpan.PERMANENT);
+            pluginBinaryFile.setContent(actorProfile.getPhoto());
+            pluginBinaryFile.persistToMedia();
+        }
 
     }
 
