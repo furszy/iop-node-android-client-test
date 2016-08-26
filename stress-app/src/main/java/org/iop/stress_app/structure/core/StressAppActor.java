@@ -80,7 +80,11 @@ public class StressAppActor implements MessageReceiver{
             System.out.println("Network Service type: "+type);
             nsPublickeyMap.put(ns.getPublicKey(), (ChatNetworkServicePluginRoot) ns);
             ((ChatNetworkServicePluginRoot) ns).setMessageReceiver(this);
-            actorProfileList.forEach(actor->createAndRegisterActor(actor,(ChatNetworkServicePluginRoot) ns));
+            int actorCounter = 0;
+            for(ActorProfile actor : actorProfileList){
+                createAndRegisterActor(actor,(ChatNetworkServicePluginRoot) ns, actorCounter);
+                actorCounter++;
+            }
         });
     }
 
@@ -91,14 +95,15 @@ public class StressAppActor implements MessageReceiver{
      */
     private void createAndRegisterActor(
             ActorProfile profile,
-            ChatNetworkServicePluginRoot networkServicePluginRoot){
+            ChatNetworkServicePluginRoot networkServicePluginRoot,
+            int actorCounter){
         try{
             long threadId = Thread.currentThread().getId();
             profile.setIdentityPublicKey(UUID.randomUUID().toString());
             System.out.println("I will try to register an actor with pk " + profile.getIdentityPublicKey());
             profile.setActorType(Actors.CHAT.getCode());
-            profile.setName("Chat Actor " + threadId);
-            profile.setAlias("Alias chat " + threadId);
+            profile.setName("Chat Actor " + threadId +"- "+actorCounter);
+            profile.setAlias("Alias chat " + threadId +"- "+actorCounter);
             //This represents a valid image
             profile.setPhoto(IoPBytesArray.getIoPBytesArray());
             profile.setNsIdentityPublicKey(networkServicePluginRoot.getPublicKey());
@@ -154,6 +159,7 @@ public class StressAppActor implements MessageReceiver{
                 }
             }
         }
+        messageTestStarted = false;
     }
 
     /**
