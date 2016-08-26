@@ -148,7 +148,7 @@ public class StressAppActor implements MessageReceiver{
                 try{
                     messageToSend = "StressAppActor sends you a "+generateRandomHexString();
                     System.out.println("**** StressAppActor "+actorSender.getIdentityPublicKey()+"\n is trying to send: "+messageToSend+" to "+actorReceiver.getIdentityPublicKey());
-                    ns.sendNewMessage(actorSender, actorReceiver, messageToSend, false);
+                    ns.sendMessage(messageToSend,actorSender.getIdentityPublicKey(), actorReceiver.getIdentityPublicKey());
                     messagesCount.put(actorSender.getIdentityPublicKey(), 0);
                     actorsMap.put(actorSender.getIdentityPublicKey(),actorSender);
                     messagesSent++;
@@ -197,14 +197,9 @@ public class StressAppActor implements MessageReceiver{
             ChatNetworkServicePluginRoot networkServicePluginRoot = nsPublickeyMap.get(actorSender.getNsIdentityPublicKey());
             String messageToSend = "StressAppActor responds you a "+generateRandomHexString();
             System.out.println("*** StressAppActor is trying to respond "+messageToSend);
-            try {
-                networkServicePluginRoot.sendNewMessage(actorSender, actorReceiver, messageToSend, false);
-                messagesSent++;
-                System.out.println("*** StressAppActor has registered "+messagesSent+" messages sent");
-            } catch (CantSendMessageException e) {
-                System.out.println(actorSender.getIdentityPublicKey()+" cannot respond a message");
-                e.printStackTrace();
-            }
+            networkServicePluginRoot.sendMessage(messageToSend,actorSender.getIdentityPublicKey(), actorReceiver.getIdentityPublicKey());
+            messagesSent++;
+            System.out.println("*** StressAppActor has registered "+messagesSent+" messages sent");
         }
     }
 

@@ -2,12 +2,11 @@ package org.iop.ns.chat;
 
 import com.bitdubai.fermat_api.layer.all_definition.common.system.annotations.NeededAddonReference;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.error_manager.enums.UnexpectedPluginExceptionSeverity;
+import com.bitdubai.fermat_api.layer.all_definition.common.system.utils.LayerReference;
+import com.bitdubai.fermat_api.layer.all_definition.common.system.utils.PluginDeveloperReference;
+import com.bitdubai.fermat_api.layer.all_definition.common.system.utils.PluginReference;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.utils.PluginVersionReference;
-import com.bitdubai.fermat_api.layer.all_definition.enums.Actors;
-import com.bitdubai.fermat_api.layer.all_definition.enums.Addons;
-import com.bitdubai.fermat_api.layer.all_definition.enums.Layers;
-import com.bitdubai.fermat_api.layer.all_definition.enums.Platforms;
-import com.bitdubai.fermat_api.layer.all_definition.enums.Plugins;
+import com.bitdubai.fermat_api.layer.all_definition.enums.*;
 import com.bitdubai.fermat_api.layer.all_definition.events.EventSource;
 import com.bitdubai.fermat_api.layer.all_definition.network_service.enums.NetworkServiceType;
 import com.bitdubai.fermat_api.layer.all_definition.util.Version;
@@ -64,6 +63,12 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
                 EventSource.NETWORK_SERVICE_CHAT,
                 NetworkServiceType.CHAT
         );
+        //this is only
+        this.pluginVersionReference.setPluginDeveloperReference(
+                new PluginDeveloperReference(
+                        new PluginReference(
+                                new LayerReference(Layers.NETWORK_SERVICE),Plugins.CHAT_ACTOR),
+                        Developers.BITDUBAI));
 
     }
 
@@ -158,6 +163,7 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
             }
 
         } catch (Exception e) {
+            System.err.println("Message received: "+newFermatMessageReceive);
             e.printStackTrace();
             reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
 
@@ -174,7 +180,7 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
         return getIdentity().getPublicKey();
     }
 
-    public UUID sendMessage(final String jsonMessage,
+    public UUID sendMessage(final String message,
                             final String identityPublicKey,
                             final String actorPublicKey) {
 
@@ -195,7 +201,7 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
                     identityPublicKey,
                     actorPublicKey,
                     timestamp,
-                    jsonMessage
+                    message
             );
 
             UUID uuid = UUID.randomUUID();
