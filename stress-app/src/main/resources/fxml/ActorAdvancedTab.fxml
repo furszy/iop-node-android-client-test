@@ -26,7 +26,7 @@
                   GridPane.columnIndex="0"
                   GridPane.rowIndex="2"
                   GridPane.columnSpan="2"/>
-    <CheckBox fx:id="actorCheckBox" text="Activate this test" prefHeight="30"
+    <CheckBox fx:id="actorCheckBox" text="Activate this test" prefHeight="30" selected="true"
               GridPane.columnIndex="0"
               GridPane.rowIndex="3"
               GridPane.halignment="LEFT"
