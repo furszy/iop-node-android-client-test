@@ -26,6 +26,12 @@
                         <fx:include fx:id="nsTab" source="NetworkServiceAdvancedTab.fxml"/>
                     </content>
                 </Tab>
+                <!--Actor tab-->
+                <Tab  text="Actors">
+                    <content>
+                        <fx:include fx:id="actorsTab" source="ActorAdvancedTab.fxml"/>
+                    </content>
+                </Tab>
                 <!--Information tab-->
                 <Tab  text="Information">
                     <content>

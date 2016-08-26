@@ -7,14 +7,24 @@ import org.iop.stress_app.structure.views.InfoTextArea;
 import org.iop.stress_app.structure.views.IntegerSpinner;
 
 /**
- * Created by Manuel Perez P. (darkpriestrelative@gmail.com) on 24/08/16.
+ * Created by Manuel Perez P. (darkpriestrelative@gmail.com) on 25/08/16.
  */
-public class NetworkServiceTest extends AbstractStressTest {
+public class ActorTest extends AbstractStressTest {
 
     /**
      * Represents the control where the user sets the number of NS to start
      */
     private final IntegerSpinner nsIntegerSpinner;
+
+    /**
+     * Represents the control where the user sets the number of actors to rceate
+     */
+    private final IntegerSpinner actorIntegerSpinner;
+
+    /**
+     * Represents the number of Ns to start
+     */
+    private int actors;
 
     /**
      * Represents the number of Ns to start
@@ -26,13 +36,17 @@ public class NetworkServiceTest extends AbstractStressTest {
      *
      * @param startButton
      * @param infoTextArea
+     * @param devicesIntegerSpinner
      */
-    public NetworkServiceTest(
+    public ActorTest(
             Button startButton,
             InfoTextArea infoTextArea,
             IntegerSpinner devicesIntegerSpinner,
-            IntegerSpinner nsIntegerSpinner) {
-        super(startButton, TestType.NS_TEST, infoTextArea, devicesIntegerSpinner);
+            IntegerSpinner nsIntegerSpinner,
+            IntegerSpinner actorIntegerSpinner
+            ) {
+        super(startButton, TestType.ACTORS_TEST, infoTextArea, devicesIntegerSpinner);
+        this.actorIntegerSpinner = actorIntegerSpinner;
         this.nsIntegerSpinner = nsIntegerSpinner;
     }
 
@@ -51,15 +65,19 @@ public class NetworkServiceTest extends AbstractStressTest {
             if (!isStart) {
 
                 this.networkServices = nsIntegerSpinner.getNumber();
+                this.actors = actorIntegerSpinner.getNumber();
                 coreManager.setCoreCount(this.connections);
                 coreManager.setNetworkServiceStart(true);
                 coreManager.setNsToStart(networkServices);
+                coreManager.setActorCreation(true);
+                coreManager.setActorsToCreate(actors);
                 coreManager.startStressTest();
                 isStart = true;
 
                 //Notify the user the test
                 appendText("Testing with "+this.connections+" connections");
                 appendText("Started "+networkServices+" network services");
+                appendText("Created "+actors+" actors");
                 //Change the button text
                 changeButtonText();
             }else{
@@ -75,6 +93,7 @@ public class NetworkServiceTest extends AbstractStressTest {
                 this.connections+=connections;
                 appendText("Working with "+this.connections+" connections");
                 appendText("Added "+networkServices+" network services to every connection");
+                appendText("Added "+actors+" actors to each network service");
 
             }
 
@@ -84,6 +103,4 @@ public class NetworkServiceTest extends AbstractStressTest {
             e.printStackTrace();
         }
     }
-
-
 }

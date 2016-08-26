@@ -62,6 +62,13 @@ public class StressAppNetworkService {
         }
     }
 
+    /**
+     * This method returns the abstractNetworkServiceList
+     * @return
+     */
+    public HashMap<NetworkServiceType, AbstractNetworkService> getAbstractNetworkServiceList() {
+        return abstractNetworkServiceList;
+    }
 
     private void loadAllNetworkServicesInExtDirectory(){
 

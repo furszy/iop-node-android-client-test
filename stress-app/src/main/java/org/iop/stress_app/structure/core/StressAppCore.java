@@ -115,10 +115,11 @@ public class StressAppCore {
 
             System.out.println("FERMAT - Network StressAppCore - started satisfactory...");
 
-//            while (!ioPClientPluginRoot.isConnected()) {
-//                System.out.println("Not connected yet");
-//                Thread.sleep(5000);
-//            }
+            while (!ioPClientPluginRoot.isConnected()) {
+                System.out.println("Not connected yet - Thread Id: "+Thread.currentThread().getId());
+                Thread.sleep(100);
+            }
+            System.out.println("******** Client connected ********");
 
             //actorMessengerManager = new ActorMessengerManager(this);
 

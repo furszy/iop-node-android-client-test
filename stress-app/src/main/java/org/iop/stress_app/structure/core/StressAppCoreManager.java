@@ -18,6 +18,7 @@ public class StressAppCoreManager {
     private boolean networkServiceStart = false;
     private int nsToStart = 0;
     private boolean actorCreation = false;
+    private int actorsToCreate = 0;
 
     public StressAppCoreManager() {
         this.stressAppCoreList = new ArrayList<>();
@@ -67,6 +68,16 @@ public class StressAppCoreManager {
                     stressAppNetworkService.addNetworkService("ChatNetworkServicePluginRoot");
                 }
                 stressAppNetworkService.startNetworkServices();
+                //after we created the NS, we'll gonna try to create actors
+                if(actorCreation){
+                    StressAppActor stressAppActor = new StressAppActor(stressAppNetworkService);
+                    for(int j=0; j<actorsToCreate ; j++){
+                        stressAppActor.addActor();
+                    }
+                    stressAppActor.createAndRegisterActors();
+                    //Now we gonna request a list of actors
+                    stressAppActor.requestActorList();
+                }
             }
         }
     }
@@ -80,6 +91,10 @@ public class StressAppCoreManager {
 
     public void setNsToStart(int nsToStart){
         this.nsToStart = nsToStart;
+    }
+
+    public void setActorsToCreate(int actorsToCreate){
+        this.actorsToCreate = actorsToCreate;
     }
 
     public void setNetworkServiceStart(boolean networkServiceStart) {
