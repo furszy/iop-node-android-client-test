@@ -1,18 +1,26 @@
 package org.iop.stress_app.structure.core;
 
 import com.bitdubai.fermat_api.layer.all_definition.enums.Actors;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.exceptions.CantSendMessageException;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import org.iop.ns.chat.ChatNetworkServicePluginRoot;
+import org.iop.ns.chat.structure.ChatMetadataRecord;
+import org.iop.ns.chat.structure.test.MessageReceiver;
 import org.iop.stress_app.structure.utils.IoPBytesArray;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by Manuel Perez P. (darkpriestrelative@gmail.com) on 25/08/16.
  */
-public class StressAppActor {
+public class StressAppActor implements MessageReceiver{
+
+    /**
+     * Default values
+     */
+    private final static int MAX = 1000;
+    private final static int OFFSET = 0;
+    private final static int RESPONDS = 4;
 
     /**
      * Represents the StressAppNetworkService instance
@@ -25,12 +33,36 @@ public class StressAppActor {
     private List<ActorProfile> actorProfileList;
 
     /**
+     * Represents the Map with the NS and actorList
+     */
+    private Map<ChatNetworkServicePluginRoot, List<ActorProfile>> nsMap;
+
+    private Map<String , ChatNetworkServicePluginRoot> nsPublickeyMap;
+
+    private Map<String, Integer> messagesCount;
+
+    private Map<String, ActorProfile> actorsMap;
+
+    private boolean messageTestStarted = false;
+
+    /**
+     * Counters
+     */
+    private int actorRegistered = 0;
+    private int messagesSent = 0;
+    private int failedMessages = 0;
+    private int sucessfulMessages = 0;
+    private int receivedMessages = 0;
+
+    /**
      * Default constructor with parameters
      * @param stressAppNetworkService
      */
     public StressAppActor(StressAppNetworkService stressAppNetworkService) {
         this.stressAppNetworkService = stressAppNetworkService;
         this.actorProfileList = new ArrayList<>();
+        this.nsMap = new HashMap<>();
+        this.nsPublickeyMap = new HashMap<>();
     }
 
     /**
@@ -40,9 +72,14 @@ public class StressAppActor {
         actorProfileList.add(new ActorProfile());
     }
 
+    /**
+     * This method creates and register actor for each NS.
+     */
     public void createAndRegisterActors(){
         stressAppNetworkService.getAbstractNetworkServiceList().forEach((type,ns)->{
             System.out.println("Network Service type: "+type);
+            nsPublickeyMap.put(ns.getPublicKey(), (ChatNetworkServicePluginRoot) ns);
+            ((ChatNetworkServicePluginRoot) ns).setMessageReceiver(this);
             actorProfileList.forEach(actor->createAndRegisterActor(actor,(ChatNetworkServicePluginRoot) ns));
         });
     }
@@ -67,10 +104,130 @@ public class StressAppActor {
             profile.setNsIdentityPublicKey(networkServicePluginRoot.getPublicKey());
             profile.setExtraData("Test extra data");
             networkServicePluginRoot.registerActor(profile, 0, 0);
+            List<ActorProfile> actorList = nsMap.get(networkServicePluginRoot);
+            if(actorList ==null){
+                actorList = new ArrayList<>();
+            }
+            actorList.add(profile);
+            nsMap.put(networkServicePluginRoot, actorList);
         } catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    /**
+     * This method request an actor list
+     */
+    public void requestActorList(){
+        nsMap.keySet().forEach(ns->
+                nsMap.get(ns).forEach(profile->
+                        ns.requestActorProfilesList(MAX,OFFSET,profile.getNsIdentityPublicKey())));
+    }
+
+    public void messageTest(List<ActorProfile> list){
+        if(messageTestStarted){
+            return ;
+        }
+        messageTestStarted = true;
+        messagesCount = new HashMap<>();
+        actorsMap = new HashMap<>();
+        list.forEach(actor->actorsMap.put(actor.getIdentityPublicKey(), actor));
+        ActorProfile actorReceiver;
+        String messageToSend;
+        for(ChatNetworkServicePluginRoot ns : nsMap.keySet()){
+            for(ActorProfile actorSender : nsMap.get(ns)){
+                actorReceiver = selectRandomActorProfile(list);
+                /*if(actorReceiver.getIdentityPublicKey().equals(actorSender.getIdentityPublicKey())){
+                    actorReceiver = selectRandomActorProfile(list);
+                }*/
+                try{
+                    messageToSend = "StressAppActor sends you a "+generateRandomHexString();
+                    System.out.println("**** StressAppActor "+actorSender.getIdentityPublicKey()+"\n is trying to send: "+messageToSend+" to "+actorReceiver.getIdentityPublicKey());
+                    ns.sendNewMessage(actorSender, actorReceiver, messageToSend, false);
+                    messagesCount.put(actorSender.getIdentityPublicKey(), 0);
+                    actorsMap.put(actorSender.getIdentityPublicKey(),actorSender);
+                    messagesSent++;
+                    System.out.println("*** StressAppActor has registered "+messagesSent+" messages sent");
+                } catch (Exception e){
+                    System.out.println(actorSender.getIdentityPublicKey()+" cannot send a message");
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * This method selects and returns a random from the given list
+     * @param list
+     * @return
+     */
+    private ActorProfile selectRandomActorProfile(List<ActorProfile> list){
+        int randomIndex = (int) (((double)list.size())*Math.random());
+        return list.get(randomIndex);
+    }
+
+    /**
+     * This method creates a random Hex String
+     * @return
+     */
+    private String generateRandomHexString(){
+        return Long.toHexString(Double.doubleToLongBits(Math.random()));
+    }
+
+    /**
+     * The following methods will implement the MessageReceiver interface and will be used to
+     * get the NS messages.
+     */
+
+    @Override
+    public void onMessageReceived(String sender, ChatMetadataRecord chatMetadataRecord) {
+        System.out.println("*** StressAppActor has received a message from "+sender);
+        System.out.println("*** StressAppActor has registered "+receivedMessages+" received messages");
+        String receiverPk = chatMetadataRecord.getRemoteActorPublicKey();
+        int responds = messagesCount.get(receiverPk);
+        if(responds<RESPONDS){
+            ActorProfile actorSender = actorsMap.get(receiverPk);
+            ActorProfile actorReceiver = actorsMap.get(chatMetadataRecord.getLocalActorPublicKey());
+            ChatNetworkServicePluginRoot networkServicePluginRoot = nsPublickeyMap.get(actorSender.getNsIdentityPublicKey());
+            String messageToSend = "StressAppActor responds you a "+generateRandomHexString();
+            System.out.println("*** StressAppActor is trying to respond "+messageToSend);
+            try {
+                networkServicePluginRoot.sendNewMessage(actorSender, actorReceiver, messageToSend, false);
+                messagesSent++;
+                System.out.println("*** StressAppActor has registered "+messagesSent+" messages sent");
+            } catch (CantSendMessageException e) {
+                System.out.println(actorSender.getIdentityPublicKey()+" cannot respond a message");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onActorListReceived(List<ActorProfile> list) {
+        System.out.println("*** StressAppActor has received a list with "+list.size()+" actors");
+        //System.out.println(list);
+        if(!messageTestStarted){
+            messageTest(list);
+        }
+    }
+
+    @Override
+    public void onActorRegistered(ActorProfile actorProfile) {
+        System.out.println("*** StressAppActor has detected an actor registered, please, Manuel, notify and put this on the view");
+        actorRegistered++;
+        System.out.println("*** StressAppActor has registered "+actorRegistered+" actors");
+    }
+
+    @Override
+    public void onMessageFail(UUID messageId) {
+        System.out.println("*** StressAppActor has detected a failed message, please, Manuel, notify and put this on the view");
+        failedMessages++;
+        System.out.println("*** StressAppActor has registered "+failedMessages+" failed messages");
 
     }
-    
+
+    @Override
+    public void onActorOffline(String remotePkGoOffline) {
+        //TODO: to implement and notify to UI
+    }
 }

@@ -75,6 +75,8 @@ public class StressAppCoreManager {
                         stressAppActor.addActor();
                     }
                     stressAppActor.createAndRegisterActors();
+                    //Now we gonna request a list of actors
+                    stressAppActor.requestActorList();
                 }
             }
         }
