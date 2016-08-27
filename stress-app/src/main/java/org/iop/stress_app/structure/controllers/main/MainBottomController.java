@@ -5,10 +5,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import org.iop.client.version_1.util.HardcodeConstants;
 import org.iop.stress_app.structure.controllers.AbstractMainController;
 import org.iop.stress_app.structure.interfaces.StressTest;
 import org.iop.stress_app.structure.tests.ActorTest;
@@ -16,6 +15,7 @@ import org.iop.stress_app.structure.tests.DevicesTest;
 import org.iop.stress_app.structure.tests.NetworkServiceTest;
 import org.iop.stress_app.structure.views.InfoTextArea;
 import org.iop.stress_app.structure.views.IntegerSpinner;
+import org.iop.stress_app.structure.views.SummaryLabel;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -37,6 +37,9 @@ public class MainBottomController extends AbstractMainController {
     private final static String ACTOR_CHECK_BOX = "actorCheckBox";
     private final static String ACTOR_TEXT_AREA_ID = "actorInfoArea";
     private final static String ACTOR_SPINNER_ID = "actorSpinner";
+    private final static String SUMMARY_LABEL = "summaryLabel";
+
+    private final static int SUMMARY_TAB_INDEX = 3;
 
     /**
      * Devices Children Maps
@@ -46,6 +49,7 @@ public class MainBottomController extends AbstractMainController {
     HashMap<String, Node> tabPaneNodes;
     HashMap<String, Node> nsTabPaneNodes;
     HashMap<String, Node> actorTabPaneNodes;
+    HashMap<String, Node> informationTabNodes;
 
     /**
      * Represents the main container present in this controller
@@ -107,6 +111,11 @@ public class MainBottomController extends AbstractMainController {
      * Represents the Actors Tab IntegerSpinner
      */
     IntegerSpinner actorIntegerSpinner;
+
+    /**
+     * Represents the summary label.
+     */
+    SummaryLabel summaryLabel;
 
     /**
      * Tests
@@ -206,6 +215,30 @@ public class MainBottomController extends AbstractMainController {
             actorTabPaneNodes = mapChildren((Parent) innerNode);
         }
         //System.out.println(actorTabPaneNodes);
+        if(informationTabNodes==null){
+            //Now, we need the BorderPane
+            Node tabPane = borderPaneNodes.get(TAB_PANE_ID);
+            //System.out.println(tabPane);
+            //Select the summary tab in the UI
+            ((TabPane) tabPane).getSelectionModel().select(SUMMARY_TAB_INDEX);
+            ObservableList<Node> children = ((Parent) tabPane).getChildrenUnmodifiable();
+            //children.forEach(n-> System.out.println(((Parent)n).getId()));
+            //Todo: to improve
+            //for some reason the TabPane that I need is in index 0
+            //System.out.println(children);
+            Node node = children.get(0);
+            //System.out.println(node);
+            ObservableList<Node> innerNodes=((Parent)node).getChildrenUnmodifiable();
+            Node innerNode = innerNodes.get(0);
+            //System.out.println(innerNode);
+            ObservableList<Node> scrollNodes=((Parent)innerNode).getChildrenUnmodifiable();
+            Node scrollNode = scrollNodes.get(0);
+            ObservableList<Node> centerNodes=((Parent)scrollNode).getChildrenUnmodifiable();
+            Node centerNode = centerNodes.get(0);
+            ObservableList<Node> layerNodes=((Parent)centerNode).getChildrenUnmodifiable();
+            informationTabNodes = mapChildren((Parent) layerNodes.get(0));
+        }
+        //System.out.println(informationTabNodes);
     }
 
     /**
@@ -300,6 +333,16 @@ public class MainBottomController extends AbstractMainController {
         return null;
     }
 
+    private SummaryLabel getInformationTabSummaryLabel(){
+        mapAllDeviceChildren();
+        Node summaryLabelNode = informationTabNodes.get(SUMMARY_LABEL);
+        if(summaryLabelNode instanceof SummaryLabel){
+            SummaryLabel informationLabel = (SummaryLabel) summaryLabelNode;
+            return informationLabel;
+        }
+        return null;
+    }
+
     /**
      * This method executes an action
      */
@@ -337,9 +380,12 @@ public class MainBottomController extends AbstractMainController {
             if(actorIntegerSpinner==null){
                 actorIntegerSpinner = getActorIntegerSpinner();
             }
+            if(summaryLabel==null){
+                summaryLabel = getInformationTabSummaryLabel();
+            }
             if(actorTabCheckBox.isSelected()){
                 if(test==null){
-                    test = new ActorTest(mainButton, actorInfoArea, devicesIntegerSpinner, nsIntegerSpinner, actorIntegerSpinner);
+                    test = new ActorTest(mainButton, actorInfoArea, devicesIntegerSpinner, nsIntegerSpinner, actorIntegerSpinner, summaryLabel);
                 }
             } else if(nsTabCheckBox.isSelected()&&!actorTabCheckBox.isSelected()){
                 if(test==null)
@@ -349,6 +395,7 @@ public class MainBottomController extends AbstractMainController {
                     test = new DevicesTest(devicesIntegerSpinner, coreInfoArea, mainButton);
             }
 
+            statusLabel.setText("Iop Node IP: "+ HardcodeConstants.SERVER_IP_DEFAULT);
             test.executeTest();
 
         }
