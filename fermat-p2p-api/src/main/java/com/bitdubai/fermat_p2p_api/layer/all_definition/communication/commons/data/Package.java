@@ -39,7 +39,7 @@ public class Package implements Serializable {
     /**
      * Represent the networkServiceTypeSource value
      */
-    private NetworkServiceType networkServiceTypeSource;
+//    private NetworkServiceType networkServiceTypeSource;
 
     /**
      * Represent the destinationPublicKey
@@ -84,7 +84,7 @@ public class Package implements Serializable {
 
         this.packageId = packageId;
         this.content                  = content                 ;
-        this.networkServiceTypeSource = networkServiceTypeSource;
+//        this.networkServiceTypeSource = networkServiceTypeSource;
         this.packageType              = packageType             ;
         this.signature                = signature               ;
         this.destinationPublicKey     = destinationPublicKey    ;
@@ -101,14 +101,13 @@ public class Package implements Serializable {
             throw new InvalidParameterException("Content can't be null.");
 
         if (packageType == null)
-            throw new InvalidParameterException("packageType can't be null. ns type: "+networkServiceTypeSource);
+            throw new InvalidParameterException("packageType can't be null. content: "+content);
 
 //        if (signature == null)
 //            throw new InvalidParameterException("signature can't be null.");
 
         this.packageId = packageId;
         this.content                  = content                 ;
-        this.networkServiceTypeSource = networkServiceTypeSource;
         this.packageType              = packageType             ;
         this.signature                = signature               ;
         this.destinationPublicKey     = destinationPublicKey    ;
@@ -146,9 +145,9 @@ public class Package implements Serializable {
      *
      * @return networkServiceTypeSource
      */
-    public NetworkServiceType getNetworkServiceTypeSource() {
-        return networkServiceTypeSource;
-    }
+//    public NetworkServiceType getNetworkServiceTypeSource() {
+//        return networkServiceTypeSource;
+//    }
 
     /**
      * Set the ClientDestination
@@ -273,7 +272,7 @@ public class Package implements Serializable {
 
     public static Package rebuildInstance(final UUID packageId,
                                           final String             content                     ,
-                                          final NetworkServiceType networkServiceTypeSource    ,
+//                                          final NetworkServiceType networkServiceTypeSource    ,
                                           final PackageType        packageType                 ,
                                           final String             destinationIdentityPublicKey) {
 
@@ -292,7 +291,7 @@ public class Package implements Serializable {
         return new Package(
                 packageId,
                 content                     ,
-                networkServiceTypeSource    ,
+//                networkServiceTypeSource    ,
                 packageType                 ,
                 null                   ,
                 destinationIdentityPublicKey

@@ -315,9 +315,8 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
         newMessageTransmitListener.setEventHandler(new FermatEventHandler<NetworkClientNewMessageTransmitEvent>() {
             @Override
             public void handleEvent(NetworkClientNewMessageTransmitEvent fermatEvent) throws FermatException {
-
-                AbstractNetworkService abstractNetworkService = networkServices.get(fermatEvent.getNetworkServiceTypeSource());
-
+                PackageInformation packageInformation = messageSender.packageAck(fermatEvent.getPackageId());
+                AbstractNetworkService abstractNetworkService = networkServices.get(packageInformation.getNetworkServiceType());
                 if (abstractNetworkService.isStarted())
                     abstractNetworkService.onMessageReceived(fermatEvent.getContent());
                 else System.out.println("NetworkService message recive event problem: network service off , NS:"+ abstractNetworkService.getProfile().getNetworkServiceType());
