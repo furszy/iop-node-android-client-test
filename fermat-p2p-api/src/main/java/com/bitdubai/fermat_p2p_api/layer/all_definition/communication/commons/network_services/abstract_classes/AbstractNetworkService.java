@@ -5,13 +5,12 @@ import com.bitdubai.fermat_api.layer.all_definition.common.system.abstract_class
 import com.bitdubai.fermat_api.layer.all_definition.common.system.annotations.NeededAddonReference;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.annotations.NeededPluginReference;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.error_manager.enums.UnexpectedPluginExceptionSeverity;
+import com.bitdubai.fermat_api.layer.all_definition.common.system.utils.LayerReference;
+import com.bitdubai.fermat_api.layer.all_definition.common.system.utils.PluginDeveloperReference;
+import com.bitdubai.fermat_api.layer.all_definition.common.system.utils.PluginReference;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.utils.PluginVersionReference;
 import com.bitdubai.fermat_api.layer.all_definition.crypto.asymmetric.ECCKeyPair;
-import com.bitdubai.fermat_api.layer.all_definition.enums.Addons;
-import com.bitdubai.fermat_api.layer.all_definition.enums.Layers;
-import com.bitdubai.fermat_api.layer.all_definition.enums.Platforms;
-import com.bitdubai.fermat_api.layer.all_definition.enums.Plugins;
-import com.bitdubai.fermat_api.layer.all_definition.enums.ServiceStatus;
+import com.bitdubai.fermat_api.layer.all_definition.enums.*;
 import com.bitdubai.fermat_api.layer.all_definition.events.EventSource;
 import com.bitdubai.fermat_api.layer.all_definition.network_service.enums.NetworkServiceType;
 import com.bitdubai.fermat_api.layer.osa_android.broadcaster.FermatBundle;
@@ -110,6 +109,7 @@ public abstract class AbstractNetworkService extends AbstractPlugin implements N
         this.networkServiceType    = networkServiceType;
 
         this.registered            = Boolean.FALSE;
+
     }
 
     /**
@@ -350,7 +350,7 @@ public abstract class AbstractNetworkService extends AbstractPlugin implements N
      *
      * @Exceptions MessageTooBigException
      */
-    public final UUID sendNewMessage(final ActorProfile sender        ,
+    protected final UUID sendNewMessage(final ActorProfile sender        ,
                                final ActorProfile destination   ,
                                final String       messageContent,
                                final boolean p2pLayerMonitoring) throws CantSendMessageException {
