@@ -235,11 +235,11 @@ public class StressAppActor implements MessageReceiver{
             String messageToSend = "StressAppActor responds you a "+generateRandomHexString();
             System.out.println("*** StressAppActor is trying to respond "+messageToSend);
             try {
-                networkServicePluginRoot.sendNewMessage(actorSender, actorReceiver, messageToSend, false);
+                networkServicePluginRoot.sendMessage(messageToSend, actorSender.getIdentityPublicKey(), actorReceiver.getIdentityPublicKey());
                 messagesSent++;
                 System.out.println("*** StressAppActor has registered "+messagesSent+" messages sent");
                 report(ReportType.MESSAGE_SENT);
-            } catch (CantSendMessageException e) {
+            } catch (Exception e) {
                 System.out.println(actorSender.getIdentityPublicKey()+" cannot respond a message");
                 e.printStackTrace();
             }
