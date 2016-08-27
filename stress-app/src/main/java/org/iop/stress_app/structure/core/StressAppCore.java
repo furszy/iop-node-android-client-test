@@ -15,9 +15,12 @@ import com.bitdubai.fermat_pip_addon.layer.platform_service.error_manager.develo
 import com.bitdubai.fermat_pip_addon.layer.platform_service.event_manager.developer.bitdubai.version_1.EventManagerPlatformServiceAddonRoot;
 import com.fermat_p2p_layer.version_1.P2PLayerPluginRoot;
 
+import javafx.application.Platform;
 import org.iop.client.version_1.IoPClientPluginRoot;
 import org.iop.ns.chat.ChatNetworkServicePluginRoot;
 import org.iop.ns.chat.structure.test.MessageReceiver;
+import org.iop.stress_app.structure.enums.ReportType;
+import org.iop.stress_app.structure.views.SummaryLabel;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +35,9 @@ public class StressAppCore {
     IoPClientPluginRoot ioPClientPluginRoot;
     private ActorProfile profile;
     private ActorProfile lastRemoteProfile;
+
+    //TODO: to improve, this is not right
+    private SummaryLabel summaryLabel;
 
     private boolean networkServiceStart = false;
     private boolean actorCreation = false;
@@ -120,6 +126,9 @@ public class StressAppCore {
                 Thread.sleep(100);
             }
             System.out.println("******** Client connected ********");
+            if(summaryLabel!=null){
+                reportClientConnected();
+            }
 
             //actorMessengerManager = new ActorMessengerManager(this);
 
@@ -210,5 +219,22 @@ public class StressAppCore {
     }
     public void addDatabase(AbstractNetworkService networkService) {
         networkService.setPluginDatabaseSystem((PluginDatabaseSystem) pluginDatabaseSystemAndroidAddonRoot.getManager());
+    }
+
+    /**
+     * The following methods is to notify to the UI that a client is connected,
+     * This is for test and requires a proper implementation.
+     */
+    public void setSummaryLabel(SummaryLabel summaryLabel){
+        this.summaryLabel=summaryLabel;
+    }
+
+    private void reportClientConnected(){
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                summaryLabel.report(ReportType.CLIENT_CONNECTED);
+            }
+        });
     }
 }
