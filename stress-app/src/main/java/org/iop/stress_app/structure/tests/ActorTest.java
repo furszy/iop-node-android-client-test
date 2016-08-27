@@ -1,10 +1,12 @@
 package org.iop.stress_app.structure.tests;
 
 import javafx.scene.control.Button;
+import org.iop.stress_app.structure.core.StressAppCoreManager;
 import org.iop.stress_app.structure.enums.TestType;
 import org.iop.stress_app.structure.interfaces.AbstractStressTest;
 import org.iop.stress_app.structure.views.InfoTextArea;
 import org.iop.stress_app.structure.views.IntegerSpinner;
+import org.iop.stress_app.structure.views.SummaryLabel;
 
 /**
  * Created by Manuel Perez P. (darkpriestrelative@gmail.com) on 25/08/16.
@@ -31,6 +33,8 @@ public class ActorTest extends AbstractStressTest {
      */
     private int networkServices;
 
+    private final SummaryLabel summaryLabel;
+
     /**
      * Default constructor
      *
@@ -43,11 +47,14 @@ public class ActorTest extends AbstractStressTest {
             InfoTextArea infoTextArea,
             IntegerSpinner devicesIntegerSpinner,
             IntegerSpinner nsIntegerSpinner,
-            IntegerSpinner actorIntegerSpinner
+            IntegerSpinner actorIntegerSpinner,
+            SummaryLabel summaryLabel
             ) {
         super(startButton, TestType.ACTORS_TEST, infoTextArea, devicesIntegerSpinner);
         this.actorIntegerSpinner = actorIntegerSpinner;
         this.nsIntegerSpinner = nsIntegerSpinner;
+        this.summaryLabel = summaryLabel;
+        this.coreManager = new StressAppCoreManager(summaryLabel);
     }
 
     @Override

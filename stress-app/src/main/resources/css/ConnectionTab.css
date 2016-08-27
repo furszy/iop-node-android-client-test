@@ -27,7 +27,7 @@
 .scroll-pane{
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
 }
-#coreInfoArea{
+#coreInfoArea, #summaryLabel{
     -fx-font-family: "Inconsolata";
     -fx-font-size: 11px;
 }

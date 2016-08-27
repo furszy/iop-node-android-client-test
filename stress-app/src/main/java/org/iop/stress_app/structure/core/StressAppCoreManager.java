@@ -1,5 +1,7 @@
 package org.iop.stress_app.structure.core;
 
+import org.iop.stress_app.structure.views.SummaryLabel;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -20,8 +22,15 @@ public class StressAppCoreManager {
     private boolean actorCreation = false;
     private int actorsToCreate = 0;
 
+    private SummaryLabel summaryLabel;
+
     public StressAppCoreManager() {
         this.stressAppCoreList = new ArrayList<>();
+    }
+
+    public StressAppCoreManager(SummaryLabel summaryLabel) {
+        this.stressAppCoreList = new ArrayList<>();
+        this.summaryLabel = summaryLabel;
     }
 
     public void setCoreCount(int coreCount){
@@ -61,6 +70,9 @@ public class StressAppCoreManager {
 
         @Override
         public void run() {
+            if(summaryLabel!=null){
+                stressAppCore.setSummaryLabel(summaryLabel);
+            }
             stressAppCore.start();
             if(networkServiceStart){
                 StressAppNetworkService stressAppNetworkService = new StressAppNetworkService(stressAppCore);
@@ -70,7 +82,9 @@ public class StressAppCoreManager {
                 stressAppNetworkService.startNetworkServices();
                 //after we created the NS, we'll gonna try to create actors
                 if(actorCreation){
-                    StressAppActor stressAppActor = new StressAppActor(stressAppNetworkService);
+                    StressAppActor stressAppActor = new StressAppActor(
+                            stressAppNetworkService,
+                            summaryLabel);
                     for(int j=0; j<actorsToCreate ; j++){
                         stressAppActor.addActor();
                     }
