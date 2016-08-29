@@ -265,6 +265,29 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
         }
     }
 
+    public void requestActorProfile(String name,int max, int offset,String requesterPublicKey) {
+
+        try {
+            UUID packageId = discoveryActorProfiles(new DiscoveryQueryParameters(
+                    null,
+                    NetworkServiceType.ACTOR_CHAT,
+                    Actors.CHAT.getCode(),
+                    name,
+                    null,
+                    null,
+                    null,
+                    null,
+                    true,
+                    null,
+                    max,
+                    offset,
+                    true
+            ), requesterPublicKey);
+        } catch (CantSendMessageException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void onActorRegistered(ActorProfile actorProfile) {
 

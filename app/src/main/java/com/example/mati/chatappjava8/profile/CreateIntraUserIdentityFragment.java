@@ -347,7 +347,6 @@ public class CreateIntraUserIdentityFragment extends Fragment {
             profile.setAlias("Alias chat");
             //This represents a valid image
             profile.setPhoto(brokerImageByteArray);
-            profile.setNsIdentityPublicKey(manager.getNetWorkServicePublicKey());
             profile.setExtraData("Test extra data");
             executorService.submit(new Runnable() {
                 @Override
@@ -383,7 +382,6 @@ public class CreateIntraUserIdentityFragment extends Fragment {
             profile.setAlias("Alias chat");
             //This represents a valid image
             profile.setPhoto(brokerImageByteArray);
-            profile.setNsIdentityPublicKey(manager.getNetWorkServicePublicKey());
             profile.setExtraData("Test extra data");
             executorService.submit(new Runnable() {
                 @Override

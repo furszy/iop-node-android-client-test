@@ -65,6 +65,9 @@ public class ListActivity extends AppCompatActivity
 
     private AtomicBoolean isRefreshing;
 
+    private int filterMax = 10;
+    private int filterOffset = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -201,11 +204,18 @@ public class ListActivity extends AppCompatActivity
 //                        listAdapter.changeDataSet(listActors);
                         listAdapter.getFilter().filter(newText);
                     }
+
                     return false;
                 }
                 @Override
-                public boolean onQueryTextSubmit(String query) {
-                    return false;
+                public boolean onQueryTextSubmit(final String query) {
+                    executorService.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            Core.getInstance().getChatNetworkServicePluginRoot().requestActorProfile(query, filterMax, filterOffset, Core.getInstance().getProfile().getIdentityPublicKey());
+                        }
+                    });
+                    return true;
                 }
             };
             searchView.setOnQueryTextListener(queryTextListener);
