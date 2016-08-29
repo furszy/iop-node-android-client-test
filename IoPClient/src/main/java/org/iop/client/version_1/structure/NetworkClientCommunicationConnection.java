@@ -518,7 +518,6 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                 //todo: esto hay que mejorarlo
                 Package pack = Package.createInstance(
                         packageContent.toJson(),
-                        networkServiceType,
                         packageType,
                         clientIdentity.getPrivateKey(),
                         destinationIdentityPublicKey
@@ -577,7 +576,6 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                 networkClientCommunicationChannel.getClientConnection().getBasicRemote().sendObject(
                         Package.createInstance(
                                 packageContent.toJson(),
-                                networkServiceType,
                                 PackageType.MESSAGE_TRANSMIT,
                                 clientIdentity.getPrivateKey(),
                                 destinationIdentityPublicKey
