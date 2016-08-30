@@ -1,5 +1,6 @@
 package org.iop.stress_app.structure.controllers.main;
 
+import org.iop.client.version_1.util.HardcodeConstants;
 import org.iop.stress_app.structure.controllers.AbstractMainController;
 import org.iop.stress_app.structure.views.DynamicChoiceSelector;
 
@@ -24,5 +25,8 @@ public class MainController extends AbstractMainController {
         DynamicChoiceSelector dynamicChoiceSelector = new DynamicChoiceSelector();
         String nodeIP = dynamicChoiceSelector.showAndWaitResult();
         System.out.println("I will work with the IP "+nodeIP);
+
+        //Set the IP to work with.
+        HardcodeConstants.setServerIpDefault(nodeIP);
     }
 }
