@@ -12,6 +12,12 @@ import java.util.ResourceBundle;
  */
 public class MainController extends AbstractMainController {
 
+    /**
+     * In this method I'll be calling the procedure to ask to the user what IP he/she wants to work with.
+     * After that, this address will be added to the IoP-client as SERVER_IP_DEFAULT
+     * @param location
+     * @param resources
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         //Showing a dialog to select an IP

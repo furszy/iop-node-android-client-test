@@ -1,8 +1,11 @@
 package org.iop.stress_app.structure.views;
 
+import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.layout.Region;
 import org.iop.stress_app.structure.enums.DefaultServerIP;
+import org.iop.stress_app.structure.utils.IPAddressChecker;
 
 import java.util.Optional;
 
@@ -64,13 +67,26 @@ public class DynamicChoiceSelector extends ChoiceDialog {
         String userDefinedIp;
         if(result.isPresent()){
             userDefinedIp = result.get();
-            if(userDefinedIp==null||userDefinedIp.isEmpty()){
-                //TODO: check IP format.
-                return userDefinedIp;
+            if(userDefinedIp!=null||!userDefinedIp.isEmpty()){
+                //If the IP format is invalid I'll return the default IP
+                if(IPAddressChecker.isValidIpAddress(userDefinedIp)){
+                    return userDefinedIp;
+                } else{
+                    showAndWaitErrorAlert(userDefinedIp);
+                }
             }
         }
         return DEFAULT_IP;
+    }
 
+    private void showAndWaitErrorAlert(String ipSubmitted){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Stress App - Error Notification");
+        alert.setHeaderText("You submitted an incorrect IP format");
+        alert.setContentText("Sorry, '"+ipSubmitted+"' does't match with the proper format.\n" +
+                "Don't worry!, I'll set for you the default IP '"+DEFAULT_IP+"'");
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+        alert.showAndWait();
     }
 
 }
