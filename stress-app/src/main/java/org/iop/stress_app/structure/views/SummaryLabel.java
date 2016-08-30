@@ -14,6 +14,7 @@ public class SummaryLabel extends Label {
     private int nsStarted = 0;
     private int actorsCreated = 0;
     private int actorRegistered = 0;
+    private int exceptionDetected = 0;
     private int messagesSent = 0;
     private int failedMessages = 0;
     private int successfulMessages = 0;
@@ -37,6 +38,8 @@ public class SummaryLabel extends Label {
             case CLIENT_CONNECTED:
                 clientsConnected++;
                 break;
+            case EXCEPTION_DETECTED:
+
             case FAILED_MESSAGES:
                 failedMessages++;
                 break;
@@ -71,6 +74,7 @@ public class SummaryLabel extends Label {
                 "- Actors Created: " + actorsCreated + "\n" +
                 "- Actor Registered: " + actorRegistered + "\n" +
                 "- Clients Connected: " + clientsConnected + "\n" +
+                "- Exceptions Detected (*): " + exceptionDetected + "\n" +
                 "- Failed Messages: " + failedMessages + "\n" +
                 "- Messages Sent: " + messagesSent + "\n" +
                 "- Network Service Started: " + nsStarted + "\n" +
@@ -78,7 +82,8 @@ public class SummaryLabel extends Label {
                 "- Request List Received: " + requestListReceived + "\n" +
                 "- Received Messages: " + receivedMessages + "\n" +
                 "- Successful Messages: " + successfulMessages + "\n" +
-                "---------------";
+                "---------------\n" +
+                "(*) Exceptions detected in actor test execution.";
         System.out.println(report);
         setText(report);
     }

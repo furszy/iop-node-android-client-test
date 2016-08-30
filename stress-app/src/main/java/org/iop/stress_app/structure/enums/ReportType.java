@@ -13,6 +13,7 @@ public enum ReportType implements FermatEnum {
     ACTOR_CREATED("AC"),
     ACTOR_REGISTERED("AR"),
     CLIENT_CONNECTED("CC"),
+    EXCEPTION_DETECTED("ED"),
     FAILED_MESSAGES("FM"),
     MESSAGE_SENT("MS"),
     NS_STARED("NS"),

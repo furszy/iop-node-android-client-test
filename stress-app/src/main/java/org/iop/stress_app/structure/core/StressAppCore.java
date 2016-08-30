@@ -100,6 +100,7 @@ public class StressAppCore {
             p2PLayerPluginRoot = new P2PLayerPluginRoot();
             p2PLayerPluginRoot.setEventManager((EventManager) eventManagerPlatformServiceAddonRoot.getManager());
             p2PLayerPluginRoot.setPluginDatabaseSystem((PluginDatabaseSystem) pluginDatabaseSystemAndroidAddonRoot.getManager());
+            System.out.println("Layer pk:"+p2PLayerPluginRoot.getId());
             p2PLayerPluginRoot.start();
 
             //node

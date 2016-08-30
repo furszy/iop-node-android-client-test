@@ -631,4 +631,8 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
     public NetworkChannel getNetworkClient() {
         return client;
     }
+
+    public UUID getId(){
+        return this.pluginId;
+    }
 }
