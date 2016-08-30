@@ -22,6 +22,8 @@ public class StressAppCoreManager {
     private boolean actorCreation = false;
     private int actorsToCreate = 0;
 
+    private int total = 0;
+
     private SummaryLabel summaryLabel;
 
     public StressAppCoreManager() {
@@ -87,10 +89,12 @@ public class StressAppCoreManager {
                             summaryLabel);
                     for(int j=0; j<actorsToCreate ; j++){
                         stressAppActor.addActor();
+                        total++;
                     }
                     stressAppActor.createAndRegisterActors();
                     //Now we gonna request a list of actors
                     stressAppActor.requestActorList();
+
                 }
             }
         }

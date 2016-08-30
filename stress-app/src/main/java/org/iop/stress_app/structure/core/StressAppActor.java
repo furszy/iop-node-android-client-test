@@ -144,7 +144,7 @@ public class StressAppActor implements MessageReceiver{
     public void requestActorList(){
         nsMap.keySet().forEach(ns->
                 nsMap.get(ns).forEach(profile->{
-                    ns.requestActorProfilesList(MAX,OFFSET,profile.getNsIdentityPublicKey());
+                    ns.requestActorProfilesList(MAX,OFFSET,profile.getIdentityPublicKey());
                     report(ReportType.REQUEST_LIST_SENT);
                         }));
 
@@ -234,6 +234,7 @@ public class StressAppActor implements MessageReceiver{
             ChatNetworkServicePluginRoot networkServicePluginRoot = nsPublicKeyMap.get(actorSender.getNsIdentityPublicKey());
             String messageToSend = "StressAppActor responds you a "+generateRandomHexString();
             System.out.println("*** StressAppActor is trying to respond "+messageToSend);
+            messagesCount.put(receiverPk, responds++);
             try {
                 networkServicePluginRoot.sendMessage(messageToSend, actorSender.getIdentityPublicKey(), actorReceiver.getIdentityPublicKey());
                 messagesSent++;
@@ -248,11 +249,11 @@ public class StressAppActor implements MessageReceiver{
 
     @Override
     public void onActorListReceived(List<ActorProfile> list) {
-        System.out.println(list);
+        report(ReportType.REQUEST_LIST_RECEIVED);
+        System.out.println("Thread Id List :"+Thread.currentThread().getId());
         if(!messageTestStarted){
             messageTest(list);
         }
-        report(ReportType.REQUEST_LIST_RECEIVED);
     }
 
     @Override
