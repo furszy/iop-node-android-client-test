@@ -81,7 +81,9 @@ public class StressAppCoreManager {
                 for(int i=0; i<nsToStart; i++){
                     stressAppNetworkService.addNetworkService("ChatNetworkServicePluginRoot");
                 }
-                stressAppNetworkService.startNetworkServices();
+                //stressAppNetworkService.startNetworkServices();
+                //Starting only NS chat
+                stressAppNetworkService.startChatNetworkServices();
                 //after we created the NS, we'll gonna try to create actors
                 if(actorCreation){
                     StressAppActor stressAppActor = new StressAppActor(
@@ -92,8 +94,8 @@ public class StressAppCoreManager {
                         total++;
                     }
                     stressAppActor.createAndRegisterActors();
-                    //Now we gonna request a list of actors
-                    stressAppActor.requestActorList();
+                    //Now we gonna request a list of actors - false indicates that we want to request a list by client
+                    stressAppActor.requestActorList(false);
 
                 }
             }

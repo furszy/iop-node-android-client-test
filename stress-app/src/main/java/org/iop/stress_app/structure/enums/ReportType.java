@@ -20,6 +20,7 @@ public enum ReportType implements FermatEnum {
     RECEIVED_MESSAGE("RM"),
     REQUEST_LIST_RECEIVED("RLR"),
     REQUEST_LIST_SENT("RLS"),
+    RESPOND_MESSAGES("RXM"),
     SUCCESSFUL_MESSAGE("SM")
             ;
 
@@ -49,6 +50,8 @@ public enum ReportType implements FermatEnum {
                 return REQUEST_LIST_SENT;
             case "RM":
                 return RECEIVED_MESSAGE;
+            case "RXM":
+                return RESPOND_MESSAGES;
             case "SM":
                 return SUCCESSFUL_MESSAGE;
             default:

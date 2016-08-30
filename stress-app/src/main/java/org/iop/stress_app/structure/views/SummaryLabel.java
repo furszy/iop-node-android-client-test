@@ -22,6 +22,7 @@ public class SummaryLabel extends Label {
     private int clientsConnected = 0;
     private int requestListSent = 0;
     private int requestListReceived = 0;
+    private int respondMessages = 0;
 
     /**
      * This method increase a counter and print in the UI the summary
@@ -39,7 +40,8 @@ public class SummaryLabel extends Label {
                 clientsConnected++;
                 break;
             case EXCEPTION_DETECTED:
-
+                exceptionDetected++;
+                break;
             case FAILED_MESSAGES:
                 failedMessages++;
                 break;
@@ -57,6 +59,9 @@ public class SummaryLabel extends Label {
                 break;
             case RECEIVED_MESSAGE:
                 receivedMessages++;
+                break;
+            case RESPOND_MESSAGES:
+                respondMessages++;
                 break;
             case SUCCESSFUL_MESSAGE:
                 successfulMessages++;
@@ -81,6 +86,7 @@ public class SummaryLabel extends Label {
                 "- Request List Sent: " + requestListSent + "\n" +
                 "- Request List Received: " + requestListReceived + "\n" +
                 "- Received Messages: " + receivedMessages + "\n" +
+                "- Respond Messages: " + respondMessages + "\n" +
                 "- Successful Messages: " + successfulMessages + "\n" +
                 "---------------\n" +
                 "(*) Exceptions detected in actor test execution.";

@@ -97,8 +97,9 @@ public class StressAppActor implements MessageReceiver{
      * This method creates and register actor for each NS.
      */
     public void createAndRegisterActors(){
-        stressAppNetworkService.getAbstractNetworkServiceList().forEach((type,ns)->{
-            System.out.println("Network Service type: "+type);
+        //stressAppNetworkService.getAbstractNetworkServiceList().forEach((type,ns)->{
+        stressAppNetworkService.getChatNetworkServicePluginRootList().forEach(ns->{
+            //System.out.println("Network Service type: "+type);
             nsPublicKeyMap.put(ns.getPublicKey(), (ChatNetworkServicePluginRoot) ns);
             ((ChatNetworkServicePluginRoot) ns).setMessageReceiver(this);
             int actorCounter = 0;
@@ -128,7 +129,7 @@ public class StressAppActor implements MessageReceiver{
             System.out.println("I will try to register an actor with pk " + profile.getIdentityPublicKey());
             profile.setActorType(Actors.CHAT.getCode());
             profile.setName("Chat Actor " + threadId +"- "+actorCounter);
-            profile.setAlias("Alias chat " + threadId +"- "+actorCounter);
+            profile.setAlias("Bot FX User " + threadId +"- "+actorCounter);
             //This represents a valid image
             profile.setPhoto(IoPBytesArray.getIoPBytesArray());
             //profile.setNsIdentityPublicKey(networkServicePluginRoot.getPublicKey());
@@ -143,6 +144,7 @@ public class StressAppActor implements MessageReceiver{
             actorNesMap.put(profile.getIdentityPublicKey(), networkServicePluginRoot.getNetWorkServicePublicKey());
         } catch(Exception e){
             report(ReportType.EXCEPTION_DETECTED);
+            System.out.println("Error when trying to create an actor "+e);
             e.printStackTrace();
         }
     }
@@ -150,12 +152,20 @@ public class StressAppActor implements MessageReceiver{
     /**
      * This method request an actor list
      */
-    public void requestActorList(){
-        nsMap.keySet().forEach(ns->
-                nsMap.get(ns).forEach(profile->{
-                    ns.requestActorProfilesList(MAX,OFFSET,profile.getIdentityPublicKey());
-                    report(ReportType.REQUEST_LIST_SENT);
-                        }));
+    public void requestActorList(boolean allActors){
+        if(allActors){
+            nsMap.keySet().forEach(ns->
+                    nsMap.get(ns).forEach(profile->{
+                        ns.requestActorProfilesList(MAX,OFFSET,profile.getIdentityPublicKey());
+                        report(ReportType.REQUEST_LIST_SENT);
+                    }));
+        } else{
+            Map.Entry<ChatNetworkServicePluginRoot, List<ActorProfile>> nsEntry = nsMap.entrySet().iterator().next();
+            ChatNetworkServicePluginRoot ns = nsEntry.getKey();
+            List<ActorProfile> actorList = nsEntry.getValue();
+            ns.requestActorProfilesList(MAX,OFFSET,actorList.get(0).getIdentityPublicKey());
+            report(ReportType.REQUEST_LIST_SENT);
+        }
 
     }
 
@@ -237,7 +247,12 @@ public class StressAppActor implements MessageReceiver{
         System.out.println("*** StressAppActor has registered "+receivedMessages+" received messages");
         report(ReportType.RECEIVED_MESSAGE);
         String receiverPk = chatMetadataRecord.getRemoteActorPublicKey();
-        int responds = messagesCount.get(receiverPk);
+        int responds;
+        if(messagesCount.get(receiverPk)==null){
+            responds = 0;
+        } else {
+            responds = messagesCount.get(receiverPk);
+        }
         ActorProfile actorSender = actorsMap.get(receiverPk);
         if(responds<RESPONDS){
             try {
@@ -254,10 +269,11 @@ public class StressAppActor implements MessageReceiver{
                 messagesSent++;
                 System.out.println("*** StressAppActor has registered "+messagesSent+" messages sent");
                 report(ReportType.MESSAGE_SENT);
+                report(ReportType.RESPOND_MESSAGES);
             } catch (Exception e) {
                 report(ReportType.EXCEPTION_DETECTED);
                 System.out.println(actorSender.getIdentityPublicKey()+" cannot respond a message");
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
     }
