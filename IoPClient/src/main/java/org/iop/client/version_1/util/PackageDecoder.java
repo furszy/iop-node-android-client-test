@@ -46,7 +46,7 @@ public class PackageDecoder implements Decoder.Binary<Package>{
             return Package.rebuildInstance(
                     UUID.fromString(pack.id()),
                     pack.content(),
-                    (pack.networkServiceType() != null) ? NetworkServiceType.getByCode(pack.networkServiceType()) : null,
+//                    (pack.networkServiceType() != null) ? NetworkServiceType.getByCode(pack.networkServiceType()) : null,
                     PackageType.buildWithInt(pack.packageType()),
                     pack.destinationPk()
             );

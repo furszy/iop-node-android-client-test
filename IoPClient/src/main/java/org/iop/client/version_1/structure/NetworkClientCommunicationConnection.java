@@ -366,7 +366,7 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
         if (profile instanceof ActorProfile) {
             packageType = PackageType.CHECK_IN_ACTOR_REQUEST;
             System.out.println("##########################\nRegistering actor profile\n############################");
-            ((ActorProfile) profile).setClientIdentityPublicKey(clientIdentity.getPublicKey());
+//            ((ActorProfile) profile).setClientIdentityPublicKey(clientIdentity.getPublicKey());
         }else if (profile instanceof ClientProfile) {
             packageType = PackageType.CHECK_IN_CLIENT_REQUEST;
         }else if (profile instanceof NetworkServiceProfile) {
@@ -417,7 +417,7 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
 
         if (profile instanceof ActorProfile) {
             packageType = PackageType.UPDATE_ACTOR_PROFILE_REQUEST;
-            ((ActorProfile) profile).setClientIdentityPublicKey(clientIdentity.getPublicKey());
+//            ((ActorProfile) profile).setClientIdentityPublicKey(clientIdentity.getPublicKey());
             profileUpdateMsgRequest = new UpdateActorProfileMsgRequest(profile);
             profileUpdateMsgRequest.setMessageContentType(MessageContentType.JSON);
 
@@ -518,7 +518,6 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                 //todo: esto hay que mejorarlo
                 Package pack = Package.createInstance(
                         packageContent.toJson(),
-                        networkServiceType,
                         packageType,
                         clientIdentity.getPrivateKey(),
                         destinationIdentityPublicKey
@@ -577,7 +576,6 @@ public class NetworkClientCommunicationConnection implements NetworkClientConnec
                 networkClientCommunicationChannel.getClientConnection().getBasicRemote().sendObject(
                         Package.createInstance(
                                 packageContent.toJson(),
-                                networkServiceType,
                                 PackageType.MESSAGE_TRANSMIT,
                                 clientIdentity.getPrivateKey(),
                                 destinationIdentityPublicKey

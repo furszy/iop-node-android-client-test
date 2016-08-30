@@ -30,7 +30,7 @@ public class NetworkClientNewMessageTransmitEvent extends AbstractEvent<P2pEvent
     /**
      * Represent the networkServiceTypeSource value
      */
-    private NetworkServiceType networkServiceTypeSource;
+//    private NetworkServiceType networkServiceTypeSource;
 
     /**
      * Constructor with parameters
@@ -49,13 +49,13 @@ public class NetworkClientNewMessageTransmitEvent extends AbstractEvent<P2pEvent
         this.content = content;
     }
 
-    public NetworkServiceType getNetworkServiceTypeSource() {
-        return networkServiceTypeSource;
-    }
-
-    public void setNetworkServiceTypeSource(NetworkServiceType networkServiceTypeSource) {
-        this.networkServiceTypeSource = networkServiceTypeSource;
-    }
+//    public NetworkServiceType getNetworkServiceTypeSource() {
+//        return networkServiceTypeSource;
+//    }
+//
+//    public void setNetworkServiceTypeSource(NetworkServiceType networkServiceTypeSource) {
+//        this.networkServiceTypeSource = networkServiceTypeSource;
+//    }
 
     public UUID getPackageId() {
         return packageId;
@@ -69,7 +69,7 @@ public class NetworkClientNewMessageTransmitEvent extends AbstractEvent<P2pEvent
     public String toString() {
         return "NetworkClientNewMessageTransmitEvent{" +
                 "content='" + content + '\'' +
-                ", networkServiceTypeSource=" + networkServiceTypeSource +
+//                ", networkServiceTypeSource=" + networkServiceTypeSource +
                 '}';
     }
 }

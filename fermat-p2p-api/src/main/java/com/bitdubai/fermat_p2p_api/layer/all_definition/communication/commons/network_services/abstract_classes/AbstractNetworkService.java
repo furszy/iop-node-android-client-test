@@ -268,16 +268,15 @@ public abstract class AbstractNetworkService extends AbstractPlugin implements N
      * Notify the client when a incoming message is receive by the incomingTemplateNetworkServiceMessage
      * ant fire a new event
      *
+     * @param incomingMessage
      */
-    public final void onMessageReceived(String incomingMessage) {
+    public final void onMessageReceived(NetworkServiceMessage incomingMessage) {
 
         try {
 
-            NetworkServiceMessage networkServiceMessage = NetworkServiceMessage.parseContent(incomingMessage);
-
             //TODO networkServiceMessage.setContent(AsymmetricCryptography.decryptMessagePrivateKey(networkServiceMessage.getContent(), this.identity.getPrivateKey()));
 
-            onNewMessageReceived(networkServiceMessage);
+            onNewMessageReceived(incomingMessage);
 
         } catch (Exception e) {
             this.reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
