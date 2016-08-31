@@ -129,11 +129,13 @@ public class StressAppActor implements MessageReceiver{
             System.out.println("I will try to register an actor with pk " + profile.getIdentityPublicKey());
             profile.setActorType(Actors.CHAT.getCode());
             profile.setName("Chat Actor " + threadId +"- "+actorCounter);
-            profile.setAlias("Bot FX User " + threadId +"- "+actorCounter);
+            profile.setAlias("Bot " + threadId + "-" + actorCounter);
             //This represents a valid image
             profile.setPhoto(IoPBytesArray.getIoPBytesArray());
             //profile.setNsIdentityPublicKey(networkServicePluginRoot.getPublicKey());
             profile.setExtraData("Test extra data");
+            //This is a test coordinate
+            profile.setLocation(43.99309,110.92348);
             networkServicePluginRoot.registerActor(profile, 0, 0);
             List<ActorProfile> actorList = nsMap.get(networkServicePluginRoot);
             if(actorList ==null){
