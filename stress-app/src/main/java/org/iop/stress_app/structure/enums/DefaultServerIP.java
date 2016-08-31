@@ -14,8 +14,8 @@ public enum DefaultServerIP implements FermatEnum {
 
     DEFAULT_SERVER_IP("DSI",0,HardcodeConstants.SERVER_IP_DEFAULT,"Default server (recommended)"),
     FURSZY_SERVER("FS",1,"186.23.58.203", "@furzy's node"),
-    NODE_198("NO",2,"193.234.224.198", "Marku's Node 198"),
-    NODE_223("NT",3,"193.234.224.223", "Marku's Node 223"),
+    NODE_198("NO",2,"193.234.224.198", "Markus' Node 198"),
+    NODE_223("NT",3,"193.234.224.223", "Markus' Node 223"),
     //Please, let this option at last with the last index.
     USER_DEFINED("UD",4,"...", "Defined by you"),
     ;

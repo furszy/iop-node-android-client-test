@@ -524,8 +524,8 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
     }
 
     @Override
-    public void register(ActorProfile profile, NetworkServiceProfile networkServiceProfileRequester) throws CantRegisterProfileException, CantSendMessageException {
-        messageSender.registerProfile(profile, networkServiceProfileRequester.getNetworkServiceType());
+    public UUID register(ActorProfile profile, NetworkServiceProfile networkServiceProfileRequester) throws CantRegisterProfileException, CantSendMessageException {
+        return messageSender.registerProfile(profile, networkServiceProfileRequester.getNetworkServiceType());
     }
 
 

@@ -77,7 +77,7 @@ public class SummaryLabel extends Label {
         String report = "SUMMARY:\n" +
                 "\n" +
                 "- Actors Created: " + actorsCreated + "\n" +
-                "- Actor Registered: " + actorRegistered + "\n" +
+                "- Actors Registered: " + actorRegistered + "\n" +
                 "- Clients Connected: " + clientsConnected + "\n" +
                 "- Exceptions Detected (*): " + exceptionDetected + "\n" +
                 "- Failed Messages: " + failedMessages + "\n" +
