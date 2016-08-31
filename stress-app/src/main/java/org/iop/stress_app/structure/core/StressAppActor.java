@@ -272,7 +272,7 @@ public class StressAppActor implements MessageReceiver{
                 report(ReportType.RESPOND_MESSAGES);
             } catch (Exception e) {
                 report(ReportType.EXCEPTION_DETECTED);
-                System.out.println(actorSender.getIdentityPublicKey()+" cannot respond a message");
+                System.out.println(actorSender.getIdentityPublicKey()+" cannot respond a message:\n"+e.getMessage());
                 //e.printStackTrace();
             }
         }
