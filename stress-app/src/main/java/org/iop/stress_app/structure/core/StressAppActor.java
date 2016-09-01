@@ -11,6 +11,7 @@ import org.iop.stress_app.structure.enums.ReportType;
 import org.iop.stress_app.structure.exceptions.CannotRespondMessageException;
 import org.iop.stress_app.structure.exceptions.CannotSelectARandomActorException;
 import org.iop.stress_app.structure.utils.IoPBytesArray;
+import org.iop.stress_app.structure.utils.ShellReporter;
 import org.iop.stress_app.structure.views.SummaryLabel;
 
 import java.util.*;
@@ -58,6 +59,8 @@ public class StressAppActor implements MessageReceiver{
 
     private SummaryLabel summaryLabel;
 
+    private ShellReporter shellReporter;
+
     private int randomSelectorIndex = 0;
 
     /**
@@ -77,13 +80,15 @@ public class StressAppActor implements MessageReceiver{
      */
     public StressAppActor(
             StressAppNetworkService stressAppNetworkService,
-            SummaryLabel summaryLabel) {
+            SummaryLabel summaryLabel,
+            ShellReporter shellReporter) {
         this.stressAppNetworkService = stressAppNetworkService;
         this.actorProfileList = new ArrayList<>();
         this.nsMap = new HashMap<>();
         this.nsPublicKeyMap = new HashMap<>();
         this.actorNesMap = new HashMap<>();
         this.summaryLabel = summaryLabel;
+        this.shellReporter = shellReporter;
     }
 
     /**
@@ -325,12 +330,17 @@ public class StressAppActor implements MessageReceiver{
     }
 
     private void report(ReportType reportType){
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                summaryLabel.report(reportType);
-            }
-        });
+        if(summaryLabel!=null){
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    summaryLabel.report(reportType);
+                }
+            });
+        }
+        if(shellReporter!=null){
+            shellReporter.report(reportType);
+        }
     }
 
 }
