@@ -38,6 +38,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.cl
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.ActorListMsgRequest;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.request.IsActorOnlineMsgRequest;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.respond.MsgRespond;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.respond.base.STATUS;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.ProfileTypes;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.enums.UpdateTypes;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.events_op_codes.EventOp;
@@ -398,7 +399,7 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
                 PackageInformation packageInformation = messageSender.packageAck(fermatEvent.getContent().getPackageId());
                 AbstractNetworkService abstractNetworkService = networkServices.get( packageInformation.getNetworkServiceType());
                 if (abstractNetworkService.isStarted()) {
-                    if (fermatEvent.getContent().getStatus() == MsgRespond.STATUS.SUCCESS) {
+                    if (fermatEvent.getContent().getStatus() == STATUS.SUCCESS) {
                         System.out.println("##### ACK MENSAJE LLEGÓ BIEN A LA LAYER!!!##### ID:" + fermatEvent.getContent().getPackageId());
                         //Mensaje llega exitoso, falta
                         abstractNetworkService.handleOnMessageSent(fermatEvent.getContent().getPackageId());

@@ -54,7 +54,6 @@ public abstract class AbstractPlugin implements AbstractPluginInterface {
 
     private FermatContext pluginContext;
 
-
     private final ConcurrentHashMap<AddonVersionReference , Field> addonNeededReferences         ;
     private final ConcurrentHashMap<PluginVersionReference, Field> pluginNeededReferences        ;
     private final ConcurrentHashMap<LayerReference        , Field> layerNeededReferences         ;
