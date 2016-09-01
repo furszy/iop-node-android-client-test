@@ -54,7 +54,7 @@ public class ActorTest extends AbstractStressTest {
         this.actorIntegerSpinner = actorIntegerSpinner;
         this.nsIntegerSpinner = nsIntegerSpinner;
         this.summaryLabel = summaryLabel;
-        this.coreManager = new StressAppCoreManager(summaryLabel);
+        this.coreManager = new StressAppCoreManager(summaryLabel,null);
     }
 
     @Override

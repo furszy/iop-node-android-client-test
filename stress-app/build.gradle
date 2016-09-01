@@ -1,10 +1,15 @@
 apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = "org.iop.stress_app.Main"
 
 sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
 }
+
+defaultTasks = ['clean', 'jar']
 
 dependencies {
     sourceSets.main.resources.srcDirs = ["src/main/resources/"]
@@ -22,4 +27,10 @@ dependencies {
     compile ('org.glassfish.tyrus.bundles:tyrus-standalone-client:1.12'){
         exclude group:'javax.websocket', module:'javax.websocket-api'
     }
+}
+
+jar {
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    manifest { attributes 'Main-Class': 'org.iop.stress_app.Main' }
+    baseName 'stress_app'
 }

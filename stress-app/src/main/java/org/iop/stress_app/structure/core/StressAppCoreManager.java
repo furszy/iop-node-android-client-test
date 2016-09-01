@@ -1,5 +1,6 @@
 package org.iop.stress_app.structure.core;
 
+import org.iop.stress_app.structure.utils.ShellReporter;
 import org.iop.stress_app.structure.views.SummaryLabel;
 
 import java.util.ArrayList;
@@ -25,14 +26,16 @@ public class StressAppCoreManager {
     private int total = 0;
 
     private SummaryLabel summaryLabel;
+    private ShellReporter shellReporter;
 
     public StressAppCoreManager() {
         this.stressAppCoreList = new ArrayList<>();
     }
 
-    public StressAppCoreManager(SummaryLabel summaryLabel) {
+    public StressAppCoreManager(SummaryLabel summaryLabel, ShellReporter shellReporter) {
         this.stressAppCoreList = new ArrayList<>();
         this.summaryLabel = summaryLabel;
+        this.shellReporter = shellReporter;
     }
 
     public void setCoreCount(int coreCount){
@@ -88,7 +91,8 @@ public class StressAppCoreManager {
                 if(actorCreation){
                     StressAppActor stressAppActor = new StressAppActor(
                             stressAppNetworkService,
-                            summaryLabel);
+                            summaryLabel,
+                            shellReporter);
                     for(int j=0; j<actorsToCreate ; j++){
                         stressAppActor.addActor();
                         total++;

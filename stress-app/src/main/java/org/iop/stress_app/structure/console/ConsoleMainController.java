@@ -1,7 +1,9 @@
 package org.iop.stress_app.structure.console;
 
 import org.iop.client.version_1.util.HardcodeConstants;
+import org.iop.stress_app.structure.core.StressAppCoreManager;
 import org.iop.stress_app.structure.utils.IPAddressChecker;
+import org.iop.stress_app.structure.utils.ShellReporter;
 
 import java.util.Arrays;
 
@@ -53,6 +55,18 @@ public class ConsoleMainController {
         System.out.println("Network Services -> "+numericArguments[NS_INDEX]);
         System.out.println("Actors -> "+numericArguments[ACTORS_INDEX]);
         System.out.println("Node IP -> "+ip);
+
+        //Set the IP
+        HardcodeConstants.setServerIpDefault(ip);
+
+        //Start the app
+        StressAppCoreManager stressAppCoreManager = new StressAppCoreManager(null,new ShellReporter());
+        stressAppCoreManager.setCoreCount(numericArguments[DEVICES_INDEX]);
+        stressAppCoreManager.setNetworkServiceStart(true);
+        stressAppCoreManager.setNsToStart(numericArguments[NS_INDEX]);
+        stressAppCoreManager.setActorCreation(true);
+        stressAppCoreManager.setActorsToCreate(numericArguments[ACTORS_INDEX]);
+        stressAppCoreManager.startStressTest();
 
     }
 
