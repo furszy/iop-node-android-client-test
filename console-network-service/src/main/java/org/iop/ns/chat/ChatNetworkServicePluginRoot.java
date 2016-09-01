@@ -50,6 +50,7 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
     private ContactsDAO contactsDAO;
     private MessageReceiver messageReceiver;
 
+    private boolean stressApp = false;
 
     //esto se que va en db pero bueno, cero ganas de hacer una db despues de 10 horas laburando
     private HashMap<UUID,String> actorOnlineEventSubscribed;
@@ -163,9 +164,20 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
             }
 
         } catch (Exception e) {
-            System.err.println("Message received: "+newFermatMessageReceive);
-            e.printStackTrace();
-            reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
+
+            /**
+             * TODO: this is only for test the stress app
+             */
+            if(stressApp){
+                ChatMetadataRecord chatRecord = GsonProvider.getGson().fromJson(newFermatMessageReceive.getContent(), ChatMetadataRecord.class);
+                if (messageReceiver!=null){
+                    messageReceiver.onMessageReceived(newFermatMessageReceive.getSenderPublicKey(),chatRecord);
+                }
+            } else {
+                System.err.println("Message received: "+newFermatMessageReceive);
+                e.printStackTrace();
+                reportError(UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
+            }
 
         }
     }
@@ -353,5 +365,8 @@ public class ChatNetworkServicePluginRoot extends AbstractActorNetworkService {
         return contactsDAO.listContacts();
     }
 
+    public void setStressApp(boolean stressApp){
+        this.stressApp = stressApp;
+    }
 
 }

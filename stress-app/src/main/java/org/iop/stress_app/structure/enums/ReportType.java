@@ -13,12 +13,14 @@ public enum ReportType implements FermatEnum {
     ACTOR_CREATED("AC"),
     ACTOR_REGISTERED("AR"),
     CLIENT_CONNECTED("CC"),
+    EXCEPTION_DETECTED("ED"),
     FAILED_MESSAGES("FM"),
     MESSAGE_SENT("MS"),
     NS_STARED("NS"),
     RECEIVED_MESSAGE("RM"),
     REQUEST_LIST_RECEIVED("RLR"),
     REQUEST_LIST_SENT("RLS"),
+    RESPOND_MESSAGES("RXM"),
     SUCCESSFUL_MESSAGE("SM")
             ;
 
@@ -48,6 +50,8 @@ public enum ReportType implements FermatEnum {
                 return REQUEST_LIST_SENT;
             case "RM":
                 return RECEIVED_MESSAGE;
+            case "RXM":
+                return RESPOND_MESSAGES;
             case "SM":
                 return SUCCESSFUL_MESSAGE;
             default:

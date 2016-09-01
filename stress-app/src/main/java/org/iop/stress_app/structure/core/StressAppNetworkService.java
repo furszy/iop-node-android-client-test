@@ -8,7 +8,9 @@ import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginFileSystem;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.abstract_classes.AbstractNetworkService;
 import org.iop.ns.chat.ChatNetworkServicePluginRoot;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by mati on 23/08/16.
@@ -27,9 +29,18 @@ public class StressAppNetworkService {
      */
     private HashMap<NetworkServiceType,AbstractNetworkService> abstractNetworkServiceList;
 
+    /**
+     * Represents a list of ChatNetworkServicePluginRoot in case that we want to create multiple instances of this NS
+     */
+    private List<ChatNetworkServicePluginRoot> chatNetworkServicePluginRootList;
+
+    private List<ChatNetworkServicePluginRoot> startedChatNS;
+
     public StressAppNetworkService(StressAppCore stressAppCore) {
         abstractNetworkServiceList = new HashMap<>();
         this.stressAppCore = stressAppCore;
+        this.chatNetworkServicePluginRootList = new ArrayList<>();
+        this.startedChatNS = new ArrayList<>();
     }
 
 
@@ -45,6 +56,8 @@ public class StressAppNetworkService {
         }else{
 //            AbstractNetworkService abstractNetworkService = loadNetworkService(networkServicePluginRootClassName);
         }
+        //Add new chat NS to the list
+        chatNetworkServicePluginRootList.add(new ChatNetworkServicePluginRoot());
     }
 
     public void startNetworkServices(){
@@ -62,12 +75,36 @@ public class StressAppNetworkService {
         }
     }
 
+    public void startChatNetworkServices(){
+        chatNetworkServicePluginRootList.forEach(nsChat->{
+            try {
+                stressAppCore.addLayer(nsChat);
+                stressAppCore.addErrorManager(nsChat);
+                stressAppCore.addDatabase(nsChat);
+                stressAppCore.addFileSystem(nsChat);
+                nsChat.setStressApp(true);
+                nsChat.start();
+                startedChatNS.add(nsChat);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
     /**
      * This method returns the abstractNetworkServiceList
      * @return
      */
     public HashMap<NetworkServiceType, AbstractNetworkService> getAbstractNetworkServiceList() {
         return abstractNetworkServiceList;
+    }
+
+    /**
+     * This method returns the chatNetworkServicePluginRootList
+     * @return
+     */
+    public List<ChatNetworkServicePluginRoot> getChatNetworkServicePluginRootList() {
+        return startedChatNS;
     }
 
     private void loadAllNetworkServicesInExtDirectory(){

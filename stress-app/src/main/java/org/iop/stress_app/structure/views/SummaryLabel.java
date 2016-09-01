@@ -14,6 +14,7 @@ public class SummaryLabel extends Label {
     private int nsStarted = 0;
     private int actorsCreated = 0;
     private int actorRegistered = 0;
+    private int exceptionDetected = 0;
     private int messagesSent = 0;
     private int failedMessages = 0;
     private int successfulMessages = 0;
@@ -21,6 +22,7 @@ public class SummaryLabel extends Label {
     private int clientsConnected = 0;
     private int requestListSent = 0;
     private int requestListReceived = 0;
+    private int respondMessages = 0;
 
     /**
      * This method increase a counter and print in the UI the summary
@@ -36,6 +38,9 @@ public class SummaryLabel extends Label {
                 break;
             case CLIENT_CONNECTED:
                 clientsConnected++;
+                break;
+            case EXCEPTION_DETECTED:
+                exceptionDetected++;
                 break;
             case FAILED_MESSAGES:
                 failedMessages++;
@@ -55,6 +60,9 @@ public class SummaryLabel extends Label {
             case RECEIVED_MESSAGE:
                 receivedMessages++;
                 break;
+            case RESPOND_MESSAGES:
+                respondMessages++;
+                break;
             case SUCCESSFUL_MESSAGE:
                 successfulMessages++;
                 break;
@@ -69,16 +77,19 @@ public class SummaryLabel extends Label {
         String report = "SUMMARY:\n" +
                 "\n" +
                 "- Actors Created: " + actorsCreated + "\n" +
-                "- Actor Registered: " + actorRegistered + "\n" +
+                "- Actors Registered: " + actorRegistered + "\n" +
                 "- Clients Connected: " + clientsConnected + "\n" +
+                "- Exceptions Detected (*): " + exceptionDetected + "\n" +
                 "- Failed Messages: " + failedMessages + "\n" +
                 "- Messages Sent: " + messagesSent + "\n" +
                 "- Network Service Started: " + nsStarted + "\n" +
                 "- Request List Sent: " + requestListSent + "\n" +
                 "- Request List Received: " + requestListReceived + "\n" +
                 "- Received Messages: " + receivedMessages + "\n" +
+                "- Respond Messages: " + respondMessages + "\n" +
                 "- Successful Messages: " + successfulMessages + "\n" +
-                "---------------";
+                "---------------\n" +
+                "(*) Exceptions detected in actor test execution.";
         System.out.println(report);
         setText(report);
     }

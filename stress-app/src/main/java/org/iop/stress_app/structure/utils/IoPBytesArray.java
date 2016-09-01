@@ -3,6 +3,7 @@ package org.iop.stress_app.structure.utils;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 
 /**
  * This class must return an array of bytes with a selected logo.
@@ -23,8 +24,7 @@ public class IoPBytesArray {
      */
     public static byte[] getIoPBytesArray(){
         try{
-            File file = new File(IOP_LOGO_PATH);
-            FileInputStream fis = new FileInputStream(file);
+            InputStream fis = IoPBytesArray.class.getResourceAsStream(IOP_LOGO_PATH);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             byte[] buf = new byte[1024];
             for (int readNum; (readNum = fis.read(buf)) != -1;) {
@@ -44,6 +44,10 @@ public class IoPBytesArray {
                     0, 73, 69, 78, 68, -82, 66, 96, -126};
         }
 
+    }
+
+    public static String getIopLogoPath(){
+        return IOP_LOGO_PATH;
     }
 
 }
