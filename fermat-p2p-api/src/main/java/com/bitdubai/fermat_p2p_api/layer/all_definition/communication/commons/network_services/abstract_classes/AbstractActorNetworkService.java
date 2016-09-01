@@ -25,6 +25,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.ne
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.network_services.utils.RefreshParameters;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,6 +49,8 @@ public abstract class AbstractActorNetworkService extends AbstractNetworkService
 
     private ConcurrentHashMap<ActorProfile, RefreshParameters> registeredActors;
 
+    private HashMap<UUID, ActorProfile> registeredActorsByPackageId;
+
     /**
      * Constructor with parameters
      *
@@ -66,6 +69,7 @@ public abstract class AbstractActorNetworkService extends AbstractNetworkService
         );
 
         registeredActors = new ConcurrentHashMap<>();
+        registeredActorsByPackageId = new HashMap<>();
     }
 
     /**
@@ -186,7 +190,8 @@ public abstract class AbstractActorNetworkService extends AbstractNetworkService
             );
 
             try {
-                this.getConnection().register(actorToRegister, getProfile());
+                UUID packageId = this.getConnection().register(actorToRegister, getProfile());
+                registeredActorsByPackageId.put(packageId, actorToRegister);
             } catch (CantRegisterProfileException | CantSendMessageException e) {
                 throw new CantRegisterActorException(e.getCause(), e.getContext(), e.getPossibleReason());
             }
@@ -208,6 +213,14 @@ public abstract class AbstractActorNetworkService extends AbstractNetworkService
             for (Map.Entry<ActorProfile, RefreshParameters> entry : registeredActors.entrySet())
                 if (entry.getKey().getIdentityPublicKey().equals(publicKey))
                     return entry.getKey();
+
+        return null;
+    }
+
+    private ActorProfile getRegisteredActorByPackageId(final UUID packageId) {
+
+        if (registeredActorsByPackageId != null)
+            return registeredActorsByPackageId.get(packageId);
 
         return null;
     }
@@ -301,7 +314,7 @@ public abstract class AbstractActorNetworkService extends AbstractNetworkService
 
     public final void onActorRegistered(UUID packageId, String publicKey) {
 
-        ActorProfile registeredActor = (registeredActors != null ? getRegisteredActorByPublicKey(publicKey) : null);
+        ActorProfile registeredActor = (registeredActors != null ? getRegisteredActorByPackageId(packageId) : null);
 
         if (registeredActor != null)
             onActorRegistered(registeredActor);

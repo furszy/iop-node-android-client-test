@@ -15,7 +15,7 @@ public class HardcodeConstants {
      */
 
 //    public static final String SERVER_IP_DEFAULT = "190.77.23.196";
-    public static final String SERVER_IP_DEFAULT = "186.23.58.203"; //"193.234.224.198";
+    public static  String SERVER_IP_DEFAULT = "186.23.58.203"; //"193.234.224.198";
 
 //    public static final String SERVER_IP_DEFAULT = "52.40.221.93";
 //    public static final String SERVER_IP_DEFAULT = "201.209.222.2";
@@ -42,5 +42,9 @@ public class HardcodeConstants {
      * Represents the value of ENABLE_CLIENT
      */
     public static final Boolean ENABLE_CLIENT = Boolean.FALSE;
+
+    public static void setServerIpDefault(String serverIpDefault){
+        SERVER_IP_DEFAULT = serverIpDefault;
+    }
 
 }

@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.iop.stress_app.structure.StressAppManager;
+import org.iop.stress_app.structure.utils.IoPBytesArray;
 
 /**
  * Created by Manuel Perez P. (darkpriestrelative@gmail.com) on 22/08/16.
@@ -25,7 +26,7 @@ public class Main extends Application {
         stage.setTitle("IoP Stress App");
         stage.setScene(scene);
         stage.setResizable(false);
-        stage.getIcons().add(new Image(getClass().getResourceAsStream("/images/iop.png")));
+        stage.getIcons().add(new Image(getClass().getResourceAsStream(IoPBytesArray.getIopLogoPath())));
         stage.setOnCloseRequest(e -> System.exit(0));
         stage.show();
     }
