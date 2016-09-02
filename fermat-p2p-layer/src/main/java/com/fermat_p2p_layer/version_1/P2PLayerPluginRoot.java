@@ -356,7 +356,7 @@ public class P2PLayerPluginRoot extends AbstractPlugin implements P2PLayerManage
                 AbstractNetworkService abstractNetworkService = networkServices.get(packageInformation.getNetworkServiceType());
                 if (abstractNetworkService.isStarted()) {
                     System.out.println("P2PLayer discoveryList: "+ fermatEvent.getPackageId());
-                    if (fermatEvent.getStatus() == NetworkClientActorListReceivedEvent.STATUS.SUCCESS)
+                    if (fermatEvent.getStatus() == STATUS.SUCCESS)
                         abstractNetworkService.handleNetworkClientActorListReceivedEvent(fermatEvent.getPackageId(), fermatEvent.getActorList());
                     else
                         System.out.println("ERROR IN THE QUERY WITH ID: "+ fermatEvent.getPackageId());

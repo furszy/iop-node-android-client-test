@@ -2,6 +2,7 @@ package com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.c
 
 import com.bitdubai.fermat_api.layer.all_definition.events.common.AbstractEvent;
 import com.bitdubai.fermat_api.layer.all_definition.network_service.enums.NetworkServiceType;
+import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.data.client.respond.base.STATUS;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.commons.profiles.ActorProfile;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.enums.P2pEventType;
 
@@ -20,11 +21,6 @@ import java.util.UUID;
  * @since   Java JDK 1.7
  */
 public class NetworkClientActorListReceivedEvent extends AbstractEvent<P2pEventType> {
-
-    public enum STATUS{
-        SUCCESS,
-        FAILED
-    }
 
     /**
      * Represent the query id
