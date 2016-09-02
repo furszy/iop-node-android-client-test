@@ -38,6 +38,11 @@ public class Main extends Application {
     public static void main(String[] args) {
         System.out.println("* STRESS FERMAT - Network Client - Version 1.0 (2016) *");
         System.out.println("* www.fermat.org *");
+        //if arguments exists, I will launch the console version
+        if(args.length>0){
+            ConsoleMain.main(args);
+            return;
+        }
         //Launch the app
         launch(args);
     }

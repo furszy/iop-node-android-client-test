@@ -11,6 +11,7 @@ import org.iop.stress_app.structure.enums.ReportType;
 import org.iop.stress_app.structure.exceptions.CannotRespondMessageException;
 import org.iop.stress_app.structure.exceptions.CannotSelectARandomActorException;
 import org.iop.stress_app.structure.utils.IoPBytesArray;
+import org.iop.stress_app.structure.utils.ShellReporter;
 import org.iop.stress_app.structure.views.SummaryLabel;
 
 import java.util.*;
@@ -58,6 +59,8 @@ public class StressAppActor implements MessageReceiver{
 
     private SummaryLabel summaryLabel;
 
+    private ShellReporter shellReporter;
+
     private int randomSelectorIndex = 0;
 
     /**
@@ -77,13 +80,15 @@ public class StressAppActor implements MessageReceiver{
      */
     public StressAppActor(
             StressAppNetworkService stressAppNetworkService,
-            SummaryLabel summaryLabel) {
+            SummaryLabel summaryLabel,
+            ShellReporter shellReporter) {
         this.stressAppNetworkService = stressAppNetworkService;
         this.actorProfileList = new ArrayList<>();
         this.nsMap = new HashMap<>();
         this.nsPublicKeyMap = new HashMap<>();
         this.actorNesMap = new HashMap<>();
         this.summaryLabel = summaryLabel;
+        this.shellReporter = shellReporter;
     }
 
     /**
@@ -230,6 +235,15 @@ public class StressAppActor implements MessageReceiver{
     }
 
     /**
+     * This method returns a random ChatNetworkServicePluginRoot
+     * @return
+     */
+    private ChatNetworkServicePluginRoot getRandomChatNs(){
+        Map.Entry<String, ChatNetworkServicePluginRoot> entry = nsPublicKeyMap.entrySet().iterator().next();
+        return entry.getValue();
+    }
+
+    /**
      * This method creates a random Hex String
      * @return
      */
@@ -260,10 +274,16 @@ public class StressAppActor implements MessageReceiver{
             try {
                 ActorProfile actorReceiver = actorsMap.get(chatMetadataRecord.getLocalActorPublicKey());
                 String nsPublicKey = actorNesMap.get(actorSender.getIdentityPublicKey());
+                ChatNetworkServicePluginRoot networkServicePluginRoot;
+
+                //If the actor public key is not registered any NS, I'll try to send the message from a random NS.
                 if(nsPublicKey==null){
-                    throw new CannotRespondMessageException("The Network Service public key is not registered");
+                    //throw new CannotRespondMessageException("The Network Service public key is not registered");
+                    networkServicePluginRoot = getRandomChatNs();
+                } else {
+                    networkServicePluginRoot = nsPublicKeyMap.get(nsPublicKey);
                 }
-                ChatNetworkServicePluginRoot networkServicePluginRoot = nsPublicKeyMap.get(nsPublicKey);
+
                 String messageToSend = "StressAppActor responds you a "+generateRandomHexString();
                 System.out.println("*** StressAppActor is trying to respond "+messageToSend);
                 messagesCount.put(receiverPk, responds++);
@@ -310,12 +330,17 @@ public class StressAppActor implements MessageReceiver{
     }
 
     private void report(ReportType reportType){
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                summaryLabel.report(reportType);
-            }
-        });
+        if(summaryLabel!=null){
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    summaryLabel.report(reportType);
+                }
+            });
+        }
+        if(shellReporter!=null){
+            shellReporter.report(reportType);
+        }
     }
 
 }
