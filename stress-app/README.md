@@ -21,4 +21,10 @@ Cada vez que se ejecuta un build de gradle, este genera un archivo .jar el cual 
 -a o --actors para indicar la cantidad de actores (usuarios) que se van a crear para emular el proceso de envío y recepción de mensajes.
 -i o --ip para indicar la dirección IP del nodo al cual se requiere hacer la prueba de stress```
 
+Por ejemplo:
+
+```java -jar stress_app.jar -d 5 -n 10 -a 8 -ip 192.168.100.100```
+
+Indica que se solicita realizar una prueba con 5 clientes, iniciando 10 Network Services cada uno y estos, a su vez, creando y registrando 8 actores. Todos estos elementos apuntarán apuntando a la dirección IP 162.168.100.100
+
 En caso de no suministrar algún argumento o que exista un error en alguno de estos no hay problema, la app seleccionará un valor por defecto para realizar la prueba.
